@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v2.8</title>
+    <title>Core-Learning v2.9</title>
     <style>
         :root {
-            /* Core Theme v2.8 - Pro Grey UI */
-            --bg-app: #000000;       /* Tiefschwarz */
-            --bg-card: #111111;      /* Sehr dunkles Grau */
-            --input-bg: #1a1a1a;     /* Dunkles Anthrazit */
-            --border: #333333;       /* Dezente Linien */
-            --text-main: #ffffff;    /* Weiß für Haupttext */
-            --text-muted: #999999;   /* Hellgrau für Nebentext */
-            --primary: #aaaaaa;      /* Silber-Grau als Akzent */
+            /* Core Theme v2.9 - Pro Grey UI & Strict Grid */
+            --bg-app: #000000;
+            --bg-card: #111111;
+            --input-bg: #1a1a1a;
+            --border: #333333;
+            --text-main: #ffffff;
+            --text-muted: #999999;
+            --primary: #aaaaaa;
             --primary-glow: rgba(255, 255, 255, 0.1);
             
             --success-bg: #0a140a;
             --success-text: #aaccaa;
             --error-bg: #1a0505;
             --error-text: #ccaaaa;
-            --star-color: #eab308; /* Sternfarbe bleibt */
+            --star-color: #eab308;
             --fire-color: #ffcc99;
         }
 
@@ -39,34 +39,17 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- ANIMATIONS --- */
         .fade-in { animation: fadeIn 0.3s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- HEADER --- */
-        #app-header {
-            text-align: center;
-            margin-bottom: 25px;
-            cursor: pointer;
-            user-select: none;
-        }
-
+        #app-header { text-align: center; margin-bottom: 25px; cursor: pointer; user-select: none; }
         #app-header h1 {
-            font-size: 1.6rem;
-            letter-spacing: 2px;
-            color: var(--text-main);
-            margin: 0;
-            text-transform: none;
-            font-weight: normal;
-            text-shadow: 0 0 10px var(--primary-glow);
+            font-size: 1.6rem; letter-spacing: 2px; color: var(--text-main);
+            margin: 0; font-weight: normal; text-shadow: 0 0 10px var(--primary-glow);
         }
-        
         .fat-spot { font-weight: 800; text-transform: uppercase; }
-
-        .subtitle {
-            font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;
-            letter-spacing: 1.5px; margin-top: 5px; font-weight: 600;
-        }
+        .subtitle { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 5px; font-weight: 600; }
 
         /* --- CONTAINER --- */
         .container {
@@ -84,10 +67,8 @@
             font-size: 15px; box-sizing: border-box; transition: all 0.2s;
             font-family: inherit;
         }
-        
         textarea { resize: vertical; min-height: 40px; line-height: 1.4; white-space: pre-wrap; }
         #input-note { min-height: 70px; }
-
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--text-muted); background-color: #000000; }
 
         button {
@@ -97,17 +78,13 @@
         }
         button:active { transform: scale(0.98); }
         button:hover { background: #ffffff; }
-
         button.secondary { background-color: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); }
         button.secondary:hover { background-color: #2a2a2a; color: #ffffff; }
-        
-        button.danger { background-color: transparent; border: 1px solid #552222; color: #cc8888; margin-top: 10px; font-weight: 600; }
+        button.danger { background-color: transparent; border: 1px solid #552222; color: #cc8888; margin-top: 0; font-weight: 600; }
         button.danger:hover { background-color: #330000; border-color: #880000; color: #ffaaaa;}
-        
         button.outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-muted); font-weight: 600; }
         button.outline:hover { background-color: var(--input-bg); color: #ffffff; border-color: #aaaaaa; }
         
-        /* Stats */
         .stats-row { display: flex; gap: 8px; margin-bottom: 15px; }
         .stat-card {
             flex: 1; background: var(--input-bg); padding: 10px; border-radius: 6px;
@@ -116,7 +93,6 @@
         .stat-val { font-size: 1.3rem; font-weight: 800; display: block; }
         .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Circle Button */
         .list-btn-circle {
             width: 55px; height: 55px; border-radius: 50%;
             background: var(--input-bg); color: var(--text-main);
@@ -135,72 +111,79 @@
             border: 1px solid var(--border);
         }
         .btn-icon:hover { color: #ffffff; border-color: #666666; background: #2a2a2a;}
-
         .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.3); }
         .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: #f97316; } 
-        
         .btn-edit { color: #99ccff; background: rgba(100, 150, 255, 0.1); border-color: #5577aa; }
         .btn-delete-small { background: rgba(239, 68, 68, 0.05); color: #cc6666; border-color: #883333;}
 
-        /* --- SICHERES KOMPAKTES KARTEN LAYOUT v2.8 --- */
+        /* --- STRIKTE SPALTEN STRUKTUR v2.9 --- */
         .vocab-item {
             border: 1px solid var(--border); 
-            padding: 12px 15px;
-            margin-bottom: 8px; /* Weniger Abstand */
+            padding: 15px 15px 10px 15px;
+            margin-bottom: 8px;
             display: flex; 
             flex-direction: column; 
             border-radius: 8px;
             background: var(--input-bg);
             transition: opacity 0.3s, border-color 0.2s;
-            min-height: 50px; height: auto;
         }
         .vocab-item.paused { opacity: 0.3; }
         .vocab-item:hover { border-color: #666666; }
         
-        /* Grid Layout für felsenfesten Stand */
-        .vocab-card-grid {
-            display: grid;
-            grid-template-columns: 1fr 30px 1fr; 
-            gap: 10px;
-            align-items: start; /* Wichtig: Oben bündig */
+        /* Der Wrapper für die beiden Spalten */
+        .vocab-columns-wrapper {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start; /* Oben bündig wichtig! */
             width: 100%;
+            gap: 15px; /* Abstand zwischen den Spalten */
         }
 
-        .vocab-word {
-            font-size: 0.92rem; 
-            font-weight: 500; 
-            white-space: pre-wrap; 
-            line-height: 1.3; 
-            color: var(--text-main);
-            text-align: left;
+        /* Die beiden Spalten als eigene Textfelder */
+        .vocab-col {
+            flex: 1; /* Beide bekommen exakt gleich viel Platz (50% minus gap) */
+            width: 0; /* Wichtig für flexbox text wrap */
             word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        .vocab-arrow {
-            color: var(--text-muted);
-            font-size: 1rem;
+        .vocab-col.left {
+            text-align: left;
+            color: var(--text-main);
+            font-weight: 500;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+
+        .vocab-col.center {
+            flex: 0 0 20px; /* Pfeil bekommt festen Platz */
             text-align: center;
-            opacity: 0.5;
-            padding-top: 2px; 
+            color: var(--text-muted);
+            padding-top: 3px; /* Optische Korrektur */
+            opacity: 0.6;
         }
 
-        .vocab-translation {
+        .vocab-col.right {
             text-align: right;
             color: var(--text-main);
             font-weight: 600;
-            font-size: 0.92rem;
-            line-height: 1.3;
-            word-wrap: break-word;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
         }
 
-        .vocab-note { 
-            color: var(--text-muted); 
-            font-size: 0.78rem; 
-            margin-top: 8px; 
-            white-space: pre-wrap; 
+        /* Notizbereich unten */
+        .vocab-note-area {
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px solid #2a2a2a;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            white-space: pre-wrap;
             line-height: 1.4;
-            border-top: 1px solid #222222;
-            padding-top: 6px;
+            text-align: left;
         }
 
         .vocab-actions-wrapper {
@@ -211,16 +194,14 @@
             gap: 5px;
         }
 
-        /* Verwaltungsleiste ganz oben */
+        /* Management Bar */
         .management-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            border-top: 1px solid var(--border);
-            padding-top: 10px;
+            display: flex; gap: 8px; margin-bottom: 15px;
+            border-top: 1px solid var(--border); padding-top: 10px;
         }
         .management-bar button, .management-bar label {
-            margin: 0; flex: 1; padding: 8px; font-size: 12px;
+            margin: 0; flex: 1; padding: 10px 5px; font-size: 11px;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .badge { font-size: 9px; padding: 1px 5px; border-radius: 3px; margin-right: 4px; text-transform: uppercase; font-weight: bold; display: inline-block; vertical-align: middle; }
@@ -229,7 +210,6 @@
 
         .hidden { display: none !important; }
         
-        /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9); z-index: 200;
@@ -241,7 +221,6 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
         }
 
-        /* Project Card */
         .project-card {
             background: var(--input-bg); padding: 12px 15px; border-radius: 8px;
             margin-bottom: 8px; display: flex; justify-content: space-between;
@@ -276,7 +255,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v2.8 | Pro Grey UI</div>
+        <div class="subtitle">v2.9 | Pro Grey UI</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -320,7 +299,7 @@
         <div class="management-bar">
             <button class="outline" onclick="exportData()">⬇️ Backup</button>
             <label class="file-upload">
-                📊 CSV Import
+                📊 Import
                 <input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)">
             </label>
             <button class="danger" onclick="clearCurrentProjectData()">Leeren</button>
@@ -392,7 +371,7 @@
         }
 
         function save() { localStorage.setItem('core_l_data_v2', JSON.stringify(appData)); }
-        function checkStreakLogic() { /*preserved*/ }
+        function checkStreakLogic() { /* Logic */ }
         function updateStreak() {
             const today = new Date().toISOString().split('T')[0];
             if (appData.lastPracticeDate !== today) {
@@ -403,9 +382,10 @@
             }
         }
 
+        // --- IMPORTANT: TRIM CLEANER ---
         function cleanString(str) {
             if(!str) return "";
-            return str.toLowerCase().replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ä/g, 'ae').replace(/ö/g, 'o').replace(/ß/g, 'ss').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/İ/g, 'i').trim();
+            return str.toLowerCase().trim().replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ä/g, 'ae').replace(/ö/g, 'o').replace(/ß/g, 'ss').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/İ/g, 'i');
         }
 
         // --- NAVIGATION ---
@@ -460,10 +440,14 @@
         }
         function deleteProject(index) { if(confirm("Projekt löschen?")) { appData.projects.splice(index, 1); save(); renderProjectList(); } }
 
-        // --- LIST RENDER v2.8 (FELSENFEST GRID) ---
+        // --- LIST RENDER v2.9 (STRICT COLUMNS) ---
         function getCurrentList() { return appData.projects[appData.activeProjectId].words; }
+        
         function addVocab() {
-            const de = document.getElementById('input-de').value.trim(); const lang = document.getElementById('input-lang').value.trim(); const note = document.getElementById('input-note').value.trim();
+            // Trim inputs immediately
+            const de = document.getElementById('input-de').value.trim(); 
+            const lang = document.getElementById('input-lang').value.trim(); 
+            const note = document.getElementById('input-note').value.trim();
             if (!de || !lang) { alert("Bitte ausfüllen."); return; }
             getCurrentList().push({ de, lang, note, active: true, priority: false, successCount: 0 });
             save(); document.getElementById('input-de').value = ''; document.getElementById('input-lang').value = ''; document.getElementById('input-note').value = ''; 
@@ -478,18 +462,20 @@
             
             filteredIndices.forEach(({ item: v, idx: realIndex }) => {
                 const div = document.createElement('div'); div.className = `vocab-item fade-in ${!v.active ? 'paused' : ''}`;
-                // v2.8 SMART GRID LAYOUT
+                // v2.9 STRICT COLUMN LAYOUT
                 div.innerHTML = `
-                    <div class="vocab-card-grid">
-                        <div class="vocab-word">
+                    <div class="vocab-columns-wrapper">
+                        <div class="vocab-col left">
                             ${v.priority ? '<span class="badge badge-priority">!</span>' : ''}
                             ${!v.active ? '<span class="badge badge-paused">⏸</span>' : ''}
                             ${v.de}
                         </div>
-                        <div class="vocab-arrow">➜</div>
-                        <div class="vocab-translation">${v.lang}</div>
+                        <div class="vocab-col center">➜</div>
+                        <div class="vocab-col right">${v.lang}</div>
                     </div>
-                    ${v.note ? `<div class="vocab-note">${v.note}</div>` : ''}
+                    
+                    ${v.note ? `<div class="vocab-note-area">💡 ${v.note}</div>` : ''}
+                    
                     <div class="vocab-actions-wrapper">
                         <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})" title="Bearbeiten">✎</button>
                         <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})" title="Priorität">★</button>
@@ -507,14 +493,15 @@
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
         function saveEdit() {
             const index = document.getElementById('edit-index').value; const list = getCurrentList();
-            list[index].de = document.getElementById('edit-de').value.trim(); list[index].lang = document.getElementById('edit-lang').value.trim(); list[index].note = document.getElementById('edit-note').value.trim();
+            list[index].de = document.getElementById('edit-de').value.trim(); 
+            list[index].lang = document.getElementById('edit-lang').value.trim(); 
+            list[index].note = document.getElementById('edit-note').value.trim();
             save(); closeEditModal(); renderList();
         }
         function togglePriority(index) { const list = getCurrentList(); list[index].priority = !list[index].priority; save(); renderList(); }
         function toggleActive(index) { const list = getCurrentList(); list[index].active = !list[index].active; if (!list[index].active) cooldownQueue = cooldownQueue.filter(i => i !== index); save(); renderList(); }
         function deleteVocab(index) { if(confirm("Eintrag löschen?")) { getCurrentList().splice(index, 1); cooldownQueue = []; save(); renderList(); updateDashboardStats(); } }
         
-        // --- KORREKTE ABFRAGE BEIM LEEREN ---
         function clearCurrentProjectData() { 
             if(confirm("Wirklich ALLE Vokabeln in diesem Projekt unwiderruflich löschen?")) { 
                 appData.projects[appData.activeProjectId].words = []; cooldownQueue = []; save(); renderList(); updateDashboardStats(); 
@@ -544,7 +531,12 @@
                 rows.forEach(parts => {
                     if(parts.length >= 2) {
                         const de = parts[0]; const lang = parts[1]; const note = parts.length >= 3 ? parts[2] : '';
-                        if(de && lang) { if (!list.some(w => w.de === de && w.lang === lang)) { list.push({ de, lang, note, active: true, priority: false, successCount: 0 }); added++; } else { skipped++; } }
+                        if(de && lang) { 
+                            if (!list.some(w => w.de === de && w.lang === lang)) { 
+                                // AUTO TRIM HERE
+                                list.push({ de: de.trim(), lang: lang.trim(), note: note.trim(), active: true, priority: false, successCount: 0 }); added++; 
+                            } else { skipped++; } 
+                        }
                     }
                 }); save(); renderList(); updateDashboardStats(); alert(`Import: ${added} neu, ${skipped} Duplikate.`); elem.value = '';
             }; reader.readAsText(file, 'UTF-8');
