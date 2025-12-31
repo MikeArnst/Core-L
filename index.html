@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-L</title>
+    <title>Core-L v2</title>
     <style>
         :root {
-            /* Modern Dark Palette - Core Theme */
+            /* Modern Dark Palette - Core Theme v2 */
             --bg-app: #0f172a;       
             --bg-card: #1e293b;      
             --primary: #3b82f6;      
@@ -14,13 +14,11 @@
             --text-muted: #94a3b8;   
             --input-bg: #334155;     
             --border: #475569;
-            
             --success-bg: #064e3b;
             --success-text: #34d399;
             --error-bg: #450a0a;
             --error-text: #f87171;
-            
-            --star-color: #eab308; /* Gold für Fokus */
+            --star-color: #eab308; 
         }
 
         body {
@@ -38,105 +36,57 @@
         }
 
         h1 {
-            font-size: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--text-main); /* Helles Weiß für den Core-L Look */
-            margin-bottom: 5px;
-            font-weight: 800;
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.3); /* Leichter Glow */
+            font-size: 1.5rem; text-transform: uppercase; letter-spacing: 3px;
+            color: var(--text-main); margin-bottom: 5px; font-weight: 800;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+            cursor: pointer;
         }
         
         .subtitle {
-            font-size: 0.8rem;
-            color: var(--primary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 25px;
-            font-weight: 600;
+            font-size: 0.8rem; color: var(--primary); text-transform: uppercase;
+            letter-spacing: 1px; margin-bottom: 25px; font-weight: 600;
         }
 
         .container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--bg-card);
-            padding: 25px;
-            border-radius: 16px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-            box-sizing: border-box;
-            border: 1px solid var(--border);
+            width: 100%; max-width: 500px; background: var(--bg-card);
+            padding: 25px; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px; box-sizing: border-box; border: 1px solid var(--border);
         }
 
         h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.1rem; font-weight: 600; }
 
-        input {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 12px;
-            background-color: var(--input-bg);
-            border: 1px solid transparent;
-            border-radius: 10px;
-            color: white;
-            font-size: 16px;
-            box-sizing: border-box;
-            transition: all 0.2s;
+        input, select {
+            width: 100%; padding: 14px; margin-bottom: 12px; background-color: var(--input-bg);
+            border: 1px solid transparent; border-radius: 10px; color: white;
+            font-size: 16px; box-sizing: border-box; transition: all 0.2s;
         }
-        input:focus { outline: none; border-color: var(--primary); background-color: #1e293b; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background-color: #1e293b; }
 
         button {
-            width: 100%;
-            padding: 14px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 10px;
-            transition: transform 0.1s;
+            width: 100%; padding: 14px; background-color: var(--primary);
+            color: white; border: none; border-radius: 10px; font-size: 16px;
+            font-weight: 600; cursor: pointer; margin-bottom: 10px; transition: transform 0.1s;
         }
         button:active { transform: scale(0.98); }
         button.secondary { background-color: var(--input-bg); color: var(--text-muted); }
         button.danger { background-color: transparent; border: 1px solid #ef4444; color: #ef4444; margin-top: 15px; }
         button.outline { background-color: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        button.csv-btn { background-color: transparent; border: 1px dashed var(--text-muted); color: var(--text-muted); }
 
-        /* Icon Buttons in Liste */
-        .action-row {
-            display: flex;
-            gap: 8px;
-            margin-left: 10px;
-        }
+        .action-row { display: flex; gap: 8px; margin-left: 10px; }
         .btn-icon {
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            margin: 0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            background: var(--input-bg);
-            color: var(--text-muted);
+            width: 36px; height: 36px; padding: 0; margin: 0; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; background: var(--input-bg); color: var(--text-muted);
         }
         .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.3); }
         .btn-icon.active-pause { color: var(--text-muted); opacity: 0.5; } 
         .btn-icon.is-paused { color: #f97316; border: 1px solid #f97316; } 
-        
-        .btn-delete-small {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-        }
+        .btn-delete-small { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
 
         .vocab-item {
-            border-bottom: 1px solid var(--border);
-            padding: 15px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: opacity 0.3s;
+            border-bottom: 1px solid var(--border); padding: 15px 0;
+            display: flex; justify-content: space-between; align-items: center; transition: opacity 0.3s;
         }
         .vocab-item.paused { opacity: 0.5; }
         .vocab-item:last-child { border-bottom: none; }
@@ -144,20 +94,24 @@
         .vocab-text { font-size: 15px; font-weight: 500; }
         .vocab-note { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
 
+        .project-card {
+            background: var(--input-bg); padding: 15px; border-radius: 10px;
+            margin-bottom: 10px; display: flex; justify-content: space-between;
+            align-items: center; cursor: pointer; border: 1px solid transparent;
+        }
+        .project-card:hover { border-color: var(--primary); }
+        .project-name { font-weight: bold; font-size: 1.1rem; }
+        .project-count { color: var(--text-muted); font-size: 0.9rem; }
+
         .badge {
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-right: 5px;
-            text-transform: uppercase;
-            font-weight: bold;
-            display: inline-block;
-            vertical-align: middle;
+            font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 5px;
+            text-transform: uppercase; font-weight: bold; display: inline-block; vertical-align: middle;
         }
         .badge-priority { background: var(--star-color); color: #000; }
         .badge-paused { background: var(--text-muted); color: #000; }
 
-        .hidden { display: none; }
+        .hidden { display: none !important; }
+        
         #question-display { font-size: 1.5rem; text-align: center; margin: 20px 0; font-weight: 800; color: white; }
         #feedback-area { margin-top: 20px; padding: 15px; border-radius: 12px; text-align: center; }
         .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-bg); }
@@ -181,37 +135,55 @@
 </head>
 <body>
 
-    <h1>Core-L</h1>
-    <div class="subtitle">Core Learning System</div>
+    <h1 onclick="showProjects()">Core-L</h1>
+    <div class="subtitle" id="header-subtitle">Projects</div>
 
-    <div id="view-list" class="container">
-        <h3>Neues Wort</h3>
+    <div id="view-projects" class="container">
+        <h3>Deine Projekte</h3>
+        <div id="project-list-container"></div>
+        
+        <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <input type="text" id="new-project-name" placeholder="Neues Projekt (z.B. Türkisch)">
+            <button class="outline" onclick="createNewProject()">+ Projekt erstellen</button>
+        </div>
+    </div>
+
+    <div id="view-list" class="container hidden">
+        <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px;">← Zurück zu Projekten</button>
+        
+        <h3>Wort hinzufügen</h3>
         <input type="text" id="input-de" placeholder="🇩🇪 Deutsch">
         <input type="text" id="input-lang" placeholder="🌍 Fremdsprache">
         <input type="text" id="input-note" placeholder="💡 Notiz / Info">
         <button onclick="addVocab()">Hinzufügen</button>
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; margin-bottom:10px;">
-            <h3>Deine Liste</h3>
+            <h3>Inhalt</h3>
             <span style="background:var(--input-bg); padding:2px 8px; border-radius:6px; font-size:12px; color:var(--text-muted);">
                 <span id="count">0</span> Wörter
             </span>
         </div>
         
         <div id="vocab-list-container"></div>
-        <button class="danger" onclick="clearAllData()">Alles löschen</button>
+        <button class="danger" onclick="clearCurrentProjectData()">Liste leeren</button>
 
         <hr>
-        <button class="outline" onclick="exportData()">⬇️ Datenbank speichern</button>
-        <label class="file-upload">
-            ⬆️ Datenbank laden
-            <input type="file" id="file-input" style="display: none;" onchange="importData(this)">
+        <h3 style="font-size:0.9rem; text-transform:uppercase; color:var(--text-muted);">Import / Export</h3>
+        
+        <button class="outline" onclick="exportData()">⬇️ Projekt sichern (.json)</button>
+        
+        <label class="file-upload" style="border-color: #3b82f6; margin-top:10px;">
+            📊 Excel / CSV Importieren
+            <input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)">
         </label>
+        <p style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:5px;">
+            Duplikate werden automatisch übersprungen.<br>Format: Spalte A (DE), B (Fremd), C (Info)
+        </p>
     </div>
 
     <div id="view-test" class="container hidden">
         <div style="display:flex; justify-content:space-between; color:var(--text-muted); font-size:0.9rem;">
-            <span>Training</span>
+            <span id="test-project-name">Training</span>
             <span id="test-direction">Zufall</span>
         </div>
         
@@ -234,67 +206,141 @@
         </div>
     </div>
 
-    <div class="nav-bar">
+    <div class="nav-bar hidden" id="main-nav">
         <button class="nav-btn active" onclick="switchTab('list')" id="nav-list">DATABASE</button>
         <button class="nav-btn" onclick="switchTab('test')" id="nav-test">LEARN</button>
     </div>
 
     <script>
-        // --- CORE-L SYSTEM LOGIC ---
-        
-        let vocabList = JSON.parse(localStorage.getItem('myVocabApp_v1')) || [];
+        // --- DATA STRUCTURE V2 ---
+        // data = {
+        //    activeProjectId: 0,
+        //    projects: [ { name: "Default", words: [...] }, { name: "Turkish", words: [...] } ]
+        // }
+
+        let appData = { activeProjectId: 0, projects: [] };
         let cooldownQueue = []; 
         let currentQuestionIndex = null;
         let direction = 0; 
 
-        // Migration Check
-        vocabList.forEach(v => {
-            if(v.active === undefined) v.active = true;
-            if(v.priority === undefined) v.priority = false;
-        });
+        // --- INIT & MIGRATION ---
+        loadData();
 
-        renderList();
+        function loadData() {
+            // Check for V2 Data
+            const v2Data = localStorage.getItem('core_l_data_v2');
+            
+            if (v2Data) {
+                appData = JSON.parse(v2Data);
+            } else {
+                // Try Migration from V1
+                const v1List = JSON.parse(localStorage.getItem('myVocabApp_v1'));
+                if (v1List && v1List.length > 0) {
+                    alert("Alte Daten gefunden! Migriere zu Version 2.0...");
+                    // Ensure V1 format is clean
+                    v1List.forEach(v => {
+                        if(v.active === undefined) v.active = true;
+                        if(v.priority === undefined) v.priority = false;
+                    });
+                    appData.projects.push({ name: "Mein erstes Projekt", words: v1List });
+                    save();
+                } else {
+                    // Start fresh
+                    appData.projects.push({ name: "Mein erstes Projekt", words: [] });
+                }
+            }
+            showProjects();
+        }
 
         function save() {
-            localStorage.setItem('myVocabApp_v1', JSON.stringify(vocabList));
-            renderList();
+            localStorage.setItem('core_l_data_v2', JSON.stringify(appData));
         }
 
-        // --- EXPORT / IMPORT ---
-        function exportData() {
-            if(vocabList.length === 0) { alert("Datenbank leer."); return; }
-            const blob = new Blob([JSON.stringify(vocabList)], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = "core-l-backup.json";
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        // --- HELPER: NORMALIZER (Fuzzy Logic) ---
+        function cleanString(str) {
+            if(!str) return "";
+            return str.toLowerCase()
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ä/g, 'ae') // Optional: ae für ä
+                .replace(/ö/g, 'o')
+                .replace(/ß/g, 'ss')
+                .replace(/ş/g, 's')
+                .replace(/ç/g, 'c')
+                .replace(/ı/g, 'i') // Dotless i to i
+                .replace(/İ/g, 'i') 
+                .trim();
         }
 
-        function importData(elem) {
-            const file = elem.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (Array.isArray(data)) {
-                        if(confirm("Datenbank überschreiben?")) {
-                            vocabList = data;
-                            vocabList.forEach(v => {
-                                if(v.active === undefined) v.active = true;
-                                if(v.priority === undefined) v.priority = false;
-                            });
-                            save();
-                            alert("Daten erfolgreich geladen.");
-                        }
-                    }
-                } catch (err) { alert("Fehler beim Lesen der Datei."); }
-                elem.value = '';
-            };
-            reader.readAsText(file);
+        // --- PROJECT MANAGEMENT ---
+        function showProjects() {
+            document.getElementById('view-projects').classList.remove('hidden');
+            document.getElementById('view-list').classList.add('hidden');
+            document.getElementById('view-test').classList.add('hidden');
+            document.getElementById('main-nav').classList.add('hidden');
+            document.getElementById('header-subtitle').innerText = "Projects";
+
+            const container = document.getElementById('project-list-container');
+            container.innerHTML = '';
+
+            appData.projects.forEach((proj, index) => {
+                const div = document.createElement('div');
+                div.className = 'project-card';
+                div.onclick = () => openProject(index);
+                div.innerHTML = `
+                    <span class="project-name">📂 ${proj.name}</span>
+                    <span class="project-count">${proj.words.length} Wörter</span>
+                `;
+                
+                // Add Delete Button for Project (Stop Propagation to prevent open)
+                if (appData.projects.length > 1) {
+                    const delBtn = document.createElement('button');
+                    delBtn.innerText = "✕";
+                    delBtn.className = "btn-delete-small";
+                    delBtn.style.width = "30px";
+                    delBtn.style.marginLeft = "10px";
+                    delBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteProject(index);
+                    };
+                    div.appendChild(delBtn);
+                }
+                
+                container.appendChild(div);
+            });
         }
 
-        // --- CORE FUNCTIONS ---
+        function createNewProject() {
+            const name = document.getElementById('new-project-name').value.trim();
+            if (!name) return;
+            appData.projects.push({ name: name, words: [] });
+            document.getElementById('new-project-name').value = '';
+            save();
+            showProjects();
+        }
+
+        function deleteProject(index) {
+            if(confirm(`Projekt "${appData.projects[index].name}" wirklich löschen?`)) {
+                appData.projects.splice(index, 1);
+                save();
+                showProjects();
+            }
+        }
+
+        function openProject(index) {
+            appData.activeProjectId = index;
+            // Reset Cooldown when switching projects
+            cooldownQueue = [];
+            switchTab('list');
+            document.getElementById('main-nav').classList.remove('hidden');
+            document.getElementById('header-subtitle').innerText = appData.projects[index].name;
+        }
+
+        function getCurrentList() {
+            return appData.projects[appData.activeProjectId].words;
+        }
+
+        // --- LIST FUNCTIONS ---
         function addVocab() {
             const de = document.getElementById('input-de').value.trim();
             const lang = document.getElementById('input-lang').value.trim();
@@ -302,57 +348,33 @@
 
             if (!de || !lang) { alert("Bitte Eingabefelder füllen."); return; }
             
-            vocabList.push({ de, lang, note, active: true, priority: false });
+            getCurrentList().push({ de, lang, note, active: true, priority: false });
             save();
 
             document.getElementById('input-de').value = '';
             document.getElementById('input-lang').value = '';
             document.getElementById('input-note').value = '';
-        }
-
-        function togglePriority(index) {
-            vocabList[index].priority = !vocabList[index].priority;
-            save();
-        }
-
-        function toggleActive(index) {
-            vocabList[index].active = !vocabList[index].active;
-            if (!vocabList[index].active) {
-                cooldownQueue = cooldownQueue.filter(i => i !== index);
-            }
-            save();
-        }
-
-        function deleteVocab(index) {
-            if(confirm("Eintrag löschen?")) {
-                vocabList.splice(index, 1);
-                cooldownQueue = []; 
-                save();
-            }
-        }
-
-        function clearAllData() {
-            if(confirm("Gesamte Datenbank löschen?")) {
-                localStorage.removeItem('myVocabApp_v1');
-                vocabList = []; cooldownQueue = [];
-                renderList();
-            }
+            renderList();
         }
 
         function renderList() {
+            const list = getCurrentList();
             const container = document.getElementById('vocab-list-container');
-            document.getElementById('count').innerText = vocabList.length;
+            document.getElementById('count').innerText = list.length;
             container.innerHTML = '';
 
-            if (vocabList.length === 0) {
-                container.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">Keine Einträge.</p>';
+            if (list.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">Liste leer.</p>';
                 return;
             }
 
-            vocabList.forEach((v, index) => {
+            // Show newest first
+            [...list].reverse().forEach((v, reverseIndex) => {
+                // Calculate real index because of reverse
+                const realIndex = list.length - 1 - reverseIndex;
+                
                 const div = document.createElement('div');
                 div.className = `vocab-item ${!v.active ? 'paused' : ''}`;
-                
                 div.innerHTML = `
                     <div style="flex:1; overflow:hidden;">
                         <div class="vocab-text">
@@ -362,29 +384,119 @@
                         </div>
                         ${v.note ? `<div class="vocab-note">${v.note}</div>` : ''}
                     </div>
-                    
                     <div class="action-row">
-                        <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${index})">
-                            ★
-                        </button>
-                        <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${index})">
-                            ${v.active ? '⏸' : '▶'}
-                        </button>
-                        <button class="btn-icon btn-delete-small" onclick="deleteVocab(${index})">✕</button>
+                        <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})">★</button>
+                        <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${realIndex})">${v.active ? '⏸' : '▶'}</button>
+                        <button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})">✕</button>
                     </div>
                 `;
                 container.appendChild(div);
             });
         }
 
+        function togglePriority(index) {
+            const list = getCurrentList();
+            list[index].priority = !list[index].priority;
+            save();
+            renderList();
+        }
+
+        function toggleActive(index) {
+            const list = getCurrentList();
+            list[index].active = !list[index].active;
+            if (!list[index].active) cooldownQueue = cooldownQueue.filter(i => i !== index);
+            save();
+            renderList();
+        }
+
+        function deleteVocab(index) {
+            if(confirm("Eintrag löschen?")) {
+                getCurrentList().splice(index, 1);
+                cooldownQueue = []; 
+                save();
+                renderList();
+            }
+        }
+
+        function clearCurrentProjectData() {
+            if(confirm("Alle Wörter in DIESEM Projekt löschen?")) {
+                appData.projects[appData.activeProjectId].words = [];
+                cooldownQueue = [];
+                save();
+                renderList();
+            }
+        }
+
+        // --- IMPORT / EXPORT ---
+        function exportData() {
+            const currentProj = appData.projects[appData.activeProjectId];
+            if(currentProj.words.length === 0) { alert("Nichts zu speichern."); return; }
+            
+            // Export ONLY current project words
+            const blob = new Blob([JSON.stringify(currentProj.words)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = `${cleanString(currentProj.name)}_backup.json`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function importCSV(elem) {
+            const file = elem.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n');
+                let addedCount = 0;
+                let skippedCount = 0;
+                
+                const list = getCurrentList();
+                let separator = lines[0] && lines[0].includes(';') ? ';' : ',';
+
+                lines.forEach(line => {
+                    const cleanLine = line.trim();
+                    if(cleanLine.length > 0) {
+                        const parts = cleanLine.split(separator);
+                        if(parts.length >= 2) {
+                            const de = parts[0].replace(/^"|"$/g, '').trim();
+                            const lang = parts[1].replace(/^"|"$/g, '').trim();
+                            let note = parts.length >= 3 ? parts[2].replace(/^"|"$/g, '').trim() : '';
+
+                            if(de && lang) {
+                                // DUPLICATE CHECK
+                                const exists = list.some(w => w.de === de && w.lang === lang);
+                                
+                                if (!exists) {
+                                    list.push({ de, lang, note, active: true, priority: false });
+                                    addedCount++;
+                                } else {
+                                    skippedCount++;
+                                }
+                            }
+                        }
+                    }
+                });
+
+                save();
+                renderList();
+                alert(`Import fertig:\n✅ ${addedCount} neu hinzugefügt\n⏭️ ${skippedCount} Duplikate übersprungen`);
+                elem.value = '';
+            };
+            reader.readAsText(file, 'UTF-8'); 
+        }
+
         // --- TEST LOGIC ---
         function startTest() {
-            const activeWords = vocabList.filter(v => v.active);
+            const list = getCurrentList();
+            const activeWords = list.filter(v => v.active);
+            
             if (activeWords.length === 0) {
-                alert("Keine aktiven Wörter. Bitte 'Entpausieren'.");
+                alert("Keine aktiven Wörter in diesem Projekt.");
                 switchTab('list');
                 return;
             }
+            document.getElementById('test-project-name').innerText = appData.projects[appData.activeProjectId].name;
             nextQuestion();
         }
 
@@ -395,29 +507,25 @@
             document.getElementById('notes-display').classList.add('hidden');
             document.getElementById('priority-indicator').style.visibility = 'hidden';
             
+            const list = getCurrentList();
             let selectionPool = [];
 
-            vocabList.forEach((word, index) => {
+            list.forEach((word, index) => {
                 if (!word.active) return;
                 if (cooldownQueue.includes(index)) return;
-
                 selectionPool.push(index);
-                if (word.priority) {
-                    selectionPool.push(index);
-                    selectionPool.push(index);
-                }
+                if (word.priority) { selectionPool.push(index); selectionPool.push(index); }
             });
 
             if (selectionPool.length === 0) {
-                vocabList.forEach((word, index) => {
+                // Fallback: ignore cooldown if pool is empty
+                list.forEach((word, index) => {
                     if (!word.active) return;
                     selectionPool.push(index);
-                    if (word.priority) {
-                        selectionPool.push(index);
-                        selectionPool.push(index);
-                    }
                 });
             }
+            
+            if (selectionPool.length === 0) return; // Safety
 
             const randomIndexInPool = Math.floor(Math.random() * selectionPool.length);
             currentQuestionIndex = selectionPool[randomIndexInPool];
@@ -426,7 +534,7 @@
             if (cooldownQueue.length > 5) cooldownQueue.shift();
 
             direction = Math.random() < 0.5 ? 0 : 1; 
-            const word = vocabList[currentQuestionIndex];
+            const word = list[currentQuestionIndex];
             
             if (word.priority) {
                 document.getElementById('priority-indicator').style.visibility = 'visible';
@@ -440,16 +548,22 @@
         }
 
         function checkAnswer() {
-            const input = document.getElementById('test-input').value.trim().toLowerCase();
-            const word = vocabList[currentQuestionIndex];
+            const input = document.getElementById('test-input').value.trim();
+            const list = getCurrentList();
+            const word = list[currentQuestionIndex];
             const correctSolution = direction === 0 ? word.lang : word.de;
             
-            const isCorrect = input === correctSolution.toLowerCase();
+            // SMART CHECK (Tolerant Input)
+            const inputClean = cleanString(input);
+            const solutionClean = cleanString(correctSolution);
+
+            const isCorrect = inputClean === solutionClean;
             showResult(isCorrect, correctSolution, word.note);
         }
 
         function solve() {
-            const word = vocabList[currentQuestionIndex];
+            const list = getCurrentList();
+            const word = list[currentQuestionIndex];
             const correctSolution = direction === 0 ? word.lang : word.de;
             showResult(false, correctSolution, word.note, true);
         }
@@ -465,6 +579,10 @@
             if (isCorrect) {
                 feedback.className = 'correct';
                 feedback.innerHTML = `<h3 style="margin:0">Korrekt!</h3>`;
+                // Show original formatting in case user typed "sag" but solution was "sağ"
+                if (cleanString(document.getElementById('test-input').value) !== solution && !wasSkipped) {
+                     feedback.innerHTML += `<p style="font-size:0.9rem; margin-top:5px;">Genau: <b>${solution}</b></p>`;
+                }
             } else {
                 feedback.className = 'wrong';
                 feedback.innerHTML = wasSkipped 
@@ -480,9 +598,12 @@
             }
         }
 
+        // --- NAVIGATION ---
         function switchTab(tab) {
             document.getElementById('view-list').classList.add('hidden');
             document.getElementById('view-test').classList.add('hidden');
+            document.getElementById('view-projects').classList.add('hidden');
+            
             document.getElementById('nav-list').classList.remove('active');
             document.getElementById('nav-test').classList.remove('active');
 
