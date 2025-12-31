@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v3.3</title>
+    <title>Core-Learning v4.1</title>
     <style>
         :root {
-            /* Core Theme v3.3 */
+            /* Core Theme v4.1 - Status Bars & Leitner Logic */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -22,6 +22,14 @@
             --error-text: #f87171;
             --star-color: #eab308;
             --fire-color: #fb923c;
+
+            /* Box Colors (Muted/Dark) */
+            --box-0: #262626; /* Dark Grey */
+            --box-1: #451a03; /* Dark Bronze */
+            --box-2: #5c2b0c; /* Bronze */
+            --box-3: #172554; /* Dark Blue */
+            --box-4: #1e1b4b; /* Deep Indigo */
+            --box-5: #422006; /* Dark Gold/Brownish */
         }
 
         body {
@@ -125,32 +133,61 @@
         .btn-edit { color: #60a5fa; }
         .btn-delete-small { color: #ef4444; }
 
-        /* --- VOKABEL KARTEN v3.3 --- */
+        /* --- VOKABEL KARTEN v4.1 (Mit Status-Leiste) --- */
         .vocab-item {
             border: 1px solid var(--border); 
-            padding: 16px;
-            margin-bottom: 10px;
+            padding: 0 0 16px 0; /* Oben 0 padding für die Leiste */
+            margin-bottom: 15px;
             display: flex; 
             flex-direction: column; 
             border-radius: 10px;
             background: #151515;
             transition: opacity 0.3s;
+            overflow: hidden; /* Damit die Leiste die Rundung übernimmt */
         }
         .vocab-item.paused { opacity: 0.4; }
         
-        /* Das Grid */
+        /* Die neue Status-Leiste */
+        .status-bar {
+            width: 100%;
+            height: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            box-sizing: border-box;
+            font-size: 9px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 12px;
+        }
+        /* Box Farben */
+        .box-0 { background: var(--box-0); }
+        .box-1 { background: var(--box-1); }
+        .box-2 { background: var(--box-2); }
+        .box-3 { background: var(--box-3); }
+        .box-4 { background: var(--box-4); }
+        .box-5 { background: var(--box-5); color: #fbbf24; }
+
+        .error-mark { color: var(--error-text); font-size: 10px; }
+
+        /* Padding für den Inhalt der Karte wiederherstellen */
+        .vocab-content-pad {
+            padding: 0 16px;
+        }
+
         .vocab-columns-wrapper {
             display: grid;
-            grid-template-columns: 1fr 20px 1fr; /* 20px für Pfeil */
+            grid-template-columns: 1fr 20px 1fr;
             gap: 12px;
-            align-items: start; /* Startet oben bündig */
+            align-items: start;
             width: 100%;
         }
 
         .vocab-col {
             word-wrap: break-word;
             overflow-wrap: break-word;
-            white-space: pre-wrap; /* Wichtig für Zeilenumbrüche */
+            white-space: pre-wrap; 
             font-size: 0.95rem;
             line-height: 1.5; 
             color: var(--text-main);
@@ -160,7 +197,6 @@
         .vocab-col.left { text-align: left; }
         .vocab-col.right { text-align: right; }
         
-        /* Der Pfeil */
         .vocab-col.center {
             text-align: center;
             color: var(--text-muted);
@@ -176,10 +212,10 @@
         }
 
         .vocab-actions-wrapper {
-            width: 100%; display: flex; justify-content: flex-end; margin-top: 10px; gap: 6px;
+            width: 100%; display: flex; justify-content: flex-end; margin-top: 10px; gap: 6px; padding: 0 16px;
         }
 
-        /* Management Bar (Oben) */
+        /* Management Bar */
         .management-bar {
             display: flex; gap: 8px; margin-bottom: 15px; margin-top: 15px;
             border-top: 1px solid var(--border); padding-top: 15px;
@@ -230,7 +266,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v3.3 | Clean Edition</div>
+        <div class="subtitle">v4.1 | Smart System</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -256,8 +292,8 @@
         </div>
         
         <h3>Neues Wort</h3>
-        <textarea id="input-de" rows="1" placeholder="🇩🇪 Deutsch (z.B. der Tisch)"></textarea>
-        <textarea id="input-lang" rows="1" placeholder="🌍 Fremdsprache (z.B. masa)"></textarea>
+        <textarea id="input-de" rows="1" placeholder="🇩🇪 Deutsch"></textarea>
+        <textarea id="input-lang" rows="1" placeholder="🌍 Fremdsprache"></textarea>
         <textarea id="input-note" rows="2" placeholder="💡 Notiz (Optional)"></textarea>
         <button onclick="addVocab()">Speichern</button>
         
@@ -312,9 +348,14 @@
         </div>
 
         <div id="question-area">
-            <p style="text-align:center; color:var(--text-muted); margin-top:10px; font-size: 0.85rem;">Übersetze:</p>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <p style="text-align:left; color:var(--text-muted); font-size: 0.85rem; margin:0;">Übersetze:</p>
+                <span id="level-indicator" style="font-size:0.7rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:var(--text-muted);">Box 0</span>
+            </div>
+            
             <div id="question-display">...</div>
             <div id="priority-indicator" style="text-align:center; margin-bottom:10px; font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
+            
             <input type="text" id="test-input" placeholder="Antwort..." autocomplete="off">
             <button onclick="checkAnswer()">Prüfen</button>
             <button class="secondary" onclick="solve()">Lösung</button>
@@ -328,7 +369,8 @@
     </div>
 
     <script>
-        // --- DATA ---
+        // --- DATA STRUCTURE v4.1 ---
+        // words structure: { de, lang, note, active, priority, box (0-5), lastWrong (bool) }
         let appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] };
         let cooldownQueue = []; let currentQuestionIndex = null; let direction = 0; 
 
@@ -341,50 +383,51 @@
                 else {
                     const v1List = JSON.parse(localStorage.getItem('myVocabApp_v1'));
                     if (v1List && v1List.length > 0) {
-                        v1List.forEach(v => { v.active = true; v.priority = false; v.successCount = 0; });
+                        v1List.forEach(v => { v.active = true; v.priority = false; v.box = 0; v.lastWrong = false; });
                         appData.projects.push({ name: "Migriert", words: v1List }); save();
-                    } else { appData.projects.push({ name: "Start Projekt", words: [] }); }
+                    } 
+                    // KEIN auto-create mehr hier, wenn leer. User muss selbst klicken.
                 }
+                
+                // MIGRATION / REPAIR
                 if (appData.streak === undefined) appData.streak = 0;
                 if (!appData.projects) appData.projects = [];
                 
-                // AUTO REPAIR ON START
-                repairAllData();
-                
+                repairAllData(); 
                 checkStreakLogic(); showProjects(); 
-            } catch(e) { appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [{ name: "Neu", words: [] }] }; save(); showProjects(); }
+            } catch(e) { 
+                // Fallback nur bei Crash
+                appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] }; 
+                save(); showProjects(); 
+            }
         }
 
-        // --- NEW: AUTO REPAIR FUNCTION ---
+        // --- DATA REPAIR & MIGRATION ---
         function repairAllData() {
             let changeMade = false;
             if(appData.projects) {
                 appData.projects.forEach(proj => {
                     if(proj.words) {
                         proj.words.forEach(word => {
-                            // Bereinige JEDES Wort automatisch beim Start
                             const cleanDe = cleanDisplay(word.de);
                             const cleanLang = cleanDisplay(word.lang);
                             const cleanNote = cleanDisplay(word.note);
-                            
                             if(word.de !== cleanDe || word.lang !== cleanLang || word.note !== cleanNote) {
-                                word.de = cleanDe;
-                                word.lang = cleanLang;
-                                word.note = cleanNote;
-                                changeMade = true;
+                                word.de = cleanDe; word.lang = cleanLang; word.note = cleanNote; changeMade = true;
                             }
+                            // Init v4.1 fields
+                            if(word.box === undefined) { word.box = 0; changeMade = true; }
+                            if(word.lastWrong === undefined) { word.lastWrong = false; changeMade = true; }
+                            // Remove obsolete
+                            if(word.successCount !== undefined) delete word.successCount; 
                         });
-                        // Leere Einträge entfernen
                         const beforeCount = proj.words.length;
                         proj.words = proj.words.filter(w => w.de || w.lang);
                         if(proj.words.length !== beforeCount) changeMade = true;
                     }
                 });
             }
-            if(changeMade) {
-                save();
-                console.log("Daten automatisch repariert.");
-            }
+            if(changeMade) save();
         }
 
         function save() { localStorage.setItem('core_l_data_v2', JSON.stringify(appData)); }
@@ -399,20 +442,13 @@
             }
         }
 
-        // --- DEEP CLEANER (Zeilenweise) ---
         function cleanString(str) {
             if(!str) return "";
-            return str.split('\n')
-                      .map(line => line.trim())
-                      .filter(line => line.length > 0)
-                      .join('\n')
-                      .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ä/g, 'ae').replace(/ö/g, 'o').replace(/ß/g, 'ss').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/İ/g, 'i')
-                      .toLowerCase();
+            return str.split('\n').map(line => line.trim()).filter(line => line.length > 0).join('\n')
+                      .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ä/g, 'ae').replace(/ö/g, 'o').replace(/ß/g, 'ss').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/İ/g, 'i').toLowerCase();
         }
-        
         function cleanDisplay(str) {
             if(!str) return "";
-            // Entfernt Leerzeichen am Anfang/Ende jeder Zeile und leere Zeilen
             return str.split('\n').map(l => l.trim()).filter(l => l.length > 0).join('\n');
         }
 
@@ -432,53 +468,58 @@
             document.getElementById('view-list-manager').classList.add('hidden'); document.getElementById('view-test').classList.add('hidden');
         }
         function showProjects() {
-            hideAllViews(); document.getElementById('view-projects').classList.remove('hidden');
-            renderProjectList();
+            hideAllViews(); document.getElementById('view-projects').classList.remove('hidden'); renderProjectList();
         }
         function openProject(index) {
-            appData.activeProjectId = index; cooldownQueue = [];
-            switchTab('dashboard');
+            appData.activeProjectId = index; cooldownQueue = []; switchTab('dashboard');
         }
         function updateDashboardStats() {
             const list = getCurrentList(); document.getElementById('streak-count').innerText = appData.streak;
             if(!list || list.length === 0) { document.getElementById('mastery-percent').innerText = "0"; return; }
-            const mastered = list.filter(w => (w.successCount || 0) > 2).length;
+            const mastered = list.filter(w => (w.box || 0) >= 4).length; // Mastery = Box 4+
             document.getElementById('mastery-percent').innerText = Math.round((mastered / list.length) * 100);
         }
 
         // --- PROJECT ---
         function renderProjectList() {
             const container = document.getElementById('project-list-container'); container.innerHTML = '';
-            if(!appData.projects) appData.projects = [];
+            
+            if(!appData.projects || appData.projects.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">Keine Projekte vorhanden.<br>Erstelle jetzt eins!</p>';
+                return;
+            }
+
             appData.projects.forEach((proj, index) => {
                 const div = document.createElement('div'); div.className = 'project-card'; div.onclick = () => openProject(index);
                 div.innerHTML = `<span class="project-name">📂 ${proj.name}</span><span class="project-count">${proj.words.length}</span>`;
-                if (appData.projects.length > 1) {
-                    const delBtn = document.createElement('button'); delBtn.innerText = "✕"; delBtn.className = "btn-icon btn-delete-small"; delBtn.style.width = "30px"; delBtn.style.marginLeft = "10px";
-                    delBtn.onclick = (e) => { e.stopPropagation(); deleteProject(index); }; div.appendChild(delBtn);
-                } container.appendChild(div);
+                // Immer Lösch-Button anzeigen
+                const delBtn = document.createElement('button'); delBtn.innerText = "✕"; delBtn.className = "btn-icon btn-delete-small"; delBtn.style.width = "30px"; delBtn.style.marginLeft = "10px";
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteProject(index); }; div.appendChild(delBtn);
+                container.appendChild(div);
             });
         }
         function createNewProject() {
             const name = document.getElementById('new-project-name').value.trim(); if (!name) return;
             appData.projects.push({ name: name, words: [] }); document.getElementById('new-project-name').value = ''; save(); renderProjectList();
         }
-        function deleteProject(index) { if(confirm("Projekt löschen?")) { appData.projects.splice(index, 1); save(); renderProjectList(); } }
+        function deleteProject(index) { 
+            if(confirm("Projekt löschen? Alle Daten darin gehen verloren.")) { 
+                appData.projects.splice(index, 1); save(); renderProjectList(); 
+            } 
+        }
 
         // --- LIST RENDER ---
-        function getCurrentList() { return appData.projects[appData.activeProjectId].words; }
+        function getCurrentList() { 
+            if (appData.projects[appData.activeProjectId]) return appData.projects[appData.activeProjectId].words;
+            return [];
+        }
         
         function addVocab() {
-            const deRaw = document.getElementById('input-de').value;
-            const langRaw = document.getElementById('input-lang').value;
-            const noteRaw = document.getElementById('input-note').value;
-            
-            const de = cleanDisplay(deRaw);
-            const lang = cleanDisplay(langRaw);
-            const note = cleanDisplay(noteRaw);
-
+            const de = cleanDisplay(document.getElementById('input-de').value);
+            const lang = cleanDisplay(document.getElementById('input-lang').value);
+            const note = cleanDisplay(document.getElementById('input-note').value);
             if (!de || !lang) { alert("Bitte ausfüllen."); return; }
-            getCurrentList().push({ de, lang, note, active: true, priority: false, successCount: 0 });
+            getCurrentList().push({ de, lang, note, active: true, priority: false, box: 0, lastWrong: false });
             save(); document.getElementById('input-de').value = ''; document.getElementById('input-lang').value = ''; document.getElementById('input-note').value = ''; 
             alert("Gespeichert!"); updateDashboardStats();
         }
@@ -492,15 +533,24 @@
             filteredIndices.forEach(({ item: v, idx: realIndex }) => {
                 const div = document.createElement('div'); div.className = `vocab-item fade-in ${!v.active ? 'paused' : ''}`;
                 
-                // --- DER FIX FÜR DIE ANZEIGE: KEINE LEERZEICHEN IM CODE! ---
+                // v4.1: STATUS BAR
+                const boxClass = `box-${v.box || 0}`;
+                const errorIcon = v.lastWrong ? '<span class="error-mark">⚠️</span>' : '';
+                
                 div.innerHTML = `
-                    <div class="vocab-columns-wrapper">
-                        <div class="vocab-col left">${v.priority ? '<span class="badge badge-priority">!</span>' : ''}${!v.active ? '<span class="badge badge-paused">⏸</span>' : ''}${v.de}</div>
-                        <div class="vocab-col center">➜</div>
-                        <div class="vocab-col right">${v.lang}</div>
+                    <div class="status-bar ${boxClass}">
+                        <div style="flex:1"></div>
+                        <div style="flex:1; text-align:center;">${v.box || 0}</div>
+                        <div style="flex:1; text-align:right;">${errorIcon}</div>
                     </div>
-                    
-                    ${v.note ? `<div class="vocab-note-area">💡 ${v.note}</div>` : ''}
+                    <div class="vocab-content-pad">
+                        <div class="vocab-columns-wrapper">
+                            <div class="vocab-col left">${v.priority ? '<span class="badge badge-priority">!</span>' : ''}${!v.active ? '<span class="badge badge-paused">⏸</span>' : ''}${v.de}</div>
+                            <div class="vocab-col center">➜</div>
+                            <div class="vocab-col right">${v.lang}</div>
+                        </div>
+                        ${v.note ? `<div class="vocab-note-area">💡 ${v.note}</div>` : ''}
+                    </div>
                     
                     <div class="vocab-actions-wrapper">
                         <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})" title="Bearbeiten">✎</button>
@@ -527,20 +577,13 @@
         function togglePriority(index) { const list = getCurrentList(); list[index].priority = !list[index].priority; save(); renderList(); }
         function toggleActive(index) { const list = getCurrentList(); list[index].active = !list[index].active; if (!list[index].active) cooldownQueue = cooldownQueue.filter(i => i !== index); save(); renderList(); }
         function deleteVocab(index) { if(confirm("Eintrag löschen?")) { getCurrentList().splice(index, 1); cooldownQueue = []; save(); renderList(); updateDashboardStats(); } }
-        
-        function clearCurrentProjectData() { 
-            if(confirm("Wirklich ALLE Vokabeln in diesem Projekt unwiderruflich löschen?")) { 
-                appData.projects[appData.activeProjectId].words = []; cooldownQueue = []; save(); renderList(); updateDashboardStats(); 
-            } 
-        }
+        function clearCurrentProjectData() { if(confirm("Wirklich ALLE Vokabeln in diesem Projekt unwiderruflich löschen?")) { appData.projects[appData.activeProjectId].words = []; cooldownQueue = []; save(); renderList(); updateDashboardStats(); } }
 
         function exportData() {
             const currentProj = appData.projects[appData.activeProjectId]; if(currentProj.words.length === 0) { alert("Leer."); return; }
             const blob = new Blob([JSON.stringify(currentProj.words)], { type: "application/json" }); const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = `backup.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
-        
-        // --- CSV PARSER ---
         function parseCSV(text) {
             const rows = []; let currentRow = []; let currentCell = ''; let inQuotes = false;
             const chars = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -552,32 +595,24 @@
                 else { currentCell += char; }
             } if (currentCell || currentRow.length > 0) { currentRow.push(currentCell.trim()); rows.push(currentRow); } return rows;
         }
-        
         function importCSV(elem) {
             const file = elem.files[0]; if (!file) return;
             const reader = new FileReader(); reader.onload = function(e) {
-                const rows = parseCSV(e.target.result); 
-                let added = 0; let skipped = 0; const list = getCurrentList();
-                
+                const rows = parseCSV(e.target.result); let added = 0; let skipped = 0; const list = getCurrentList();
                 rows.forEach(parts => {
                     if(parts.length >= 2) {
-                        const de = cleanDisplay(parts[0]); 
-                        const lang = cleanDisplay(parts[1]); 
-                        const note = parts.length >= 3 ? cleanDisplay(parts[2]) : '';
-
+                        const de = cleanDisplay(parts[0]); const lang = cleanDisplay(parts[1]); const note = parts.length >= 3 ? cleanDisplay(parts[2]) : '';
                         if(!de && !lang) { skipped++; return; } 
-                        
                         if (!list.some(w => w.de === de && w.lang === lang)) { 
-                            list.push({ de, lang, note, active: true, priority: false, successCount: 0 }); added++; 
+                            // Neue Wörter starten in Box 0
+                            list.push({ de, lang, note, active: true, priority: false, box: 0, lastWrong: false }); added++; 
                         } else { skipped++; } 
                     }
-                }); 
-                save(); renderList(); updateDashboardStats(); 
-                alert(`Import fertig: ${added} neu, ${skipped} ignoriert.`); elem.value = '';
+                }); save(); renderList(); updateDashboardStats(); alert(`Import fertig: ${added} neu, ${skipped} ignoriert.`); elem.value = '';
             }; reader.readAsText(file, 'UTF-8');
         }
 
-        // --- TEST ---
+        // --- SMART TRAINING v4.1 (Box Logic) ---
         function startTest() {
             const list = getCurrentList(); const activeWords = list.filter(v => v.active); 
             if (activeWords.length === 0) { alert("Keine Wörter."); switchTab('dashboard'); return; }
@@ -585,21 +620,57 @@
         }
         function nextQuestion() {
             document.getElementById('question-area').classList.remove('hidden'); document.getElementById('result-area').classList.add('hidden'); document.getElementById('test-input').value = ''; document.getElementById('notes-display').classList.add('hidden'); document.getElementById('priority-indicator').style.visibility = 'hidden';
+            
             const list = getCurrentList(); let selectionPool = [];
-            list.forEach((word, index) => { if (!word.active || cooldownQueue.includes(index)) return; selectionPool.push(index); if (word.priority) { selectionPool.push(index); selectionPool.push(index); } });
-            if (selectionPool.length === 0) list.forEach((word, index) => { if (word.active) selectionPool.push(index); });
+            list.forEach((word, index) => { 
+                if (!word.active || cooldownQueue.includes(index)) return; 
+                // Weight Logic (Leitner)
+                let weight = 10;
+                const box = word.box || 0;
+                if (box === 0) weight = 50; 
+                else if (box === 1) weight = 25; 
+                else if (box === 2) weight = 12; 
+                else if (box === 3) weight = 6;
+                else if (box === 4) weight = 3;
+                else if (box === 5) weight = 1; // Box 5 is rare but possible
+                
+                if (word.priority) weight *= 3;
+                for(let i=0; i<weight; i++) selectionPool.push(index);
+            });
+            
+            if (selectionPool.length === 0) list.forEach((word, index) => { if (word.active) selectionPool.push(index); }); 
             if (selectionPool.length === 0) return;
+
             currentQuestionIndex = selectionPool[Math.floor(Math.random() * selectionPool.length)]; cooldownQueue.push(currentQuestionIndex); if (cooldownQueue.length > 5) cooldownQueue.shift();
-            direction = Math.random() < 0.5 ? 0 : 1; const word = list[currentQuestionIndex]; if (word.priority) document.getElementById('priority-indicator').style.visibility = 'visible';
+            direction = Math.random() < 0.5 ? 0 : 1; const word = list[currentQuestionIndex]; 
+            
+            if (word.priority) document.getElementById('priority-indicator').style.visibility = 'visible';
+            
+            // Show Box in Training
+            document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
+            
             document.getElementById('question-display').innerText = direction === 0 ? word.de : word.lang;
             setTimeout(() => document.getElementById('test-input').focus(), 100);
         }
         function checkAnswer() {
             const input = document.getElementById('test-input').value.trim(); const list = getCurrentList(); const word = list[currentQuestionIndex]; const correctSolution = direction === 0 ? word.lang : word.de;
             const isCorrect = cleanString(input) === cleanString(correctSolution);
-            if (isCorrect) { if (!word.successCount) word.successCount = 0; word.successCount++; updateStreak(); } save(); showResult(isCorrect, correctSolution, word.note);
+            
+            if (isCorrect) { 
+                if (word.box === undefined) word.box = 0;
+                if (word.box < 5) word.box++; // Level up
+                word.lastWrong = false; // Fehler-Markierung weg
+                updateStreak(); 
+            } else {
+                word.box = 0; // Drop to 0 on fail
+                word.lastWrong = true; // Fehler-Markierung an
+            }
+            save(); showResult(isCorrect, correctSolution, word.note);
         }
-        function solve() { const list = getCurrentList(); const word = list[currentQuestionIndex]; const correctSolution = direction === 0 ? word.lang : word.de; showResult(false, correctSolution, word.note, true); }
+        function solve() { const list = getCurrentList(); const word = list[currentQuestionIndex]; const correctSolution = direction === 0 ? word.lang : word.de; 
+            word.box = 0; word.lastWrong = true; save(); // Solve counts as wrong
+            showResult(false, correctSolution, word.note, true); 
+        }
         function showResult(isCorrect, solution, note, wasSkipped = false) {
             document.getElementById('question-area').classList.add('hidden'); document.getElementById('result-area').classList.remove('hidden');
             const feedback = document.getElementById('feedback-message'); feedback.className = isCorrect ? 'correct' : 'wrong';
