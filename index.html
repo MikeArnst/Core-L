@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v7.0</title>
+    <title>Core-Learning v8.0</title>
     <style>
         :root {
-            /* Core Theme v7.0 - Fail-Safe Edition */
+            /* Core Theme v8.0 - Bulletproof */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -81,7 +81,6 @@
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
-        /* DASHBOARD STATS */
         .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
         .stat-card {
             flex: 1; background: var(--input-bg); padding: 15px; border-radius: 12px;
@@ -103,7 +102,6 @@
         .action-item:active .list-btn-circle { transform: scale(0.9); }
         .action-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
 
-        /* CARDS */
         .vocab-item {
             border: 1px solid var(--border); padding: 0 0 0 0; margin-bottom: 20px;
             display: flex; flex-direction: column; border-radius: 10px; background: #151515;
@@ -204,7 +202,6 @@
         .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #ccc; }
         .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
         
-        /* SPACIOUS QUESTION AREA (80px) */
         #question-display { 
             font-size: 1.4rem; text-align: center; font-weight: 500; color: white; 
             white-space: pre-wrap; line-height: 1.4; 
@@ -224,7 +221,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v7.0 | Fail-Safe Edition</div>
+        <div class="subtitle">v8.0 | Bulletproof</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -387,42 +384,53 @@
             try {
                 const v2Data = localStorage.getItem('core_l_data_v2');
                 if (v2Data) { appData = JSON.parse(v2Data); } 
-                else { appData.projects.push({ name: "Start Projekt", words: [] }); }
-                if (appData.streak === undefined) appData.streak = 0;
+                else { appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] }; }
+                
                 if (!appData.projects) appData.projects = [];
-                // AGGRESSIVE REPAIR ON LOAD
+                if (appData.projects.length === 0) appData.projects.push({ name: "Start Projekt", words: [] });
+                
+                // BULLETPROOF REPAIR ON LOAD
                 repairAllData(); checkStreakLogic(); showProjects(); 
-            } catch(e) { appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] }; save(); showProjects(); }
+            } catch(e) { 
+                appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [{ name: "Start Projekt", words: [] }] }; 
+                save(); showProjects(); 
+            }
         }
 
         function repairAllData() {
-            if(appData.projects) {
-                appData.projects.forEach(proj => {
-                    if(proj.words) {
-                        proj.words.forEach(word => {
-                            // Ensure structure
-                            if(!word.type) word.type = 'word';
-                            if(word.box === undefined) word.box = 0;
-                            if(word.active === undefined) word.active = true;
-                            
-                            if(word.type === 'word') { 
-                                if(!word.de) word.de = "Datenfehler";
-                                if(!word.lang) word.lang = "Fehler";
-                                word.de = cleanDisplay(word.de); 
-                                word.lang = cleanDisplay(word.lang); 
-                            }
-                            if(word.type === 'sequence') {
-                                if(!word.title) word.title = "";
-                                if(!Array.isArray(word.steps) || word.steps.length === 0) {
-                                    word.steps = [{de:"Fehler", lang:"Fehler"}]; // Prevent empty sequence crash
-                                }
-                            }
-                        });
-                        // Basic Filter (Remove only totally broken objects)
-                        proj.words = proj.words.filter(w => w && typeof w === 'object');
+            if(!appData.projects) appData.projects = [];
+            // Remove NULL projects
+            appData.projects = appData.projects.filter(p => p !== null && p !== undefined);
+            
+            appData.projects.forEach(proj => {
+                if(!proj.words) proj.words = [];
+                
+                // 1. Remove complete garbage (nulls)
+                proj.words = proj.words.filter(w => w !== null && w !== undefined);
+
+                // 2. Fix structure
+                proj.words.forEach(word => {
+                    if(!word.type) word.type = 'word';
+                    if(word.box === undefined) word.box = 0;
+                    if(word.active === undefined) word.active = true;
+                    
+                    if(word.type === 'word') { 
+                        word.de = cleanDisplay(word.de || ""); 
+                        word.lang = cleanDisplay(word.lang || ""); 
+                    }
+                    if(word.type === 'sequence') {
+                        if(!word.title) word.title = "";
+                        if(!Array.isArray(word.steps)) word.steps = [];
                     }
                 });
-            }
+                
+                // 3. Remove logically broken items (empty strings)
+                proj.words = proj.words.filter(w => {
+                    if(w.type === 'word') return (w.de && w.lang);
+                    if(w.type === 'sequence') return (w.steps && w.steps.length > 0 && w.steps[0].de);
+                    return false;
+                });
+            });
             save();
         }
 
@@ -481,15 +489,25 @@
         function deleteProject(index) { if(confirm("Löschen?")) { appData.projects.splice(index, 1); save(); renderProjectList(); } }
 
         // --- LIST & SELECTION ---
-        function getCurrentList() { return appData.projects[appData.activeProjectId].words; }
+        function getCurrentList() { 
+            // Safety check in case activeProjectId is invalid
+            if(!appData.projects[appData.activeProjectId]) {
+                appData.activeProjectId = 0; 
+                if(!appData.projects[0]) appData.projects.push({name: "Rescue", words:[]});
+            }
+            return appData.projects[appData.activeProjectId].words; 
+        }
         
         function addVocab() {
             const de = cleanDisplay(document.getElementById('input-de').value);
             const lang = cleanDisplay(document.getElementById('input-lang').value);
             const note = cleanDisplay(document.getElementById('input-note').value);
             if (!de || !lang) { alert("Bitte ausfüllen."); return; }
-            // Ensure FULL Structure
-            getCurrentList().push({ type: 'word', de: de, lang: lang, note: note, active: true, priority: false, box: 0 });
+            
+            getCurrentList().push({ 
+                type: 'word', de: de, lang: lang, note: note, active: true, priority: false, box: 0, lastWrong: false 
+            });
+            
             save(); document.getElementById('input-de').value = ''; document.getElementById('input-lang').value = ''; document.getElementById('input-note').value = ''; 
             alert("Gespeichert!"); updateDashboardStats();
         }
@@ -525,7 +543,7 @@
             const newSeq = { type: 'sequence', box: 0, active: true, priority: false, steps: newSteps, title: "" };
             for (let i = indices.length - 1; i >= 0; i--) list.splice(indices[i], 1);
             
-            list.push(newSeq); // NEWEST LAST = NEWEST TOP in SORT
+            list.push(newSeq); 
             
             save(); toggleSelectMode(false); alert("Sequenz erstellt!");
         }
@@ -547,7 +565,6 @@
                 return item.de.toLowerCase().includes(searchTerm) || item.lang.toLowerCase().includes(searchTerm);
             });
 
-            // Sortierung
             if (sortMode === 'newest') displayList.reverse();
             else if (sortMode === 'oldest') { /* nix */ }
             else if (sortMode === 'box-asc') displayList.sort((a, b) => (a.box || 0) - (b.box || 0));
@@ -579,7 +596,7 @@
 
                 let contentHtml = '';
                 if (v.type === 'sequence') {
-                    let displayTitle = v.title || (v.steps[0].de.substring(0, 25) + "...");
+                    let displayTitle = v.title || (v.steps[0] ? (v.steps[0].de.substring(0, 25) + "...") : "Leere Sequenz");
                     contentHtml = `
                         <div class="vocab-content-pad ${v.expanded ? 'expanded' : ''}">
                             <div class="seq-header" onclick="this.parentElement.classList.toggle('expanded')">
@@ -720,64 +737,66 @@
             }; reader.readAsText(file);
         }
 
-        // --- TRAINING LOGIC v7.0 (FAIL-SAFE FIX) ---
+        // --- TRAINING LOGIC v8.0 (ERROR DISPLAY) ---
         function startTest() {
-            repairAllData(); // Force clean
-            const list = getCurrentList(); 
-            const activeWords = list.filter(v => v.active); 
-            
-            if (activeWords.length === 0) { 
-                switchTab('test'); 
-                document.getElementById('question-display').innerText = "Keine aktiven Vokabeln.";
-                document.getElementById('test-input').style.display = 'none'; 
-                return; 
+            try {
+                repairAllData();
+                const list = getCurrentList(); 
+                const activeWords = list.filter(v => v.active); 
+                
+                if (activeWords.length === 0) { 
+                    switchTab('test'); 
+                    document.getElementById('question-display').innerText = "Keine aktiven Vokabeln.";
+                    document.getElementById('test-input').style.display = 'none'; 
+                    return; 
+                }
+                
+                document.getElementById('test-input').style.display = 'block'; 
+                document.getElementById('test-project-name').innerText = appData.projects[appData.activeProjectId].name; 
+                nextQuestion();
+            } catch(e) {
+                alert("Start-Fehler: " + e.message);
+                switchTab('dashboard');
             }
-            
-            document.getElementById('test-input').style.display = 'block'; 
-            document.getElementById('test-project-name').innerText = appData.projects[appData.activeProjectId].name; 
-            nextQuestion();
         }
 
         function nextQuestion() {
             document.getElementById('question-area').classList.remove('hidden'); document.getElementById('result-area').classList.add('hidden'); document.getElementById('test-input').value = ''; document.getElementById('notes-display').classList.add('hidden'); document.getElementById('priority-indicator').style.visibility = 'hidden';
             document.getElementById('seq-progress').style.display = 'none';
 
-            const list = getCurrentList();
-            
-            // 1. POOL BUILDING (Simple & Robust)
-            let pool = [];
-            list.forEach((w, i) => {
-                if(!w.active) return;
-                if(cooldownQueue.includes(i)) return; // Normal cooldown check
+            try {
+                const list = getCurrentList();
+                let selectionPool = [];
+                list.forEach((word, index) => { 
+                    if (!word.active || cooldownQueue.includes(index)) return; 
+                    let weight = 10;
+                    const box = word.box || 0;
+                    if (box === 0) weight = 50; else if (box === 1) weight = 25; else if (box === 5) weight = 1; else weight = 10;
+                    if (word.priority) weight *= 3;
+                    for(let i=0; i<weight; i++) selectionPool.push(index);
+                });
                 
-                // Weight Logic
-                let weight = 10;
-                if(w.box === 0) weight = 50; else if(w.box === 1) weight = 25;
-                if(w.priority) weight *= 3;
+                if (selectionPool.length === 0) { 
+                    cooldownQueue = []; 
+                    list.forEach((word, index) => { if (word.active) selectionPool.push(index); }); 
+                }
                 
-                for(let k=0; k<weight; k++) pool.push(i);
-            });
+                if (selectionPool.length === 0) {
+                     document.getElementById('question-display').innerText = "Alles gelernt! (Leer)"; return;
+                }
 
-            // 2. FALLBACK (If pool empty, ignore cooldown)
-            if(pool.length === 0) {
-                cooldownQueue = []; // Reset global cooldown
-                list.forEach((w, i) => { if(w.active) pool.push(i); });
-            }
-
-            // 3. FINAL CHECK
-            if(pool.length === 0) {
-                document.getElementById('question-display').innerText = "Alles gelernt! (Leer)"; return;
-            }
-
-            // 4. PICK
-            currentQuestionIndex = pool[Math.floor(Math.random() * pool.length)];
-            const word = list[currentQuestionIndex];
-            
-            // 5. RENDER (No aggressive checks that cause loops)
-            if (word.type === 'sequence') { 
-                isSequenceActive = true; currentSequenceStep = 0; showSequenceStep(word); 
-            } else { 
-                isSequenceActive = false; showStandardCard(word); 
+                currentQuestionIndex = selectionPool[Math.floor(Math.random() * selectionPool.length)];
+                const word = list[currentQuestionIndex];
+                
+                if (word.type === 'sequence' && word.steps && word.steps.length > 0) { 
+                    isSequenceActive = true; currentSequenceStep = 0; showSequenceStep(word); 
+                } else { 
+                    isSequenceActive = false; showStandardCard(word); 
+                }
+            } catch(e) {
+                // ERROR BLACKBOX
+                document.getElementById('question-display').style.color = '#ff5555';
+                document.getElementById('question-display').innerText = "System Fehler: " + e.message;
             }
         }
 
@@ -788,6 +807,7 @@
             document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
             
             const txt = direction === 0 ? word.de : word.lang;
+            document.getElementById('question-display').style.color = 'white';
             document.getElementById('question-display').innerText = txt || "Fehler: Leere Karte";
             
             setTimeout(() => document.getElementById('test-input').focus(), 100);
@@ -799,6 +819,7 @@
             document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
             document.getElementById('seq-progress').innerText = `Teil ${currentSequenceStep + 1} / ${word.steps.length}`;
             document.getElementById('seq-progress').style.display = 'block';
+            document.getElementById('question-display').style.color = 'white';
             document.getElementById('question-display').innerText = step.de || "Fehler";
             setTimeout(() => document.getElementById('test-input').focus(), 100);
         }
