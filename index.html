@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v5.5</title>
+    <title>Core-Learning v5.6</title>
     <style>
         :root {
-            /* Core Theme v5.5 - Sequence Tiles Fix */
+            /* Core Theme v5.6 - Dashboard & FAB Fix */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -85,7 +85,40 @@
         button.select-mode-btn { background-color: var(--accent-seq); color: white; border: none; }
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
 
-        /* --- DASHBOARD --- */
+        /* --- DASHBOARD STATS (RESTORED & MODERN) --- */
+        .stats-row { 
+            display: flex; 
+            gap: 15px; 
+            margin-bottom: 25px; 
+        }
+        .stat-card {
+            flex: 1; 
+            background: var(--input-bg); 
+            padding: 15px; 
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .stat-val { 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            display: block; 
+            line-height: 1.2; 
+            margin-bottom: 5px; 
+        }
+        .stat-label { 
+            font-size: 0.65rem; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            font-weight: 600;
+        }
+
         .dashboard-actions { display: flex; justify-content: center; gap: 30px; margin-top: 25px; margin-bottom: 10px; }
         .action-item { text-align: center; cursor: pointer; width: 80px; }
         .list-btn-circle {
@@ -136,7 +169,6 @@
         .vocab-col.right { text-align: right; }
         .vocab-col.center { text-align: center; color: var(--text-muted); font-size: 0.9rem; opacity: 0.5; padding-top: 3px; }
 
-        /* --- NOTE STYLE (RETRO) --- */
         .vocab-note-area {
             margin-top: 12px; 
             padding-top: 10px; 
@@ -153,13 +185,12 @@
         .seq-title { font-weight: 500; color: var(--accent-seq); font-size: 0.95rem; }
         .seq-steps-container { display: none; padding-top: 5px; }
         
-        /* --- KACHEL LOOK FÜR SEQUENZEN (FIXED) --- */
         .seq-step-row { 
-            background: #1a1a1a; /* Eigener Hintergrund */
-            border: 1px solid #333; /* Eigener Rahmen */
-            border-radius: 8px; /* Abgerundet */
+            background: #1a1a1a; 
+            border: 1px solid #333; 
+            border-radius: 8px; 
             padding: 10px;
-            margin-bottom: 8px; /* Abstand zwischen Kacheln */
+            margin-bottom: 8px; 
         }
         .expanded .seq-steps-container { display: block; }
         
@@ -170,17 +201,19 @@
         .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
         .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); } 
 
+        /* --- FIXED FLOATING BUTTON --- */
         #combine-fab {
-            position: fixed; bottom: 25px; right: 25px; 
+            position: fixed; 
+            bottom: 80px; /* HÖHER GESETZT FÜR HANDY-LEISTEN */
+            right: 25px; 
             background: var(--accent-seq); color: white; 
             padding: 12px 24px; border-radius: 50px; 
             font-weight: 600; box-shadow: 0 8px 25px rgba(0,0,0,0.7);
-            z-index: 1000; cursor: pointer; border: 2px solid rgba(255,255,255,0.1);
+            z-index: 2000; cursor: pointer; border: 2px solid rgba(255,255,255,0.1);
             transform: scale(1); transition: transform 0.2s;
         }
         #combine-fab:active { transform: scale(0.95); }
 
-        /* --- TOP BAR (3 Spalten) --- */
         .top-management-bar { 
             display: grid; 
             grid-template-columns: 1fr 1fr 1fr; 
@@ -190,15 +223,15 @@
             border-bottom: 1px solid var(--border); 
         }
         .top-management-bar select, .top-management-bar label, .top-management-bar button { 
-            height: 40px; 
-            font-size: 11px; 
-            margin: 0; padding: 0; 
+            height: 40px; font-size: 11px; margin: 0; padding: 0; 
             display: flex; justify-content: center; align-items: center; text-align: center; 
             background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; 
             color: var(--text-muted); white-space: nowrap; overflow: hidden;
         }
         .top-management-bar select { text-align-last: center; }
         
+        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23AAAAAA%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 10px auto; }
+
         .edit-seq-item { display: flex; gap: 5px; margin-bottom: 10px; align-items: flex-start; background: #222; padding: 5px; border-radius: 6px; }
         .edit-seq-inputs { flex: 1; }
         .edit-seq-tools { display: flex; flex-direction: column; gap: 2px; }
@@ -224,7 +257,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v5.5 | Sequence Tiles Fix</div>
+        <div class="subtitle">v5.6 | Button Fix & Dashboard</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -267,9 +300,16 @@
 
     <div id="view-dashboard" class="container hidden fade-in">
         <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 15px; padding: 8px 15px; font-size: 12px;">← Projekte</button>
+        
         <div class="stats-row">
-            <div class="stat-card"><span class="stat-val" style="color:var(--fire-color)"><span id="streak-count">0</span> 🔥</span><span class="stat-label">Streak</span></div>
-            <div class="stat-card"><span class="stat-val" style="color:var(--success-text)"><span id="mastery-percent">0</span>%</span><span class="stat-label">Gelernt</span></div>
+            <div class="stat-card">
+                <span class="stat-val" style="color:var(--fire-color)"><span id="streak-count">0</span> 🔥</span>
+                <span class="stat-label">Streak</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" style="color:var(--success-text)"><span id="mastery-percent">0</span>%</span>
+                <span class="stat-label">Gelernt</span>
+            </div>
         </div>
         
         <h3>Neues Wort</h3>
