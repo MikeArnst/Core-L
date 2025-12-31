@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v4.4</title>
+    <title>Core-Learning v1.0</title>
     <style>
         :root {
-            /* Core Theme v4.4 - Grid Fixes & Safe Padding */
+            /* CORE-LEARNING v1.0 RELEASE THEME */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -23,7 +23,7 @@
             --star-color: #eab308;
             --fire-color: #fb923c;
 
-            /* Box Colors */
+            /* Leitner Box Colors */
             --box-0: #262626; 
             --box-1: #451a03; 
             --box-2: #5c2b0c; 
@@ -79,7 +79,6 @@
         #input-note { min-height: 60px; font-size: 14px; color: #ccc; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #666; background-color: #252525; }
 
-        /* Custom Select Style */
         select {
             appearance: none; -webkit-appearance: none;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23AAAAAA%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
@@ -145,11 +144,10 @@
         .btn-edit { color: #60a5fa; }
         .btn-delete-small { color: #ef4444; }
 
-        /* --- VOKABEL KARTEN v4.4 (Safe Padding Update) --- */
+        /* --- VOKABEL KARTEN v1.0 --- */
         .vocab-item {
             border: 1px solid var(--border); 
-            /* Hier war das Problem: Zu wenig Platz unten */
-            padding: 0; 
+            padding: 0 0 20px 0; /* Padding Bottom Fix */
             margin-bottom: 20px;
             display: flex; 
             flex-direction: column; 
@@ -174,8 +172,7 @@
         .box-5 { background: var(--box-5); color: #fbbf24; }
         .error-mark { color: var(--error-text); font-size: 10px; }
 
-        /* Container für den Inhalt */
-        .vocab-content-pad { padding: 0 16px; }
+        .vocab-content-pad { padding: 0 16px 5px 16px; }
 
         .vocab-columns-wrapper {
             display: grid; grid-template-columns: 1fr 20px 1fr; gap: 12px;
@@ -193,57 +190,26 @@
             line-height: 1.4; text-align: left; font-weight: 400;
         }
 
-        /* FIX: Actions mit festem Abstand zum unteren Rand */
         .vocab-actions-wrapper {
-            width: 100%; 
-            display: flex; 
-            justify-content: flex-end; 
-            margin-top: 15px; 
-            gap: 8px; 
-            padding: 0 16px 16px 16px; /* 16px unten, damit nichts abgeschnitten wird */
-            box-sizing: border-box;
+            width: 100%; display: flex; justify-content: flex-end; margin-top: 15px; gap: 8px; padding: 0 16px 16px 16px; box-sizing: border-box;
         }
 
-        /* --- TOP MANAGEMENT BAR v4.4 (GRID) --- */
+        /* Top Management Bar (Grid) */
         .top-management-bar {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Zwei exakt gleich große Spalten */
-            gap: 12px;
-            margin-bottom: 20px; 
-            margin-top: 15px;
-            padding-bottom: 15px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+            margin-bottom: 20px; margin-top: 15px; padding-bottom: 15px;
             border-bottom: 1px solid var(--border);
         }
+        .top-management-bar select, .top-management-bar label {
+            margin: 0; padding: 0; font-size: 13px; height: 45px; width: 100%;
+            display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+            background-color: var(--input-bg); border: 1px solid var(--border); border-radius: 8px;
+            color: var(--text-muted); cursor: pointer;
+        }
+        .top-management-bar select { text-align-last: center; text-align: center; }
         
-        .top-management-bar select, 
-        .top-management-bar label {
-            margin: 0; 
-            padding: 0;
-            font-size: 13px; 
-            height: 45px; /* Identische Höhe erzwungen */
-            width: 100%;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            box-sizing: border-box;
-            background-color: var(--input-bg); /* Einheitlicher Hintergrund */
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-        /* Für das Select Element extra Styling um Text zu zentrieren */
-        .top-management-bar select {
-            text-align-last: center; 
-            text-align: center;
-        }
-        
-        /* Footer Actions */
-        .footer-actions {
-            margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;
-        }
+        .footer-actions { margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px; }
 
-        /* Rest */
         .comparison-container { margin-top: 20px; text-align: left; border-top: 1px solid var(--border); padding-top: 20px; }
         .comp-block { margin-bottom: 15px; }
         .comp-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
@@ -292,7 +258,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v4.4 | Layout Fix</div>
+        <div class="subtitle">v1.0 | Clean Design</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -538,26 +504,14 @@
             const container = document.getElementById('vocab-list-container');
             const sortMode = document.getElementById('sort-select').value;
 
-            // Map to keep original index for editing
             let displayList = list.map((item, index) => ({...item, originalIndex: index}));
-
-            // Filter
             displayList = displayList.filter(item => item.de.toLowerCase().includes(searchTerm) || item.lang.toLowerCase().includes(searchTerm));
 
-            // Sort
-            if (sortMode === 'newest') {
-                displayList.reverse(); // Default: Newest first
-            } else if (sortMode === 'oldest') {
-                // Do nothing (already chronological)
-            } else if (sortMode === 'box-asc') {
-                displayList.sort((a, b) => (a.box || 0) - (b.box || 0));
-            } else if (sortMode === 'box-desc') {
-                displayList.sort((a, b) => (b.box || 0) - (a.box || 0));
-            }
+            if (sortMode === 'newest') displayList.reverse();
+            else if (sortMode === 'box-asc') displayList.sort((a, b) => (a.box || 0) - (b.box || 0));
+            else if (sortMode === 'box-desc') displayList.sort((a, b) => (b.box || 0) - (a.box || 0));
 
-            document.getElementById('list-count').innerText = list.length; 
-            container.innerHTML = '';
-            
+            document.getElementById('list-count').innerText = list.length; container.innerHTML = '';
             if (displayList.length === 0) { container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:0.8rem;">Leer.</p>'; return; }
             
             displayList.forEach(v => {
