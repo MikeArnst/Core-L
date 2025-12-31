@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v5.1</title>
+    <title>Core-Learning v5.2</title>
     <style>
         :root {
-            /* Core Theme v5.1 - Guide & Features */
+            /* Core Theme v5.2 - Floating UI & Custom Titles */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -71,6 +71,12 @@
         textarea { resize: vertical; min-height: 45px; line-height: 1.4; white-space: pre-wrap; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #666; background-color: #252525; }
 
+        select {
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23AAAAAA%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 10px auto;
+        }
+
         button {
             width: 100%; padding: 12px; background-color: var(--primary);
             color: #000000; border: none; border-radius: 8px; font-size: 14px;
@@ -100,10 +106,11 @@
         /* --- CARDS & SEQUENCES --- */
         .vocab-item {
             border: 1px solid var(--border); padding: 0 0 20px 0; margin-bottom: 20px;
-            display: flex; flex-direction: column; border-radius: 10px; background: #151515;
+            display: flex; flex-direction: column; border-radius: 10px; background: #151515; /* Gleich wie normale */
             transition: opacity 0.3s; overflow: hidden; position: relative;
         }
-        .vocab-item.sequence { border-left: 3px solid var(--accent-seq); } 
+        /* Nur der linke Rand zeigt Sequenz an */
+        .vocab-item.sequence { border-left: 4px solid var(--accent-seq); } 
         .vocab-item.paused { opacity: 0.4; }
 
         .select-overlay {
@@ -127,7 +134,8 @@
         .box-3 { background: var(--box-3); }
         .box-4 { background: var(--box-4); }
         .box-5 { background: var(--box-5); color: #fbbf24; }
-        .seq-tag { background: var(--accent-seq); color: white; }
+        /* Dezenter Tag für Sequenz oben im Balken */
+        .seq-tag { background: #222; border-bottom: 1px solid var(--accent-seq); }
 
         .vocab-content-pad { padding: 0 16px 5px 16px; }
         .vocab-columns-wrapper { display: grid; grid-template-columns: 1fr 20px 1fr; gap: 12px; align-items: start; width: 100%; }
@@ -137,7 +145,7 @@
         .vocab-col.center { text-align: center; color: var(--text-muted); font-size: 0.9rem; opacity: 0.5; padding-top: 3px; }
 
         .seq-header { cursor: pointer; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
-        .seq-title { font-weight: bold; color: var(--accent-seq); font-size: 0.95rem; }
+        .seq-title { font-weight: 500; color: var(--accent-seq); font-size: 0.95rem; }
         .seq-steps-container { display: none; padding-top: 10px; }
         .seq-step-row { border-bottom: 1px dashed var(--border); padding-bottom: 8px; margin-bottom: 8px; }
         .seq-step-row:last-child { border-bottom: none; }
@@ -146,8 +154,30 @@
         .vocab-actions-wrapper { width: 100%; display: flex; justify-content: flex-end; margin-top: 15px; gap: 8px; padding: 0 16px 16px 16px; box-sizing: border-box; }
         .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; }
         
+        /* --- NEW FLOATING COMBINE BUTTON --- */
+        #combine-fab {
+            position: fixed; 
+            bottom: 25px; 
+            right: 25px; 
+            background: var(--accent-seq); 
+            color: white; 
+            padding: 12px 24px; 
+            border-radius: 50px; 
+            font-weight: 600; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            z-index: 1000; /* Always on top */
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.1);
+            transform: scale(1);
+            transition: transform 0.2s;
+        }
+        #combine-fab:active { transform: scale(0.95); }
+
+        /* Top Bar Reorganized */
         .top-management-bar { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
-        .top-management-bar select, .top-management-bar label, .top-management-bar button { height: 40px; font-size: 11px; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; text-align: center;}
+        .top-management-bar select, .top-management-bar label, .top-management-bar button { height: 40px; font-size: 11px; margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; text-align: center; background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted);}
+        /* Specific Select Style */
+        .top-management-bar select { text-align-last: center; }
         
         .edit-seq-item { display: flex; gap: 5px; margin-bottom: 10px; align-items: flex-start; background: #222; padding: 5px; border-radius: 6px; }
         .edit-seq-inputs { flex: 1; }
@@ -161,18 +191,10 @@
         .project-card { background: var(--input-bg); padding: 14px 16px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid var(--border); }
         .project-name { font-weight: 500; }
         
-        #combine-fab {
-            position: fixed; bottom: 20px; right: 20px; 
-            background: var(--accent-seq); color: white; 
-            padding: 15px 25px; border-radius: 30px; 
-            font-weight: bold; box-shadow: 0 5px 20px rgba(59, 130, 246, 0.5);
-            z-index: 100; cursor: pointer;
-        }
-
-        /* --- GUIDE STYLES --- */
+        /* Guide Styles */
         .guide-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
         .guide-section:last-child { border: none; }
-        .guide-title { color: var(--text-main); font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+        .guide-title { color: var(--text-main); font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; }
         .guide-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
         .guide-legend { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #ccc; }
@@ -183,7 +205,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v5.1 | Smart Guide</div>
+        <div class="subtitle">v5.2 | Final Polish</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -200,38 +222,26 @@
 
     <div id="view-guide" class="container hidden fade-in">
         <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px;">← Zurück</button>
-        
         <div class="guide-section">
             <div class="guide-title">🧠 Das Brain-System</div>
             <div class="guide-text">
-                Vergiss stumpfes Auswendiglernen. Core-L nutzt das <b>Leitner-Prinzip</b>. 
-                Neue Wörter kommen oft dran (Box 0). Wenn du sie kannst, steigen sie auf. 
-                In Box 5 hast du sie gemeistert und sie werden nur noch selten abgefragt.
-                <br><br>
-                <b>Die Regel:</b> Ein Fehler? Zack, zurück auf Box 0. Nur so lernst du es wirklich.
+                Core-L nutzt das <b>Leitner-Prinzip</b>. Neue Wörter (Box 0) kommen oft dran. Wenn du sie kannst, steigen sie auf. In Box 5 hast du sie gemeistert.
+                <br><b>Regel:</b> Ein Fehler? Zurück auf Box 0.
             </div>
         </div>
-
         <div class="guide-section">
-            <div class="guide-title">🎨 Die Farben (Dein Level)</div>
+            <div class="guide-title">🎨 Die Farben</div>
             <div class="guide-legend">
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-0)"></span> Box 0: Neu / Falsch (Oft üben!)</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-0)"></span> Box 0: Neu / Falsch</div>
                 <div class="legend-item"><span class="color-dot" style="background:var(--box-1)"></span> Box 1: Anfänger</div>
                 <div class="legend-item"><span class="color-dot" style="background:var(--box-2)"></span> Box 2: Geht so</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-3)"></span> Box 3: Solide</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-4)"></span> Box 4: Profi</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-5); box-shadow:0 0 5px orange;"></span> Box 5: Master (Langzeitgedächtnis)</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-5); box-shadow:0 0 5px orange;"></span> Box 5: Master</div>
             </div>
         </div>
-
         <div class="guide-section">
-            <div class="guide-title">💬 Sequenzen & Features</div>
+            <div class="guide-title">💬 Sequenzen</div>
             <div class="guide-text">
-                <ul>
-                    <li style="margin-bottom:8px;"><b>Unterhaltungen lernen:</b> Du kannst Karten zu einer "Sequenz" verbinden (Blauer Rand). Die App fragt dich dann Schritt für Schritt durch den Dialog.</li>
-                    <li style="margin-bottom:8px;"><b>Fairness:</b> Tippfehler gemacht? Klicke im Training auf "War doch richtig", um deinen Streak zu retten.</li>
-                    <li><b>Import:</b> Lade deine Listen einfach als CSV rein. Die App filtert leere Zeilen automatisch raus.</li>
-                </ul>
+                Markiere Karten über "Auswahl" und klicke auf "Verbinden", um eine Unterhaltung zu erstellen (blauer Rand).
             </div>
         </div>
     </div>
@@ -266,11 +276,23 @@
         <div class="top-management-bar">
             <select id="sort-select" onchange="renderList()">
                 <option value="newest">🕒 Neu</option>
-                <option value="box-asc">🔥 Schwer</option>
+                <option value="oldest">old Alt</option>
+                <option value="box-asc">🔥 Schwer (0)</option>
+                <option value="box-desc">🏆 Best (5)</option>
             </select>
-            <label class="file-upload">📊 Import<input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)"></label>
+            
+            <select id="type-select" onchange="renderList()">
+                <option value="all">Alle Typen</option>
+                <option value="single">Nur Karten</option>
+                <option value="seq">Nur Sequenz</option>
+            </select>
+
             <button class="select-mode-btn" id="btn-select-mode" onclick="toggleSelectMode()">Auswahl</button>
         </div>
+        
+        <label class="file-upload" style="margin-bottom:15px; border:1px dashed #333; padding:10px; text-align:center; border-radius:8px; font-size:12px; color:#888;">
+            📊 CSV Importieren <input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)">
+        </label>
 
         <div id="vocab-list-container"></div>
         
@@ -285,7 +307,12 @@
     <div id="edit-modal" class="modal-overlay hidden">
         <div class="modal-content fade-in">
             <h3>Bearbeiten</h3>
-            <div id="edit-content-area"></div>
+            <div id="seq-title-edit-container" class="hidden" style="margin-bottom:15px;">
+                <label style="font-size:0.7rem; color:var(--accent-seq); text-transform:uppercase;">Sequenz Titel (Optional)</label>
+                <input type="text" id="edit-seq-title" placeholder="z.B. Urlaub Dialog">
+            </div>
+            
+            <div id="edit-content-area"></div> 
             <button onclick="saveEdit()">Speichern</button>
             <button class="secondary" onclick="closeEditModal()">Abbrechen</button>
         </div>
@@ -320,7 +347,7 @@
     </div>
 
     <script>
-        // --- DATA STRUCTURE ---
+        // --- DATA STRUCTURE v5.2 ---
         let appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] };
         let cooldownQueue = []; let currentQuestionIndex = null; 
         let currentSequenceStep = 0; let isSequenceActive = false;
@@ -347,6 +374,8 @@
                             if(!word.type) word.type = 'word';
                             if(word.box === undefined) word.box = 0;
                             if(word.type === 'word') { word.de = cleanDisplay(word.de); word.lang = cleanDisplay(word.lang); }
+                            // v5.2: Ensure title exists
+                            if(word.type === 'sequence' && !word.title) word.title = ""; 
                         });
                         proj.words = proj.words.filter(w => (w.type === 'word' && (w.de || w.lang)) || (w.type === 'sequence' && w.steps.length > 0));
                     }
@@ -452,7 +481,7 @@
                 else newSteps.push({ de: item.de, lang: item.lang, note: item.note });
             });
 
-            const newSeq = { type: 'sequence', box: 0, active: true, priority: false, steps: newSteps };
+            const newSeq = { type: 'sequence', box: 0, active: true, priority: false, steps: newSteps, title: "" };
             for (let i = indices.length - 1; i >= 0; i--) list.splice(indices[i], 1);
             list.unshift(newSeq); save(); toggleSelectMode(false); alert("Sequenz erstellt!");
         }
@@ -462,14 +491,21 @@
             const container = document.getElementById('vocab-list-container');
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const sortMode = document.getElementById('sort-select').value;
+            const typeMode = document.getElementById('type-select').value;
 
             let displayList = list.map((item, index) => ({...item, originalIndex: index}));
             
+            // Filter 1: Type
+            if(typeMode === 'single') displayList = displayList.filter(item => item.type !== 'sequence');
+            if(typeMode === 'seq') displayList = displayList.filter(item => item.type === 'sequence');
+
+            // Filter 2: Search
             displayList = displayList.filter(item => {
-                if (item.type === 'sequence') return item.steps.some(s => s.de.toLowerCase().includes(searchTerm) || s.lang.toLowerCase().includes(searchTerm));
+                if (item.type === 'sequence') return (item.title && item.title.toLowerCase().includes(searchTerm)) || item.steps.some(s => s.de.toLowerCase().includes(searchTerm) || s.lang.toLowerCase().includes(searchTerm));
                 return item.de.toLowerCase().includes(searchTerm) || item.lang.toLowerCase().includes(searchTerm);
             });
 
+            // Sort
             if (sortMode === 'newest') displayList.reverse();
             else if (sortMode === 'box-asc') displayList.sort((a, b) => (a.box || 0) - (b.box || 0));
 
@@ -492,11 +528,12 @@
 
                 let contentHtml = '';
                 if (v.type === 'sequence') {
-                    const title = v.steps[0].de.substring(0, 25) + "...";
+                    // Use custom title OR auto-generate
+                    let displayTitle = v.title || (v.steps[0].de.substring(0, 25) + "...");
                     contentHtml = `
                         <div class="vocab-content-pad ${v.expanded ? 'expanded' : ''}">
                             <div class="seq-header" onclick="this.parentElement.classList.toggle('expanded')">
-                                <span class="seq-title">💬 ${title} (${v.steps.length} Teile)</span>
+                                <span class="seq-title">💬 ${displayTitle} (${v.steps.length})</span>
                                 <span>▼</span>
                             </div>
                             <div class="seq-steps-container">
@@ -545,12 +582,19 @@
             editIndex = index;
             const item = getCurrentList()[index];
             const area = document.getElementById('edit-content-area');
+            const seqTitleContainer = document.getElementById('seq-title-edit-container');
+            
             area.innerHTML = ''; 
 
             if (item.type === 'sequence') {
+                // Show Title Input
+                seqTitleContainer.classList.remove('hidden');
+                document.getElementById('edit-seq-title').value = item.title || "";
+                
                 item.steps.forEach((step, i) => { area.innerHTML += createStepEditHTML(i, step.de, step.lang, step.note, item.steps.length); });
                 area.innerHTML += `<button class="secondary" style="margin-top:10px" onclick="addEditStep()">+ Schritt hinzufügen</button>`;
             } else {
+                seqTitleContainer.classList.add('hidden');
                 area.innerHTML = `<textarea id="edit-de" rows="1" placeholder="Deutsch">${item.de}</textarea><textarea id="edit-lang" rows="1" placeholder="Fremd">${item.lang}</textarea><textarea id="edit-note" rows="2" placeholder="Notiz">${item.note||''}</textarea>`;
             }
             document.getElementById('edit-modal').classList.remove('hidden');
@@ -563,6 +607,9 @@
         function saveEdit() {
             const list = getCurrentList(); const item = list[editIndex];
             if (item.type === 'sequence') {
+                // Save Title
+                item.title = document.getElementById('edit-seq-title').value.trim();
+                
                 const containers = document.querySelectorAll('.edit-seq-item');
                 const newSteps = [];
                 containers.forEach(div => {
@@ -581,6 +628,8 @@
         function moveStep(i, dir) { saveTempEditState(); const item = getCurrentList()[editIndex]; const temp = item.steps[i]; item.steps[i] = item.steps[i+dir]; item.steps[i+dir] = temp; openEditModal(editIndex); }
         function saveTempEditState() {
             const item = getCurrentList()[editIndex]; if (item.type !== 'sequence') return;
+            // Save title temporarily
+            item.title = document.getElementById('edit-seq-title').value;
             const containers = document.querySelectorAll('.edit-seq-item');
             containers.forEach((div, idx) => { if(item.steps[idx]) { item.steps[idx].de = div.querySelector('.step-de').value; item.steps[idx].lang = div.querySelector('.step-lang').value; item.steps[idx].note = div.querySelector('.step-note').value; } });
         }
@@ -606,7 +655,7 @@
             }; reader.readAsText(file);
         }
 
-        // --- TRAINING ---
+        // --- TRAINING LOGIC v5.0 (Sequences) ---
         function startTest() {
             const list = getCurrentList(); const activeWords = list.filter(v => v.active); 
             if (activeWords.length === 0) { alert("Keine Wörter."); switchTab('dashboard'); return; }
