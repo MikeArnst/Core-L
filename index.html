@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v3.2</title>
+    <title>Core-Learning v3.3</title>
     <style>
         :root {
-            /* Core Theme v3.2 - Auto-Repair & Stable Grid */
+            /* Core Theme v3.3 */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -125,7 +125,7 @@
         .btn-edit { color: #60a5fa; }
         .btn-delete-small { color: #ef4444; }
 
-        /* --- VOKABEL KARTEN v3.2 (Fixierte Spalten) --- */
+        /* --- VOKABEL KARTEN v3.3 --- */
         .vocab-item {
             border: 1px solid var(--border); 
             padding: 16px;
@@ -138,12 +138,12 @@
         }
         .vocab-item.paused { opacity: 0.4; }
         
-        /* Das Grid: 3 Spalten. Links und Rechts teilen sich den Platz, Mitte ist fix */
+        /* Das Grid */
         .vocab-columns-wrapper {
             display: grid;
-            grid-template-columns: 1fr 24px 1fr; 
+            grid-template-columns: 1fr 20px 1fr; /* 20px für Pfeil */
             gap: 12px;
-            align-items: start; /* Ganz wichtig: Startet oben bündig */
+            align-items: start; /* Startet oben bündig */
             width: 100%;
         }
 
@@ -154,7 +154,7 @@
             font-size: 0.95rem;
             line-height: 1.5; 
             color: var(--text-main);
-            font-weight: 400; /* Nicht fett */
+            font-weight: 400;
         }
 
         .vocab-col.left { text-align: left; }
@@ -230,7 +230,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v3.2 | Auto-Repair</div>
+        <div class="subtitle">v3.3 | Clean Edition</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -491,13 +491,11 @@
             
             filteredIndices.forEach(({ item: v, idx: realIndex }) => {
                 const div = document.createElement('div'); div.className = `vocab-item fade-in ${!v.active ? 'paused' : ''}`;
+                
+                // --- DER FIX FÜR DIE ANZEIGE: KEINE LEERZEICHEN IM CODE! ---
                 div.innerHTML = `
                     <div class="vocab-columns-wrapper">
-                        <div class="vocab-col left">
-                            ${v.priority ? '<span class="badge badge-priority">!</span>' : ''}
-                            ${!v.active ? '<span class="badge badge-paused">⏸</span>' : ''}
-                            ${v.de}
-                        </div>
+                        <div class="vocab-col left">${v.priority ? '<span class="badge badge-priority">!</span>' : ''}${!v.active ? '<span class="badge badge-paused">⏸</span>' : ''}${v.de}</div>
                         <div class="vocab-col center">➜</div>
                         <div class="vocab-col right">${v.lang}</div>
                     </div>
@@ -542,7 +540,7 @@
             const a = document.createElement('a'); a.href = url; a.download = `backup.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
         }
         
-        // --- CSV PARSER (Fix for Empty Lines) ---
+        // --- CSV PARSER ---
         function parseCSV(text) {
             const rows = []; let currentRow = []; let currentCell = ''; let inQuotes = false;
             const chars = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
