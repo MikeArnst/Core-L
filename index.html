@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v6.1</title>
+    <title>Core-Learning v7.0</title>
     <style>
         :root {
-            /* Core Theme v6.1 - Fix & Space */
+            /* Core Theme v7.0 - Fail-Safe Edition */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -44,7 +44,6 @@
         .fade-in { animation: fadeIn 0.25s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- HEADER --- */
         #app-header { text-align: center; margin-bottom: 25px; margin-top: 10px; cursor: pointer; user-select: none; }
         #app-header h1 { font-size: 1.5rem; letter-spacing: 2px; margin: 0; font-weight: 400; text-shadow: 0 0 15px rgba(255,255,255,0.05); }
         .fat-spot { font-weight: 700; text-transform: uppercase; color: #ffffff; }
@@ -80,10 +79,9 @@
         button.override-btn { background-color: rgba(20, 60, 30, 0.5); border: 1px solid #225522; color: #88cc88; margin-top: 15px; }
         button.select-mode-btn { background-color: var(--accent-seq); color: white; border: none; }
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
-        
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
-        /* --- DASHBOARD STATS --- */
+        /* DASHBOARD STATS */
         .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
         .stat-card {
             flex: 1; background: var(--input-bg); padding: 15px; border-radius: 12px;
@@ -105,7 +103,7 @@
         .action-item:active .list-btn-circle { transform: scale(0.9); }
         .action-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
 
-        /* --- CARDS & SEQUENCES --- */
+        /* CARDS */
         .vocab-item {
             border: 1px solid var(--border); padding: 0 0 0 0; margin-bottom: 20px;
             display: flex; flex-direction: column; border-radius: 10px; background: #151515;
@@ -206,11 +204,11 @@
         .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #ccc; }
         .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
         
-        /* FIX SPACING IN QUESTION AREA (80px) */
+        /* SPACIOUS QUESTION AREA (80px) */
         #question-display { 
             font-size: 1.4rem; text-align: center; font-weight: 500; color: white; 
             white-space: pre-wrap; line-height: 1.4; 
-            margin: 80px 0 80px 0; /* MAXIMALER PLATZ */
+            margin: 80px 0 80px 0; 
         }
         #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
         .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #113311; }
@@ -226,7 +224,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v6.1 | Emergency Fix</div>
+        <div class="subtitle">v7.0 | Fail-Safe Edition</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -392,6 +390,7 @@
                 else { appData.projects.push({ name: "Start Projekt", words: [] }); }
                 if (appData.streak === undefined) appData.streak = 0;
                 if (!appData.projects) appData.projects = [];
+                // AGGRESSIVE REPAIR ON LOAD
                 repairAllData(); checkStreakLogic(); showProjects(); 
             } catch(e) { appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] }; save(); showProjects(); }
         }
@@ -401,25 +400,26 @@
                 appData.projects.forEach(proj => {
                     if(proj.words) {
                         proj.words.forEach(word => {
+                            // Ensure structure
                             if(!word.type) word.type = 'word';
                             if(word.box === undefined) word.box = 0;
-                            if(word.lastWrong === undefined) word.lastWrong = false;
+                            if(word.active === undefined) word.active = true;
                             
                             if(word.type === 'word') { 
-                                word.de = cleanDisplay(word.de || ""); 
-                                word.lang = cleanDisplay(word.lang || ""); 
+                                if(!word.de) word.de = "Datenfehler";
+                                if(!word.lang) word.lang = "Fehler";
+                                word.de = cleanDisplay(word.de); 
+                                word.lang = cleanDisplay(word.lang); 
                             }
                             if(word.type === 'sequence') {
                                 if(!word.title) word.title = "";
-                                if(!Array.isArray(word.steps)) word.steps = [];
+                                if(!Array.isArray(word.steps) || word.steps.length === 0) {
+                                    word.steps = [{de:"Fehler", lang:"Fehler"}]; // Prevent empty sequence crash
+                                }
                             }
                         });
-                        // Soft Filter: Remove only completely broken items
-                        proj.words = proj.words.filter(w => {
-                            if(w.type === 'word') return (w.de || w.lang); // Keep if at least one side exists
-                            if(w.type === 'sequence') return (w.steps && w.steps.length > 0);
-                            return false;
-                        });
+                        // Basic Filter (Remove only totally broken objects)
+                        proj.words = proj.words.filter(w => w && typeof w === 'object');
                     }
                 });
             }
@@ -488,19 +488,8 @@
             const lang = cleanDisplay(document.getElementById('input-lang').value);
             const note = cleanDisplay(document.getElementById('input-note').value);
             if (!de || !lang) { alert("Bitte ausfüllen."); return; }
-            
-            // FULLY DEFINED OBJECT TO PREVENT CRASHES
-            getCurrentList().push({ 
-                type: 'word', 
-                de: de, 
-                lang: lang, 
-                note: note, 
-                active: true, 
-                priority: false, 
-                box: 0, 
-                lastWrong: false 
-            });
-            
+            // Ensure FULL Structure
+            getCurrentList().push({ type: 'word', de: de, lang: lang, note: note, active: true, priority: false, box: 0 });
             save(); document.getElementById('input-de').value = ''; document.getElementById('input-lang').value = ''; document.getElementById('input-note').value = ''; 
             alert("Gespeichert!"); updateDashboardStats();
         }
@@ -536,7 +525,7 @@
             const newSeq = { type: 'sequence', box: 0, active: true, priority: false, steps: newSteps, title: "" };
             for (let i = indices.length - 1; i >= 0; i--) list.splice(indices[i], 1);
             
-            list.push(newSeq); 
+            list.push(newSeq); // NEWEST LAST = NEWEST TOP in SORT
             
             save(); toggleSelectMode(false); alert("Sequenz erstellt!");
         }
@@ -590,7 +579,7 @@
 
                 let contentHtml = '';
                 if (v.type === 'sequence') {
-                    let displayTitle = v.title || (v.steps[0] ? (v.steps[0].de.substring(0, 25) + "...") : "Leere Sequenz");
+                    let displayTitle = v.title || (v.steps[0].de.substring(0, 25) + "...");
                     contentHtml = `
                         <div class="vocab-content-pad ${v.expanded ? 'expanded' : ''}">
                             <div class="seq-header" onclick="this.parentElement.classList.toggle('expanded')">
@@ -712,23 +701,17 @@
         function clearCurrentProjectData() { if(confirm("Alle löschen?")) { appData.projects[appData.activeProjectId].words = []; cooldownQueue = []; save(); renderList(); updateDashboardStats(); } }
         function exportData() { const blob = new Blob([JSON.stringify(getCurrentList())], { type: "application/json" }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `backup.json`; a.click(); }
         
-        // --- SMART IMPORT (SEMI-COLON FIX) ---
         function importCSV(elem) {
             const file = elem.files[0]; if (!file) return;
             const reader = new FileReader(); reader.onload = function(e) {
-                const text = e.target.result; 
-                const rows = text.split('\n'); 
-                let added=0;
-                const firstLine = rows[0] || "";
-                const separator = firstLine.includes(';') ? ';' : ','; // Auto-detect
-
+                const text = e.target.result; const rows = text.split('\n'); let added=0;
+                const firstLine = rows[0] || ""; const separator = firstLine.includes(';') ? ';' : ','; 
                 rows.forEach(r => {
                     const p = r.split(separator); 
                     if(p.length >= 2 && p[0] && p[1]) {
-                        const de = cleanDisplay(p[0]);
-                        const lang = cleanDisplay(p[1]);
+                        const de = cleanDisplay(p[0]); const lang = cleanDisplay(p[1]);
                         if(de && lang) {
-                            getCurrentList().push({ type:'word', de: de, lang: lang, note: p[2]?cleanDisplay(p[2]):'', box:0, active:true, lastWrong:false });
+                            getCurrentList().push({ type:'word', de: de, lang: lang, note: p[2]?cleanDisplay(p[2]):'', box:0, active:true });
                             added++;
                         }
                     }
@@ -737,15 +720,15 @@
             }; reader.readAsText(file);
         }
 
-        // --- TRAINING LOGIC v6.1 (CRASH FIX) ---
+        // --- TRAINING LOGIC v7.0 (FAIL-SAFE FIX) ---
         function startTest() {
-            repairAllData();
+            repairAllData(); // Force clean
             const list = getCurrentList(); 
             const activeWords = list.filter(v => v.active); 
             
             if (activeWords.length === 0) { 
                 switchTab('test'); 
-                document.getElementById('question-display').innerText = "Keine Vokabeln gefunden.";
+                document.getElementById('question-display').innerText = "Keine aktiven Vokabeln.";
                 document.getElementById('test-input').style.display = 'none'; 
                 return; 
             }
@@ -760,42 +743,40 @@
             document.getElementById('seq-progress').style.display = 'none';
 
             const list = getCurrentList();
-            let selectionPool = [];
-            list.forEach((word, index) => { 
-                if (!word.active || cooldownQueue.includes(index)) return; 
+            
+            // 1. POOL BUILDING (Simple & Robust)
+            let pool = [];
+            list.forEach((w, i) => {
+                if(!w.active) return;
+                if(cooldownQueue.includes(i)) return; // Normal cooldown check
                 
-                // CRASH PREVENT: Loose Check
-                let valid = false;
-                if (word.type === 'word') valid = true; // accept even if empty to prevent recursion loop
-                if (word.type === 'sequence') valid = true; 
-                if(!valid) return;
-
+                // Weight Logic
                 let weight = 10;
-                const box = word.box || 0;
-                if (box === 0) weight = 50; else if (box === 1) weight = 25; else if (box === 5) weight = 1; else weight = 10;
-                if (word.priority) weight *= 3;
-                for(let i=0; i<weight; i++) selectionPool.push(index);
+                if(w.box === 0) weight = 50; else if(w.box === 1) weight = 25;
+                if(w.priority) weight *= 3;
+                
+                for(let k=0; k<weight; k++) pool.push(i);
             });
-            
-            if (selectionPool.length === 0) { 
-                cooldownQueue = []; 
-                list.forEach((word, index) => { if (word.active) selectionPool.push(index); }); 
-            }
-            
-            // If still empty (no active words)
-            if (selectionPool.length === 0) {
-                 document.getElementById('question-display').innerText = "Alles gelernt! (Keine aktiven Karten)";
-                 return;
+
+            // 2. FALLBACK (If pool empty, ignore cooldown)
+            if(pool.length === 0) {
+                cooldownQueue = []; // Reset global cooldown
+                list.forEach((w, i) => { if(w.active) pool.push(i); });
             }
 
-            currentQuestionIndex = selectionPool[Math.floor(Math.random() * selectionPool.length)];
+            // 3. FINAL CHECK
+            if(pool.length === 0) {
+                document.getElementById('question-display').innerText = "Alles gelernt! (Leer)"; return;
+            }
+
+            // 4. PICK
+            currentQuestionIndex = pool[Math.floor(Math.random() * pool.length)];
             const word = list[currentQuestionIndex];
             
-            // ROBUST RENDER
-            if (word.type === 'sequence' && word.steps && word.steps.length > 0) { 
+            // 5. RENDER (No aggressive checks that cause loops)
+            if (word.type === 'sequence') { 
                 isSequenceActive = true; currentSequenceStep = 0; showSequenceStep(word); 
-            } else {
-                // Fallback for everything else
+            } else { 
                 isSequenceActive = false; showStandardCard(word); 
             }
         }
@@ -807,7 +788,7 @@
             document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
             
             const txt = direction === 0 ? word.de : word.lang;
-            document.getElementById('question-display').innerText = txt || "(Leere Karte)";
+            document.getElementById('question-display').innerText = txt || "Fehler: Leere Karte";
             
             setTimeout(() => document.getElementById('test-input').focus(), 100);
         }
@@ -818,7 +799,7 @@
             document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
             document.getElementById('seq-progress').innerText = `Teil ${currentSequenceStep + 1} / ${word.steps.length}`;
             document.getElementById('seq-progress').style.display = 'block';
-            document.getElementById('question-display').innerText = step.de || "(Leerer Schritt)";
+            document.getElementById('question-display').innerText = step.de || "Fehler";
             setTimeout(() => document.getElementById('test-input').focus(), 100);
         }
 
