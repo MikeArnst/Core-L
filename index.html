@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-L v2</title>
+    <title>Core-L v2.1</title>
     <style>
         :root {
-            /* Modern Dark Palette - Core Theme v2 */
+            /* Modern Dark Palette - Core Theme v2.1 */
             --bg-app: #0f172a;       
             --bg-card: #1e293b;      
             --primary: #3b82f6;      
@@ -55,12 +55,21 @@
 
         h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.1rem; font-weight: 600; }
 
-        input, select {
+        /* INPUTS & TEXTAREA */
+        input, select, textarea {
             width: 100%; padding: 14px; margin-bottom: 12px; background-color: var(--input-bg);
             border: 1px solid transparent; border-radius: 10px; color: white;
             font-size: 16px; box-sizing: border-box; transition: all 0.2s;
+            font-family: inherit; /* Wichtig für gleiche Schriftart in Textarea */
         }
-        input:focus, select:focus { outline: none; border-color: var(--primary); background-color: #1e293b; }
+        
+        textarea {
+            resize: vertical; /* Erlaubt manuelles Vergrößern */
+            min-height: 80px;
+            line-height: 1.5;
+        }
+
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #1e293b; }
 
         button {
             width: 100%; padding: 14px; background-color: var(--primary);
@@ -92,7 +101,15 @@
         .vocab-item:last-child { border-bottom: none; }
         
         .vocab-text { font-size: 15px; font-weight: 500; }
-        .vocab-note { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+        
+        /* WICHTIG: Damit Umbrüche angezeigt werden */
+        .vocab-note { 
+            color: var(--text-muted); 
+            font-size: 13px; 
+            margin-top: 6px; 
+            white-space: pre-wrap; /* Das sorgt für die Zeilenumbrüche */
+            line-height: 1.4;
+        }
 
         .project-card {
             background: var(--input-bg); padding: 15px; border-radius: 10px;
@@ -116,7 +133,15 @@
         #feedback-area { margin-top: 20px; padding: 15px; border-radius: 12px; text-align: center; }
         .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-bg); }
         .wrong { background-color: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-bg); }
-        .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--primary); font-size: 14px; color: var(--text-muted); text-align: left; }
+        
+        /* Auch hier: pre-wrap für Umbrüche in der Lösung */
+        .hint-box { 
+            margin-top: 15px; padding: 12px; background-color: var(--input-bg); 
+            border-left: 3px solid var(--primary); font-size: 14px; 
+            color: var(--text-muted); text-align: left;
+            white-space: pre-wrap; 
+            line-height: 1.5;
+        }
 
         .nav-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -154,7 +179,8 @@
         <h3>Wort hinzufügen</h3>
         <input type="text" id="input-de" placeholder="🇩🇪 Deutsch">
         <input type="text" id="input-lang" placeholder="🌍 Fremdsprache">
-        <input type="text" id="input-note" placeholder="💡 Notiz / Info">
+        <textarea id="input-note" placeholder="💡 Notiz / Info (Enter für neue Zeile)"></textarea>
+        
         <button onclick="addVocab()">Hinzufügen</button>
 
         <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; margin-bottom:10px;">
@@ -213,11 +239,6 @@
 
     <script>
         // --- DATA STRUCTURE V2 ---
-        // data = {
-        //    activeProjectId: 0,
-        //    projects: [ { name: "Default", words: [...] }, { name: "Turkish", words: [...] } ]
-        // }
-
         let appData = { activeProjectId: 0, projects: [] };
         let cooldownQueue = []; 
         let currentQuestionIndex = null;
@@ -227,17 +248,13 @@
         loadData();
 
         function loadData() {
-            // Check for V2 Data
             const v2Data = localStorage.getItem('core_l_data_v2');
             
             if (v2Data) {
                 appData = JSON.parse(v2Data);
             } else {
-                // Try Migration from V1
                 const v1List = JSON.parse(localStorage.getItem('myVocabApp_v1'));
                 if (v1List && v1List.length > 0) {
-                    alert("Alte Daten gefunden! Migriere zu Version 2.0...");
-                    // Ensure V1 format is clean
                     v1List.forEach(v => {
                         if(v.active === undefined) v.active = true;
                         if(v.priority === undefined) v.priority = false;
@@ -245,7 +262,6 @@
                     appData.projects.push({ name: "Mein erstes Projekt", words: v1List });
                     save();
                 } else {
-                    // Start fresh
                     appData.projects.push({ name: "Mein erstes Projekt", words: [] });
                 }
             }
@@ -262,12 +278,12 @@
             return str.toLowerCase()
                 .replace(/ğ/g, 'g')
                 .replace(/ü/g, 'u')
-                .replace(/ä/g, 'ae') // Optional: ae für ä
+                .replace(/ä/g, 'ae') 
                 .replace(/ö/g, 'o')
                 .replace(/ß/g, 'ss')
                 .replace(/ş/g, 's')
                 .replace(/ç/g, 'c')
-                .replace(/ı/g, 'i') // Dotless i to i
+                .replace(/ı/g, 'i') 
                 .replace(/İ/g, 'i') 
                 .trim();
         }
@@ -292,7 +308,6 @@
                     <span class="project-count">${proj.words.length} Wörter</span>
                 `;
                 
-                // Add Delete Button for Project (Stop Propagation to prevent open)
                 if (appData.projects.length > 1) {
                     const delBtn = document.createElement('button');
                     delBtn.innerText = "✕";
@@ -329,7 +344,6 @@
 
         function openProject(index) {
             appData.activeProjectId = index;
-            // Reset Cooldown when switching projects
             cooldownQueue = [];
             switchTab('list');
             document.getElementById('main-nav').classList.remove('hidden');
@@ -353,7 +367,7 @@
 
             document.getElementById('input-de').value = '';
             document.getElementById('input-lang').value = '';
-            document.getElementById('input-note').value = '';
+            document.getElementById('input-note').value = ''; // Reset Textarea
             renderList();
         }
 
@@ -368,9 +382,7 @@
                 return;
             }
 
-            // Show newest first
             [...list].reverse().forEach((v, reverseIndex) => {
-                // Calculate real index because of reverse
                 const realIndex = list.length - 1 - reverseIndex;
                 
                 const div = document.createElement('div');
@@ -432,7 +444,6 @@
             const currentProj = appData.projects[appData.activeProjectId];
             if(currentProj.words.length === 0) { alert("Nichts zu speichern."); return; }
             
-            // Export ONLY current project words
             const blob = new Blob([JSON.stringify(currentProj.words)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -464,9 +475,7 @@
                             let note = parts.length >= 3 ? parts[2].replace(/^"|"$/g, '').trim() : '';
 
                             if(de && lang) {
-                                // DUPLICATE CHECK
                                 const exists = list.some(w => w.de === de && w.lang === lang);
-                                
                                 if (!exists) {
                                     list.push({ de, lang, note, active: true, priority: false });
                                     addedCount++;
@@ -518,14 +527,13 @@
             });
 
             if (selectionPool.length === 0) {
-                // Fallback: ignore cooldown if pool is empty
                 list.forEach((word, index) => {
                     if (!word.active) return;
                     selectionPool.push(index);
                 });
             }
             
-            if (selectionPool.length === 0) return; // Safety
+            if (selectionPool.length === 0) return;
 
             const randomIndexInPool = Math.floor(Math.random() * selectionPool.length);
             currentQuestionIndex = selectionPool[randomIndexInPool];
@@ -553,7 +561,6 @@
             const word = list[currentQuestionIndex];
             const correctSolution = direction === 0 ? word.lang : word.de;
             
-            // SMART CHECK (Tolerant Input)
             const inputClean = cleanString(input);
             const solutionClean = cleanString(correctSolution);
 
@@ -579,7 +586,6 @@
             if (isCorrect) {
                 feedback.className = 'correct';
                 feedback.innerHTML = `<h3 style="margin:0">Korrekt!</h3>`;
-                // Show original formatting in case user typed "sag" but solution was "sağ"
                 if (cleanString(document.getElementById('test-input').value) !== solution && !wasSkipped) {
                      feedback.innerHTML += `<p style="font-size:0.9rem; margin-top:5px;">Genau: <b>${solution}</b></p>`;
                 }
@@ -598,7 +604,6 @@
             }
         }
 
-        // --- NAVIGATION ---
         function switchTab(tab) {
             document.getElementById('view-list').classList.add('hidden');
             document.getElementById('view-test').classList.add('hidden');
