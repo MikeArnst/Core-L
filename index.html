@@ -3,24 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v2.7</title>
+    <title>Core-Learning v2.8</title>
     <style>
         :root {
-            /* Core Theme v2.7 - Compact & Clean */
-            --bg-app: #0f172a;       
-            --bg-card: #1e293b;      
-            --primary: #3b82f6;      
-            --primary-glow: rgba(59, 130, 246, 0.3);
-            --text-main: #f1f5f9;    
-            --text-muted: #94a3b8;   
-            --input-bg: #334155;     
-            --border: #475569;
-            --success-bg: #064e3b;
-            --success-text: #34d399;
-            --error-bg: #450a0a;
-            --error-text: #f87171;
-            --star-color: #eab308; 
-            --fire-color: #f97316;
+            /* Core Theme v2.8 - Pro Grey UI */
+            --bg-app: #000000;       /* Tiefschwarz */
+            --bg-card: #111111;      /* Sehr dunkles Grau */
+            --input-bg: #1a1a1a;     /* Dunkles Anthrazit */
+            --border: #333333;       /* Dezente Linien */
+            --text-main: #ffffff;    /* Weiß für Haupttext */
+            --text-muted: #999999;   /* Hellgrau für Nebentext */
+            --primary: #aaaaaa;      /* Silber-Grau als Akzent */
+            --primary-glow: rgba(255, 255, 255, 0.1);
+            
+            --success-bg: #0a140a;
+            --success-text: #aaccaa;
+            --error-bg: #1a0505;
+            --error-text: #ccaaaa;
+            --star-color: #eab308; /* Sternfarbe bleibt */
+            --fire-color: #ffcc99;
         }
 
         body {
@@ -28,7 +29,7 @@
             background-color: var(--bg-app);
             color: var(--text-main);
             margin: 0;
-            padding: 15px; /* Etwas weniger Padding am Rand für mehr Platz */
+            padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -51,36 +52,35 @@
         }
 
         #app-header h1 {
-            font-size: 1.6rem; /* Etwas dezenter */
+            font-size: 1.6rem;
             letter-spacing: 2px;
             color: var(--text-main);
             margin: 0;
             text-transform: none;
             font-weight: normal;
-            text-shadow: 0 0 15px var(--primary-glow);
+            text-shadow: 0 0 10px var(--primary-glow);
         }
         
         .fat-spot { font-weight: 800; text-transform: uppercase; }
 
         .subtitle {
-            font-size: 0.75rem; color: var(--primary); text-transform: uppercase;
-            letter-spacing: 1px; margin-top: 5px; font-weight: 600;
+            font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;
+            letter-spacing: 1.5px; margin-top: 5px; font-weight: 600;
         }
 
         /* --- CONTAINER --- */
         .container {
             width: 100%; max-width: 500px; background: var(--bg-card);
-            padding: 20px; /* Kompakter */
-            border-radius: 14px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            padding: 20px; border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
             margin-bottom: 15px; box-sizing: border-box; border: 1px solid var(--border);
         }
 
-        h3 { margin-top: 0; margin-bottom: 12px; font-size: 1rem; font-weight: 600; color: var(--text-main); }
+        h3 { margin-top: 0; margin-bottom: 12px; font-size: 0.95rem; font-weight: 600; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
 
         input, select, textarea {
             width: 100%; padding: 12px; margin-bottom: 10px; background-color: var(--input-bg);
-            border: 1px solid transparent; border-radius: 8px; color: white;
+            border: 1px solid var(--border); border-radius: 6px; color: #ffffff;
             font-size: 15px; box-sizing: border-box; transition: all 0.2s;
             font-family: inherit;
         }
@@ -88,26 +88,33 @@
         textarea { resize: vertical; min-height: 40px; line-height: 1.4; white-space: pre-wrap; }
         #input-note { min-height: 70px; }
 
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #1e293b; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--text-muted); background-color: #000000; }
 
         button {
             width: 100%; padding: 12px; background-color: var(--primary);
-            color: white; border: none; border-radius: 8px; font-size: 15px;
-            font-weight: 600; cursor: pointer; margin-bottom: 8px; transition: transform 0.1s;
+            color: #000000; border: none; border-radius: 6px; font-size: 15px;
+            font-weight: 700; cursor: pointer; margin-bottom: 8px; transition: transform 0.1s, background 0.2s;
         }
         button:active { transform: scale(0.98); }
-        button.secondary { background-color: var(--input-bg); color: var(--text-muted); }
-        button.danger { background-color: transparent; border: 1px solid #ef4444; color: #ef4444; margin-top: 15px; }
-        button.outline { background-color: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        button:hover { background: #ffffff; }
+
+        button.secondary { background-color: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); }
+        button.secondary:hover { background-color: #2a2a2a; color: #ffffff; }
+        
+        button.danger { background-color: transparent; border: 1px solid #552222; color: #cc8888; margin-top: 10px; font-weight: 600; }
+        button.danger:hover { background-color: #330000; border-color: #880000; color: #ffaaaa;}
+        
+        button.outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-muted); font-weight: 600; }
+        button.outline:hover { background-color: var(--input-bg); color: #ffffff; border-color: #aaaaaa; }
         
         /* Stats */
         .stats-row { display: flex; gap: 8px; margin-bottom: 15px; }
         .stat-card {
-            flex: 1; background: var(--input-bg); padding: 10px; border-radius: 8px;
+            flex: 1; background: var(--input-bg); padding: 10px; border-radius: 6px;
             text-align: center; border: 1px solid var(--border);
         }
         .stat-val { font-size: 1.3rem; font-weight: 800; display: block; }
-        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
         /* Circle Button */
         .list-btn-circle {
@@ -116,51 +123,51 @@
             font-size: 22px; border: 1px solid var(--border);
             display: flex; align-items: center; justify-content: center;
             margin: 15px auto 0 auto; cursor: pointer; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: all 0.2s;
         }
-        .list-btn-circle:active { transform: scale(0.95); background: var(--primary); }
+        .list-btn-circle:hover { border-color: var(--text-muted); transform: translateY(-2px); }
 
         .action-row { display: flex; gap: 6px; margin-left: 10px; flex-shrink: 0;}
         .btn-icon {
             width: 32px; height: 32px; padding: 0; margin: 0; border-radius: 6px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 16px; background: rgba(51, 65, 85, 0.5); color: var(--text-muted);
-            border: 1px solid transparent;
+            font-size: 16px; background: rgba(30, 30, 30, 0.8); color: var(--text-muted);
+            border: 1px solid var(--border);
         }
-        .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.3); }
-        .btn-icon.active-pause { color: var(--text-muted); opacity: 0.5; } 
-        .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: #f97316; } 
-        .btn-edit { color: var(--primary); background: rgba(59, 130, 246, 0.1); border-color: var(--primary); }
-        .btn-delete-small { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: #ef4444;}
+        .btn-icon:hover { color: #ffffff; border-color: #666666; background: #2a2a2a;}
 
-        /* --- VOKABEL KARTEN UPDATE v2.7 (Grid Layout) --- */
+        .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.3); }
+        .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: #f97316; } 
+        
+        .btn-edit { color: #99ccff; background: rgba(100, 150, 255, 0.1); border-color: #5577aa; }
+        .btn-delete-small { background: rgba(239, 68, 68, 0.05); color: #cc6666; border-color: #883333;}
+
+        /* --- SICHERES KOMPAKTES KARTEN LAYOUT v2.8 --- */
         .vocab-item {
             border: 1px solid var(--border); 
-            padding: 12px 15px; /* Kompakteres Padding */
-            margin-bottom: 10px;
+            padding: 12px 15px;
+            margin-bottom: 8px; /* Weniger Abstand */
             display: flex; 
             flex-direction: column; 
-            border-radius: 10px;
-            background: rgba(51, 65, 85, 0.3);
-            transition: opacity 0.3s, transform 0.2s;
-            
-            /* NEU: Flexible Höhe mit Minimum */
-            min-height: 50px; 
-            height: auto;
+            border-radius: 8px;
+            background: var(--input-bg);
+            transition: opacity 0.3s, border-color 0.2s;
+            min-height: 50px; height: auto;
         }
-        .vocab-item.paused { opacity: 0.4; }
+        .vocab-item.paused { opacity: 0.3; }
+        .vocab-item:hover { border-color: #666666; }
         
-        /* Grid Layout für die Wort-Zeile: Hält alles stabil */
+        /* Grid Layout für felsenfesten Stand */
         .vocab-card-grid {
             display: grid;
-            grid-template-columns: 1fr 30px 1fr; /* Links (45%), Pfeil (fester Platz), Rechts (45%) */
+            grid-template-columns: 1fr 30px 1fr; 
             gap: 10px;
-            align-items: start; /* Oben bündig, verhindert Springen */
+            align-items: start; /* Wichtig: Oben bündig */
             width: 100%;
         }
 
         .vocab-word {
-            font-size: 0.95rem; /* Etwas kleiner */
+            font-size: 0.92rem; 
             font-weight: 500; 
             white-space: pre-wrap; 
             line-height: 1.3; 
@@ -170,29 +177,29 @@
         }
 
         .vocab-arrow {
-            color: var(--primary);
+            color: var(--text-muted);
             font-size: 1rem;
             text-align: center;
-            opacity: 0.7;
-            padding-top: 2px; /* Optischer Ausgleich zum Text */
+            opacity: 0.5;
+            padding-top: 2px; 
         }
 
         .vocab-translation {
             text-align: right;
             color: var(--text-main);
             font-weight: 600;
-            font-size: 0.95rem; /* Etwas kleiner */
+            font-size: 0.92rem;
             line-height: 1.3;
             word-wrap: break-word;
         }
 
         .vocab-note { 
             color: var(--text-muted); 
-            font-size: 0.8rem; 
+            font-size: 0.78rem; 
             margin-top: 8px; 
             white-space: pre-wrap; 
             line-height: 1.4;
-            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            border-top: 1px solid #222222;
             padding-top: 6px;
         }
 
@@ -204,6 +211,18 @@
             gap: 5px;
         }
 
+        /* Verwaltungsleiste ganz oben */
+        .management-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
+        .management-bar button, .management-bar label {
+            margin: 0; flex: 1; padding: 8px; font-size: 12px;
+        }
+
         .badge { font-size: 9px; padding: 1px 5px; border-radius: 3px; margin-right: 4px; text-transform: uppercase; font-weight: bold; display: inline-block; vertical-align: middle; }
         .badge-priority { background: var(--star-color); color: #000; }
         .badge-paused { background: var(--text-muted); color: #000; }
@@ -213,50 +232,51 @@
         /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.95); z-index: 200;
-            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.9); z-index: 200;
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);
         }
         .modal-content {
             background: var(--bg-card); width: 90%; max-width: 380px;
-            padding: 20px; border-radius: 14px; border: 1px solid var(--border);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            padding: 20px; border-radius: 10px; border: 1px solid var(--border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
         }
 
         /* Project Card */
         .project-card {
-            background: var(--input-bg); padding: 12px 15px; border-radius: 10px;
+            background: var(--input-bg); padding: 12px 15px; border-radius: 8px;
             margin-bottom: 8px; display: flex; justify-content: space-between;
-            align-items: center; cursor: pointer; border: 1px solid transparent; user-select: none;
+            align-items: center; cursor: pointer; border: 1px solid var(--border); user-select: none;
         }
-        .project-card:hover { border-color: var(--primary); background: #2e3b4e; }
+        .project-card:hover { border-color: var(--text-muted); background: #222222; }
         .project-name { font-weight: 600; font-size: 1rem; display: flex; align-items: center; gap: 10px; }
-        .project-count { color: var(--text-muted); font-size: 0.85rem; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px;}
+        .project-count { color: var(--text-muted); font-size: 0.8rem; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border);}
         
-        #question-display { font-size: 1.4rem; text-align: center; margin: 20px 0; font-weight: 700; color: white; white-space: pre-wrap; }
-        #feedback-area { margin-top: 20px; padding: 15px; border-radius: 12px; text-align: center; }
-        .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-bg); }
-        .wrong { background-color: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-bg); }
-        .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--primary); font-size: 14px; color: var(--text-muted); text-align: left; white-space: pre-wrap; line-height: 1.5; }
+        #question-display { font-size: 1.3rem; text-align: center; margin: 20px 0; font-weight: 700; color: white; white-space: pre-wrap; }
+        #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
+        .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #113311; }
+        .wrong { background-color: var(--error-bg); color: var(--error-text); border: 1px solid #331111; }
+        .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--text-muted); font-size: 14px; color: var(--text-muted); text-align: left; white-space: pre-wrap; line-height: 1.5; border-radius: 4px;}
 
         .nav-bar {
             position: fixed; bottom: 0; left: 0; width: 100%;
-            background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(10px);
+            background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(10px);
             border-top: 1px solid var(--border);
             display: flex; padding: 10px; box-sizing: border-box;
             justify-content: space-around; z-index: 100;
         }
-        .nav-btn { background: transparent; color: var(--text-muted); font-size: 13px; width: auto; margin: 0; padding: 0; font-weight: normal; }
-        .nav-btn.active { color: var(--primary); font-weight: 600; }
+        .nav-btn { background: transparent; color: var(--text-muted); font-size: 12px; width: auto; margin: 0; padding: 0; font-weight: normal; text-transform: uppercase; letter-spacing: 1.5px; }
+        .nav-btn.active { color: var(--primary); font-weight: 700; }
         
-        hr { border: 0; border-top: 1px solid var(--border); margin: 25px 0; }
-        .file-upload { display: block; margin-top: 10px; padding: 12px; border: 1px dashed var(--border); text-align: center; border-radius: 8px; cursor: pointer; color: var(--text-muted); font-size: 13px; }
+        hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
+        .file-upload { display: block; border: 1px dashed var(--border); text-align: center; border-radius: 6px; cursor: pointer; color: var(--text-muted); }
+        .file-upload:hover { border-color: #aaaaaa; color: #ffffff; background: var(--input-bg);}
     </style>
 </head>
 <body>
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v2.7 | Compact & Smart</div>
+        <div class="subtitle">v2.8 | Pro Grey UI</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -269,7 +289,7 @@
     </div>
 
     <div id="view-dashboard" class="container hidden fade-in">
-        <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px; padding: 8px 15px; font-size: 14px;">← Projekte</button>
+        <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 15px; padding: 8px 15px; font-size: 12px;">← Projekte</button>
         <div class="stats-row">
             <div class="stat-card">
                 <span class="stat-val" style="color:var(--fire-color)"><span id="streak-count">0</span> 🔥</span>
@@ -286,27 +306,27 @@
         <textarea id="input-note" rows="2" placeholder="💡 Notiz (Optional)"></textarea>
         <button onclick="addVocab()">Speichern</button>
         <div class="list-btn-circle" onclick="switchTab('listManager')" title="Liste öffnen">📜</div>
-        <p style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin-top:5px;">Datenbank</p>
+        <p style="text-align:center; font-size:0.7rem; color:var(--text-muted); margin-top:5px;">Datenbank öffnen</p>
     </div>
 
     <div id="view-list-manager" class="container hidden fade-in" style="padding-bottom: 30px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <button class="secondary" onclick="switchTab('dashboard')" style="width: auto; margin:0; padding: 8px 15px; font-size: 14px;">← Zurück</button>
-            <span style="color:var(--text-muted); font-size:0.85rem;"><span id="list-count">0</span> Einträge</span>
+            <button class="secondary" onclick="switchTab('dashboard')" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Zurück</button>
+            <span style="color:var(--text-muted); font-size:0.8rem;"><span id="list-count">0</span> Einträge</span>
         </div>
+        
         <input type="text" id="search-input" placeholder="🔍 Suchen..." onkeyup="renderList()">
         
+        <div class="management-bar">
+            <button class="outline" onclick="exportData()">⬇️ Backup</button>
+            <label class="file-upload">
+                📊 CSV Import
+                <input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)">
+            </label>
+            <button class="danger" onclick="clearCurrentProjectData()">Leeren</button>
+        </div>
+
         <div id="vocab-list-container"></div>
-        
-        <hr style="margin-top:25px;">
-        <h3 style="font-size:0.85rem; text-transform:uppercase; color:var(--text-muted);">Optionen</h3>
-        <button class="outline" onclick="exportData()">⬇️ Backup (.json)</button>
-        <label class="file-upload" style="border-color: #3b82f6; margin-top:8px;">
-            📊 CSV Import
-            <input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)">
-        </label>
-        
-        <button class="danger" onclick="clearCurrentProjectData()">Liste leeren</button>
     </div>
 
     <div id="edit-modal" class="modal-overlay hidden">
@@ -322,14 +342,14 @@
     </div>
 
     <div id="view-test" class="container hidden fade-in">
-        <div style="display:flex; justify-content:space-between; color:var(--text-muted); font-size:0.85rem;">
+        <div style="display:flex; justify-content:space-between; color:var(--text-muted); font-size:0.8rem;">
             <span id="test-project-name">Training</span>
             <span id="test-direction">Zufall</span>
         </div>
         <div id="question-area">
-            <p style="text-align:center; color:var(--text-muted); margin-top:25px; font-size: 0.9rem;">Übersetze:</p>
+            <p style="text-align:center; color:var(--text-muted); margin-top:25px; font-size: 0.85rem;">Übersetze:</p>
             <div id="question-display">...</div>
-            <div id="priority-indicator" style="text-align:center; margin-bottom:10px; font-size:0.75rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ High Priority</div>
+            <div id="priority-indicator" style="text-align:center; margin-bottom:10px; font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
             <input type="text" id="test-input" placeholder="Antwort..." autocomplete="off">
             <button onclick="checkAnswer()">Prüfen</button>
             <button class="secondary" onclick="solve()">Lösung</button>
@@ -343,7 +363,7 @@
     </div>
 
     <div class="nav-bar hidden" id="main-nav">
-        <button class="nav-btn active" onclick="switchTab('dashboard')" id="nav-dash">HOME</button>
+        <button class="nav-btn active" onclick="switchTab('dashboard')" id="nav-dash">DASHBOARD</button>
         <button class="nav-btn" onclick="switchTab('test')" id="nav-test">LEARN</button>
     </div>
 
@@ -372,10 +392,7 @@
         }
 
         function save() { localStorage.setItem('core_l_data_v2', JSON.stringify(appData)); }
-        function checkStreakLogic() { 
-            const today = new Date().toISOString().split('T')[0];
-            // Logik beibehalten
-        }
+        function checkStreakLogic() { /*preserved*/ }
         function updateStreak() {
             const today = new Date().toISOString().split('T')[0];
             if (appData.lastPracticeDate !== today) {
@@ -443,30 +460,30 @@
         }
         function deleteProject(index) { if(confirm("Projekt löschen?")) { appData.projects.splice(index, 1); save(); renderProjectList(); } }
 
-        // --- LIST RENDER WITH GRID ---
+        // --- LIST RENDER v2.8 (FELSENFEST GRID) ---
         function getCurrentList() { return appData.projects[appData.activeProjectId].words; }
         function addVocab() {
             const de = document.getElementById('input-de').value.trim(); const lang = document.getElementById('input-lang').value.trim(); const note = document.getElementById('input-note').value.trim();
-            if (!de || !lang) { alert("Bitte Wörter eingeben."); return; }
+            if (!de || !lang) { alert("Bitte ausfüllen."); return; }
             getCurrentList().push({ de, lang, note, active: true, priority: false, successCount: 0 });
             save(); document.getElementById('input-de').value = ''; document.getElementById('input-lang').value = ''; document.getElementById('input-note').value = ''; 
-            alert("Eintrag erstellt!"); updateDashboardStats();
+            alert("Gespeichert!"); updateDashboardStats();
         }
 
         function renderList() {
             const list = getCurrentList(); const searchTerm = document.getElementById('search-input').value.toLowerCase(); const container = document.getElementById('vocab-list-container');
             const filteredIndices = list.map((item, idx) => ({ item, idx })).filter(({ item }) => item.de.toLowerCase().includes(searchTerm) || item.lang.toLowerCase().includes(searchTerm)).reverse();
             document.getElementById('list-count').innerText = list.length; container.innerHTML = '';
-            if (filteredIndices.length === 0) { container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:0.9rem;">Leer.</p>'; return; }
+            if (filteredIndices.length === 0) { container.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:0.8rem;">Leer.</p>'; return; }
             
             filteredIndices.forEach(({ item: v, idx: realIndex }) => {
                 const div = document.createElement('div'); div.className = `vocab-item fade-in ${!v.active ? 'paused' : ''}`;
-                // NEUES GRID LAYOUT
+                // v2.8 SMART GRID LAYOUT
                 div.innerHTML = `
                     <div class="vocab-card-grid">
                         <div class="vocab-word">
                             ${v.priority ? '<span class="badge badge-priority">!</span>' : ''}
-                            ${!v.active ? '<span class="badge badge-paused">PAUSE</span>' : ''}
+                            ${!v.active ? '<span class="badge badge-paused">⏸</span>' : ''}
                             ${v.de}
                         </div>
                         <div class="vocab-arrow">➜</div>
@@ -474,10 +491,10 @@
                     </div>
                     ${v.note ? `<div class="vocab-note">${v.note}</div>` : ''}
                     <div class="vocab-actions-wrapper">
-                        <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})">✎</button>
-                        <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})">★</button>
-                        <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${realIndex})">${v.active ? '⏸' : '▶'}</button>
-                        <button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})">✕</button>
+                        <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})" title="Bearbeiten">✎</button>
+                        <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})" title="Priorität">★</button>
+                        <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${realIndex})" title="Pause/Aktiv">${v.active ? '⏸' : '▶'}</button>
+                        <button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})" title="Löschen">✕</button>
                     </div>
                 `;
                 container.appendChild(div);
@@ -495,11 +512,11 @@
         }
         function togglePriority(index) { const list = getCurrentList(); list[index].priority = !list[index].priority; save(); renderList(); }
         function toggleActive(index) { const list = getCurrentList(); list[index].active = !list[index].active; if (!list[index].active) cooldownQueue = cooldownQueue.filter(i => i !== index); save(); renderList(); }
-        function deleteVocab(index) { if(confirm("Löschen?")) { getCurrentList().splice(index, 1); cooldownQueue = []; save(); renderList(); updateDashboardStats(); } }
+        function deleteVocab(index) { if(confirm("Eintrag löschen?")) { getCurrentList().splice(index, 1); cooldownQueue = []; save(); renderList(); updateDashboardStats(); } }
         
-        // --- SICHERHEITSABFRAGE BEIM LEEREN ---
+        // --- KORREKTE ABFRAGE BEIM LEEREN ---
         function clearCurrentProjectData() { 
-            if(confirm("ACHTUNG: Wirklich alle Vokabeln in dieser Liste unwiderruflich löschen?")) { 
+            if(confirm("Wirklich ALLE Vokabeln in diesem Projekt unwiderruflich löschen?")) { 
                 appData.projects[appData.activeProjectId].words = []; cooldownQueue = []; save(); renderList(); updateDashboardStats(); 
             } 
         }
