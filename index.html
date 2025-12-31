@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v5.7</title>
+    <title>Core-Learning v5.8</title>
     <style>
         :root {
-            /* Core Theme v5.7 - Dashboard Restore & Inline Combine */
+            /* Core Theme v5.8 - Split Sequence & Sort Fix */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -84,40 +84,20 @@
         button.override-btn { background-color: rgba(20, 60, 30, 0.5); border: 1px solid #225522; color: #88cc88; margin-top: 15px; }
         button.select-mode-btn { background-color: var(--accent-seq); color: white; border: none; }
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
+        
+        /* New Split Button */
+        button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
-        /* --- DASHBOARD STATS (BOX DESIGN) --- */
-        .stats-row { 
-            display: flex; 
-            gap: 15px; 
-            margin-bottom: 25px; 
-        }
+        /* --- DASHBOARD STATS --- */
+        .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
         .stat-card {
-            flex: 1; 
-            background: var(--input-bg); 
-            padding: 15px; 
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            text-align: center; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            flex: 1; background: var(--input-bg); padding: 15px; border-radius: 12px;
+            border: 1px solid var(--border); text-align: center; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .stat-val { 
-            font-size: 1.8rem; 
-            font-weight: 700; 
-            display: block; 
-            line-height: 1.2; 
-            margin-bottom: 5px; 
-        }
-        .stat-label { 
-            font-size: 0.65rem; 
-            color: var(--text-muted); 
-            text-transform: uppercase; 
-            letter-spacing: 1.5px; 
-            font-weight: 600;
-        }
+        .stat-val { font-size: 1.8rem; font-weight: 700; display: block; line-height: 1.2; margin-bottom: 5px; }
+        .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
 
         .dashboard-actions { display: flex; justify-content: center; gap: 30px; margin-top: 25px; margin-bottom: 10px; }
         .action-item { text-align: center; cursor: pointer; width: 80px; }
@@ -170,15 +150,9 @@
         .vocab-col.center { text-align: center; color: var(--text-muted); font-size: 0.9rem; opacity: 0.5; padding-top: 3px; }
 
         .vocab-note-area {
-            margin-top: 12px; 
-            padding-top: 10px; 
-            border-top: 1px solid rgba(255, 255, 255, 0.1); 
-            color: #888; 
-            font-size: 0.85rem; 
-            font-style: italic; 
-            white-space: pre-wrap;
-            line-height: 1.4; 
-            text-align: left;
+            margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); 
+            color: #888; font-size: 0.85rem; font-style: italic; white-space: pre-wrap;
+            line-height: 1.4; text-align: left;
         }
 
         .seq-header { cursor: pointer; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
@@ -186,24 +160,15 @@
         .seq-steps-container { display: none; padding-top: 5px; }
         
         .seq-step-row { 
-            background: #1a1a1a; 
-            border: 1px solid #333; 
-            border-radius: 8px; 
-            padding: 10px;
-            margin-bottom: 8px; 
+            background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px; margin-bottom: 8px; 
         }
         .expanded .seq-steps-container { display: block; }
         
-        /* FOOTER AUF KARTE (Links: Verbinden, Rechts: Actions) */
+        /* FOOTER AUF KARTE */
         .vocab-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-top: 15px; 
-            padding: 0 16px 16px 16px; 
-            box-sizing: border-box;
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-top: 15px; padding: 0 16px 16px 16px; box-sizing: border-box;
         }
-
         .vocab-actions-wrapper { display: flex; justify-content: flex-end; gap: 8px; }
         
         .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; }
@@ -213,26 +178,13 @@
 
         /* INLINE COMBINE BUTTON */
         .btn-connect-inline {
-            background: var(--accent-seq); 
-            color: white; 
-            border: none; 
-            padding: 6px 12px; 
-            border-radius: 6px; 
-            font-size: 12px; 
-            font-weight: 600; 
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
-            z-index: 20; /* Over overlay */
-            position: relative;
+            background: var(--accent-seq); color: white; border: none; padding: 6px 12px; 
+            border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4); z-index: 20; position: relative;
         }
 
         .top-management-bar { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; 
-            gap: 8px; 
-            margin: 15px 0; 
-            padding-bottom: 15px; 
-            border-bottom: 1px solid var(--border); 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; padding-bottom: 15px; border-bottom: 1px solid var(--border); 
         }
         .top-management-bar select, .top-management-bar label, .top-management-bar button { 
             height: 40px; font-size: 11px; margin: 0; padding: 0; 
@@ -269,7 +221,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v5.7 | Inline Fix</div>
+        <div class="subtitle">v5.8 | Split & Sort Fix</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -381,6 +333,11 @@
             </div>
             
             <div id="edit-content-area"></div> 
+            
+            <button id="btn-split-seq" class="split-btn hidden" onclick="dissolveSequence()">♻️ In Einzelkarten zerlegen</button>
+            
+            <hr style="border-color:#333; margin:15px 0;">
+            
             <button onclick="saveEdit()">Speichern</button>
             <button class="secondary" onclick="closeEditModal()">Abbrechen</button>
         </div>
@@ -548,7 +505,11 @@
 
             const newSeq = { type: 'sequence', box: 0, active: true, priority: false, steps: newSteps, title: "" };
             for (let i = indices.length - 1; i >= 0; i--) list.splice(indices[i], 1);
-            list.unshift(newSeq); save(); toggleSelectMode(false); alert("Sequenz erstellt!");
+            
+            // PUSH to end (so it appears as NEW in "Newest First" reverse sort)
+            list.push(newSeq); 
+            
+            save(); toggleSelectMode(false); alert("Sequenz erstellt!");
         }
 
         function renderList() {
@@ -593,7 +554,6 @@
                     div.classList.add(isSel ? 'selected' : 'unselected');
                     selectHtml = `<div class="select-overlay" onclick="selectItem(${realIndex})"><div class="select-checkbox">${isSel ? '✓' : ''}</div></div>`;
                     
-                    // NEW: Inline Combine Button Logic
                     if (isSel && selectedIndices.size >= 2) {
                         connectButtonHtml = `<button class="btn-connect-inline" onclick="event.stopPropagation(); combineSelected()">🔗 Verbinden</button>`;
                     }
@@ -643,15 +603,7 @@
                     </div>
                 `;
                 
-                // Footer Layout: Left = Connect Button, Right = Actions
-                const footerHtml = `
-                    <div class="vocab-footer">
-                        <div>${connectButtonHtml}</div>
-                        ${actionsHtml}
-                    </div>
-                `;
-
-                // Re-assemble: status + content + footer
+                const footerHtml = `<div class="vocab-footer"><div>${connectButtonHtml}</div>${actionsHtml}</div>`;
                 div.innerHTML = selectHtml + statusHtml + contentHtml + footerHtml;
                 container.appendChild(div);
             });
@@ -664,16 +616,19 @@
             const item = getCurrentList()[index];
             const area = document.getElementById('edit-content-area');
             const seqTitleContainer = document.getElementById('seq-title-edit-container');
+            const splitBtn = document.getElementById('btn-split-seq');
             
             area.innerHTML = ''; 
 
             if (item.type === 'sequence') {
                 seqTitleContainer.classList.remove('hidden');
+                splitBtn.classList.remove('hidden'); // Show Split Button
                 document.getElementById('edit-seq-title').value = item.title || "";
                 item.steps.forEach((step, i) => { area.innerHTML += createStepEditHTML(i, step.de, step.lang, step.note, item.steps.length); });
                 area.innerHTML += `<button class="secondary" style="margin-top:10px" onclick="addEditStep()">+ Schritt hinzufügen</button>`;
             } else {
                 seqTitleContainer.classList.add('hidden');
+                splitBtn.classList.add('hidden');
                 area.innerHTML = `<textarea id="edit-de" rows="1" placeholder="Deutsch">${item.de}</textarea><textarea id="edit-lang" rows="1" placeholder="Fremd">${item.lang}</textarea><textarea id="edit-note" rows="2" placeholder="Notiz">${item.note||''}</textarea>`;
             }
             document.getElementById('edit-modal').classList.remove('hidden');
@@ -681,6 +636,23 @@
 
         function createStepEditHTML(i, de, lang, note, total) {
             return `<div class="edit-seq-item" id="seq-edit-${i}"><div class="edit-seq-tools"><button class="tiny-btn" onclick="moveStep(${i}, -1)" ${i===0?'disabled':''}>▲</button><button class="tiny-btn" onclick="moveStep(${i}, 1)" ${i===total-1?'disabled':''}>▼</button><button class="tiny-btn" style="background:#722" onclick="removeStep(${i})">x</button></div><div class="edit-seq-inputs"><input type="text" class="step-de" value="${de}" placeholder="DE"><input type="text" class="step-lang" value="${lang}" placeholder="Lang"><input type="text" class="step-note" value="${note}" placeholder="Note" style="font-size:10px; height:25px;"></div></div>`;
+        }
+
+        // --- NEW: DISSOLVE SEQUENCE ---
+        function dissolveSequence() {
+            if(!confirm("Sequenz wirklich auflösen? Alle Schritte werden zu einzelnen Karten.")) return;
+            const list = getCurrentList();
+            const item = list[editIndex];
+            
+            // Convert steps to single cards
+            item.steps.forEach(step => {
+                list.push({ type: 'word', de: step.de, lang: step.lang, note: step.note, active: true, priority: false, box: 0 });
+            });
+            
+            // Remove original
+            list.splice(editIndex, 1);
+            
+            save(); closeEditModal(); renderList(); alert("Sequenz aufgelöst!");
         }
 
         function saveEdit() {
@@ -711,7 +683,6 @@
         }
 
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
-        // Changed "Priority" to "Favorites" in comments, logic same
         function togglePriority(index) { const list = getCurrentList(); list[index].priority = !list[index].priority; save(); renderList(); }
         function toggleActive(index) { const list = getCurrentList(); list[index].active = !list[index].active; if (!list[index].active) cooldownQueue = cooldownQueue.filter(i => i !== index); save(); renderList(); }
         function deleteVocab(index) { if(confirm("Löschen?")) { getCurrentList().splice(index, 1); cooldownQueue = []; save(); renderList(); updateDashboardStats(); } }
