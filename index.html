@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v8.1</title>
+    <title>Core-Learning v5.0</title>
     <style>
         :root {
-            /* Core Theme v8.1 - Hotfix */
+            /* Core Theme v5.0 - Final Polish */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -81,6 +81,7 @@
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
+        /* DASHBOARD STATS */
         .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
         .stat-card {
             flex: 1; background: var(--input-bg); padding: 15px; border-radius: 12px;
@@ -102,6 +103,7 @@
         .action-item:active .list-btn-circle { transform: scale(0.9); }
         .action-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
 
+        /* CARDS */
         .vocab-item {
             border: 1px solid var(--border); padding: 0 0 0 0; margin-bottom: 20px;
             display: flex; flex-direction: column; border-radius: 10px; background: #151515;
@@ -163,11 +165,13 @@
         .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
         .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); } 
 
-        .btn-connect-inline {
-            background: var(--accent-seq); color: white; border: none; padding: 6px 12px; 
-            border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
-            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4); z-index: 20; position: relative;
+        /* INLINE BUTTONS (Connect / Delete) */
+        .btn-inline {
+            border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.4); z-index: 20; position: relative;
         }
+        .btn-connect { background: var(--accent-seq); color: white; }
+        .btn-delete-multi { background: rgba(60, 20, 20, 0.9); border: 1px solid #552222; color: #ff9999; }
 
         .top-management-bar { 
             display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; padding-bottom: 15px; border-bottom: 1px solid var(--border); 
@@ -221,7 +225,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v8.1 | Hotfix</div>
+        <div class="subtitle">v5.0 | Final Polish</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -255,9 +259,13 @@
             </div>
         </div>
         <div class="guide-section">
-            <div class="guide-title">💬 Sequenzen</div>
+            <div class="guide-title">💬 Sequenzen & Power-Features</div>
             <div class="guide-text">
-                Markiere Karten über "Auswahl" und klicke auf "Verbinden", um eine Unterhaltung zu erstellen (blauer Rand).
+                <ul>
+                    <li style="margin-bottom:8px;"><b>Auswahl-Modus:</b> Markiere Karten. Links erscheint <b>Verbinden</b> (erstellt Sequenz), Rechts erscheint <b>Löschen</b> (entfernt alle Markierten).</li>
+                    <li style="margin-bottom:8px;"><b>Sequenzen:</b> Unterhaltungen werden am Stück abgefragt. Im Bearbeiten-Menü kannst du sie mit <b>"♻️ Zerlegen"</b> wieder in Einzelkarten auflösen.</li>
+                    <li><b>Import:</b> Lade CSV-Dateien. Die App erkennt automatisch Kommas oder Semikolons.</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -391,7 +399,6 @@
                 if (!appData.projects) appData.projects = [];
                 if (appData.projects.length === 0) appData.projects.push({ name: "Start Projekt", words: [] });
                 
-                // BULLETPROOF REPAIR ON LOAD
                 repairAllData(); checkStreakLogic(); showProjects(); 
             } catch(e) { 
                 appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [{ name: "Start Projekt", words: [] }] }; 
@@ -544,6 +551,18 @@
             save(); toggleSelectMode(false); alert("Sequenz erstellt!");
         }
 
+        function deleteSelected() {
+            if (selectedIndices.size < 1) return;
+            if (!confirm(`${selectedIndices.size} Einträge löschen?`)) return;
+            
+            const list = getCurrentList();
+            const indices = Array.from(selectedIndices).sort((a,b) => a-b);
+            
+            for (let i = indices.length - 1; i >= 0; i--) list.splice(indices[i], 1);
+            
+            save(); toggleSelectMode(false); alert("Gelöscht!");
+        }
+
         function renderList() {
             const list = getCurrentList();
             const container = document.getElementById('vocab-list-container');
@@ -578,16 +597,37 @@
                 const statusHtml = `<div class="status-bar ${boxClass} ${v.type==='sequence'?'seq-tag':''}"><div style="flex:1">${v.type==='sequence'?'SEQUENZ':''}</div><div style="flex:1; text-align:center;">${v.box || 0}</div><div style="flex:1; text-align:right;">${v.lastWrong ? '⚠️' : ''}</div></div>`;
 
                 let selectHtml = '';
-                let connectButtonHtml = '';
+                let footerContent = '';
                 
                 if (isSelectMode) {
                     const isSel = selectedIndices.has(realIndex);
                     div.classList.add(isSel ? 'selected' : 'unselected');
                     selectHtml = `<div class="select-overlay" onclick="selectItem(${realIndex})"><div class="select-checkbox">${isSel ? '✓' : ''}</div></div>`;
                     
-                    if (isSel && selectedIndices.size >= 2) {
-                        connectButtonHtml = `<button class="btn-connect-inline" onclick="event.stopPropagation(); combineSelected()">🔗 Verbinden</button>`;
+                    // SELECT MODE FOOTER (Connect left, Delete right)
+                    if (isSel) {
+                        const showConnect = selectedIndices.size >= 2;
+                        footerContent = `
+                            <div class="vocab-footer">
+                                <div>${showConnect ? '<button class="btn-inline btn-connect" onclick="event.stopPropagation(); combineSelected()">🔗 Verbinden</button>' : ''}</div>
+                                <div><button class="btn-inline btn-delete-multi" onclick="event.stopPropagation(); deleteSelected()">🗑️ Löschen</button></div>
+                            </div>`;
+                    } else {
+                        // Empty placeholder for height consistency
+                        footerContent = `<div style="height:15px"></div>`;
                     }
+
+                } else {
+                    // STANDARD FOOTER (Edit, Star, etc.)
+                    const actionsHtml = `
+                        <div class="vocab-actions-wrapper">
+                            <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})">✎</button>
+                            <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})">★</button>
+                            <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${realIndex})">${v.active ? '⏸' : '▶'}</button>
+                            <button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})">✕</button>
+                        </div>
+                    `;
+                    footerContent = `<div class="vocab-footer"><div></div>${actionsHtml}</div>`;
                 }
 
                 let contentHtml = '';
@@ -625,17 +665,7 @@
                     `;
                 }
 
-                const actionsHtml = `
-                    <div class="vocab-actions-wrapper">
-                        <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})">✎</button>
-                        <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})">★</button>
-                        <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${realIndex})">${v.active ? '⏸' : '▶'}</button>
-                        <button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})">✕</button>
-                    </div>
-                `;
-                
-                const footerHtml = `<div class="vocab-footer"><div>${connectButtonHtml}</div>${actionsHtml}</div>`;
-                div.innerHTML = selectHtml + statusHtml + contentHtml + footerHtml;
+                div.innerHTML = selectHtml + statusHtml + contentHtml + footerContent;
                 container.appendChild(div);
             });
         }
@@ -733,7 +763,7 @@
             }; reader.readAsText(file);
         }
 
-        // --- TRAINING LOGIC v8.1 (FIXED) ---
+        // --- TRAINING LOGIC v8.1 ---
         function startTest() {
             try {
                 repairAllData();
@@ -759,7 +789,6 @@
         function nextQuestion() {
             document.getElementById('question-area').classList.remove('hidden'); document.getElementById('result-area').classList.add('hidden'); document.getElementById('test-input').value = ''; document.getElementById('notes-display').classList.add('hidden'); 
             
-            // SAFE PRIORITY TOGGLE
             const prioInd = document.getElementById('priority-indicator');
             if(prioInd) prioInd.style.visibility = 'hidden';
             
