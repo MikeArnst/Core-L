@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v4.3</title>
+    <title>Core-Learning v4.4</title>
     <style>
         :root {
-            /* Core Theme v4.3 - Sorting & Layout Fixes */
+            /* Core Theme v4.4 - Grid Fixes & Safe Padding */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -79,7 +79,7 @@
         #input-note { min-height: 60px; font-size: 14px; color: #ccc; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #666; background-color: #252525; }
 
-        /* Custom Select Style for Sorting */
+        /* Custom Select Style */
         select {
             appearance: none; -webkit-appearance: none;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23AAAAAA%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
@@ -145,17 +145,18 @@
         .btn-edit { color: #60a5fa; }
         .btn-delete-small { color: #ef4444; }
 
-        /* --- VOKABEL KARTEN v4.3 --- */
+        /* --- VOKABEL KARTEN v4.4 (Safe Padding Update) --- */
         .vocab-item {
             border: 1px solid var(--border); 
-            padding: 0 0 20px 0; /* VIEL PLATZ UNTEN */
+            /* Hier war das Problem: Zu wenig Platz unten */
+            padding: 0; 
             margin-bottom: 20px;
             display: flex; 
             flex-direction: column; 
             border-radius: 10px;
             background: #151515;
             transition: opacity 0.3s;
-            overflow: hidden; /* Für den Statusbalken */
+            overflow: hidden; 
         }
         .vocab-item.paused { opacity: 0.4; }
         
@@ -173,8 +174,8 @@
         .box-5 { background: var(--box-5); color: #fbbf24; }
         .error-mark { color: var(--error-text); font-size: 10px; }
 
-        /* Content Padding: Hier auch Platz lassen */
-        .vocab-content-pad { padding: 0 16px 5px 16px; }
+        /* Container für den Inhalt */
+        .vocab-content-pad { padding: 0 16px; }
 
         .vocab-columns-wrapper {
             display: grid; grid-template-columns: 1fr 20px 1fr; gap: 12px;
@@ -192,35 +193,63 @@
             line-height: 1.4; text-align: left; font-weight: 400;
         }
 
-        /* Actions mit genug Padding */
+        /* FIX: Actions mit festem Abstand zum unteren Rand */
         .vocab-actions-wrapper {
-            width: 100%; display: flex; justify-content: flex-end; margin-top: 15px; gap: 8px; padding: 0 16px;
+            width: 100%; 
+            display: flex; 
+            justify-content: flex-end; 
+            margin-top: 15px; 
+            gap: 8px; 
+            padding: 0 16px 16px 16px; /* 16px unten, damit nichts abgeschnitten wird */
+            box-sizing: border-box;
         }
 
-        /* Comparison */
-        .comparison-container {
-            margin-top: 20px; text-align: left; border-top: 1px solid var(--border); padding-top: 20px;
+        /* --- TOP MANAGEMENT BAR v4.4 (GRID) --- */
+        .top-management-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Zwei exakt gleich große Spalten */
+            gap: 12px;
+            margin-bottom: 20px; 
+            margin-top: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
         }
+        
+        .top-management-bar select, 
+        .top-management-bar label {
+            margin: 0; 
+            padding: 0;
+            font-size: 13px; 
+            height: 45px; /* Identische Höhe erzwungen */
+            width: 100%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-sizing: border-box;
+            background-color: var(--input-bg); /* Einheitlicher Hintergrund */
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        /* Für das Select Element extra Styling um Text zu zentrieren */
+        .top-management-bar select {
+            text-align-last: center; 
+            text-align: center;
+        }
+        
+        /* Footer Actions */
+        .footer-actions {
+            margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;
+        }
+
+        /* Rest */
+        .comparison-container { margin-top: 20px; text-align: left; border-top: 1px solid var(--border); padding-top: 20px; }
         .comp-block { margin-bottom: 15px; }
         .comp-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
         .comp-text { font-size: 1.1rem; font-weight: 500; white-space: pre-wrap; }
         .comp-wrong { color: var(--error-text); }
         .comp-correct { color: var(--success-text); }
-
-        /* Top Management Bar (Sort & Import) */
-        .top-management-bar {
-            display: flex; gap: 10px; margin-bottom: 15px; margin-top: 15px;
-            border-bottom: 1px solid var(--border); padding-bottom: 15px;
-        }
-        .top-management-bar select, .top-management-bar label {
-            margin: 0; flex: 1; padding: 10px; font-size: 12px; height: 42px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        
-        /* Bottom Footer (Backup & Clear) */
-        .footer-actions {
-            margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;
-        }
 
         .badge { font-size: 9px; padding: 2px 5px; border-radius: 3px; margin-right: 4px; text-transform: uppercase; font-weight: 700; display: inline-block; vertical-align: middle; }
         .badge-priority { background: var(--star-color); color: #000; }
@@ -263,7 +292,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v4.3 | Organized</div>
+        <div class="subtitle">v4.4 | Layout Fix</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -316,13 +345,13 @@
         
         <div class="top-management-bar">
             <select id="sort-select" onchange="renderList()">
-                <option value="newest">🕒 Neueste zuerst</option>
-                <option value="oldest">old Älteste zuerst</option>
-                <option value="box-asc">🔥 Schwerste (Box 0)</option>
-                <option value="box-desc">🏆 Beste (Box 5)</option>
+                <option value="newest">🕒 Neueste</option>
+                <option value="oldest">old Älteste</option>
+                <option value="box-asc">🔥 Schwerste</option>
+                <option value="box-desc">🏆 Beste</option>
             </select>
             <label class="file-upload">
-                📊 CSV Import
+                📊 Import
                 <input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)">
             </label>
         </div>
@@ -537,27 +566,7 @@
                 const boxClass = `box-${v.box || 0}`;
                 const errorIcon = v.lastWrong ? '<span class="error-mark">⚠️</span>' : '';
                 
-                div.innerHTML = `
-                    <div class="status-bar ${boxClass}">
-                        <div style="flex:1"></div>
-                        <div style="flex:1; text-align:center;">${v.box || 0}</div>
-                        <div style="flex:1; text-align:right;">${errorIcon}</div>
-                    </div>
-                    <div class="vocab-content-pad">
-                        <div class="vocab-columns-wrapper">
-                            <div class="vocab-col left">${v.priority ? '<span class="badge badge-priority">!</span>' : ''}${!v.active ? '<span class="badge badge-paused">⏸</span>' : ''}${v.de}</div>
-                            <div class="vocab-col center">➜</div>
-                            <div class="vocab-col right">${v.lang}</div>
-                        </div>
-                        ${v.note ? `<div class="vocab-note-area">💡 ${v.note}</div>` : ''}
-                    </div>
-                    <div class="vocab-actions-wrapper">
-                        <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})" title="Bearbeiten">✎</button>
-                        <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})" title="Priorität">★</button>
-                        <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${realIndex})" title="Pause/Aktiv">${v.active ? '⏸' : '▶'}</button>
-                        <button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})" title="Löschen">✕</button>
-                    </div>
-                `;
+                div.innerHTML = `<div class="status-bar ${boxClass}"><div style="flex:1"></div><div style="flex:1; text-align:center;">${v.box || 0}</div><div style="flex:1; text-align:right;">${errorIcon}</div></div><div class="vocab-content-pad"><div class="vocab-columns-wrapper"><div class="vocab-col left">${v.priority ? '<span class="badge badge-priority">!</span>' : ''}${!v.active ? '<span class="badge badge-paused">⏸</span>' : ''}${v.de}</div><div class="vocab-col center">➜</div><div class="vocab-col right">${v.lang}</div></div>${v.note ? `<div class="vocab-note-area">💡 ${v.note}</div>` : ''}</div><div class="vocab-actions-wrapper"><button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})" title="Bearbeiten">✎</button><button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})" title="Priorität">★</button><button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${realIndex})" title="Pause/Aktiv">${v.active ? '⏸' : '▶'}</button><button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})" title="Löschen">✕</button></div>`;
                 container.appendChild(div);
             });
         }
