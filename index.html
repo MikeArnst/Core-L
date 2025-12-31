@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-L v2.1</title>
+    <title>Core-L v2.2</title>
     <style>
         :root {
-            /* Modern Dark Palette - Core Theme v2.1 */
+            /* Core Theme v2.2 */
             --bg-app: #0f172a;       
             --bg-card: #1e293b;      
             --primary: #3b82f6;      
@@ -55,18 +55,19 @@
 
         h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.1rem; font-weight: 600; }
 
-        /* INPUTS & TEXTAREA */
         input, select, textarea {
             width: 100%; padding: 14px; margin-bottom: 12px; background-color: var(--input-bg);
             border: 1px solid transparent; border-radius: 10px; color: white;
             font-size: 16px; box-sizing: border-box; transition: all 0.2s;
-            font-family: inherit; /* Wichtig für gleiche Schriftart in Textarea */
+            font-family: inherit;
         }
         
+        /* Fix für Enter-Taste & Sichtbarkeit */
         textarea {
-            resize: vertical; /* Erlaubt manuelles Vergrößern */
+            resize: vertical; 
             min-height: 80px;
             line-height: 1.5;
+            white-space: pre-wrap;
         }
 
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #1e293b; }
@@ -80,8 +81,7 @@
         button.secondary { background-color: var(--input-bg); color: var(--text-muted); }
         button.danger { background-color: transparent; border: 1px solid #ef4444; color: #ef4444; margin-top: 15px; }
         button.outline { background-color: transparent; border: 1px solid var(--primary); color: var(--primary); }
-        button.csv-btn { background-color: transparent; border: 1px dashed var(--text-muted); color: var(--text-muted); }
-
+        
         .action-row { display: flex; gap: 8px; margin-left: 10px; }
         .btn-icon {
             width: 36px; height: 36px; padding: 0; margin: 0; border-radius: 8px;
@@ -102,12 +102,12 @@
         
         .vocab-text { font-size: 15px; font-weight: 500; }
         
-        /* WICHTIG: Damit Umbrüche angezeigt werden */
+        /* Zeigt Umbrüche korrekt an */
         .vocab-note { 
             color: var(--text-muted); 
             font-size: 13px; 
             margin-top: 6px; 
-            white-space: pre-wrap; /* Das sorgt für die Zeilenumbrüche */
+            white-space: pre-wrap; 
             line-height: 1.4;
         }
 
@@ -134,7 +134,6 @@
         .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-bg); }
         .wrong { background-color: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-bg); }
         
-        /* Auch hier: pre-wrap für Umbrüche in der Lösung */
         .hint-box { 
             margin-top: 15px; padding: 12px; background-color: var(--input-bg); 
             border-left: 3px solid var(--primary); font-size: 14px; 
@@ -179,7 +178,7 @@
         <h3>Wort hinzufügen</h3>
         <input type="text" id="input-de" placeholder="🇩🇪 Deutsch">
         <input type="text" id="input-lang" placeholder="🌍 Fremdsprache">
-        <textarea id="input-note" placeholder="💡 Notiz / Info (Enter für neue Zeile)"></textarea>
+        <textarea id="input-note" rows="3" placeholder="💡 Notiz / Info (Enter für Umbruch)"></textarea>
         
         <button onclick="addVocab()">Hinzufügen</button>
 
@@ -203,7 +202,8 @@
             <input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)">
         </label>
         <p style="font-size:0.75rem; color:var(--text-muted); text-align:center; margin-top:5px;">
-            Duplikate werden automatisch übersprungen.<br>Format: Spalte A (DE), B (Fremd), C (Info)
+            Kompatibel mit Excel Multiline-Zellen (Alt+Enter).<br>
+            Duplikate werden übersprungen.
         </p>
     </div>
 
@@ -238,7 +238,7 @@
     </div>
 
     <script>
-        // --- DATA STRUCTURE V2 ---
+        // --- DATA STRUCTURE ---
         let appData = { activeProjectId: 0, projects: [] };
         let cooldownQueue = []; 
         let currentQuestionIndex = null;
@@ -249,7 +249,6 @@
 
         function loadData() {
             const v2Data = localStorage.getItem('core_l_data_v2');
-            
             if (v2Data) {
                 appData = JSON.parse(v2Data);
             } else {
@@ -276,16 +275,60 @@
         function cleanString(str) {
             if(!str) return "";
             return str.toLowerCase()
-                .replace(/ğ/g, 'g')
-                .replace(/ü/g, 'u')
-                .replace(/ä/g, 'ae') 
-                .replace(/ö/g, 'o')
-                .replace(/ß/g, 'ss')
-                .replace(/ş/g, 's')
-                .replace(/ç/g, 'c')
-                .replace(/ı/g, 'i') 
-                .replace(/İ/g, 'i') 
+                .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ä/g, 'ae') 
+                .replace(/ö/g, 'o').replace(/ß/g, 'ss').replace(/ş/g, 's')
+                .replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/İ/g, 'i') 
                 .trim();
+        }
+
+        // --- HELPER: CSV PARSER (Excel Quote Handling) ---
+        function parseCSV(text) {
+            const rows = [];
+            let currentRow = [];
+            let currentCell = '';
+            let inQuotes = false;
+            
+            // Normalize Line Endings
+            const chars = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+            for (let i = 0; i < chars.length; i++) {
+                const char = chars[i];
+                const nextChar = chars[i+1];
+
+                // Quote handling
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        // Double quote inside quotes = escaped quote
+                        currentCell += '"';
+                        i++; // skip next quote
+                    } else {
+                        // Toggle quote state
+                        inQuotes = !inQuotes;
+                    }
+                } 
+                // Separator handling (semicolon or comma)
+                else if ((char === ';' || char === ',') && !inQuotes) {
+                    currentRow.push(currentCell.trim());
+                    currentCell = '';
+                } 
+                // Newline handling
+                else if (char === '\n' && !inQuotes) {
+                    currentRow.push(currentCell.trim());
+                    if(currentRow.length > 0) rows.push(currentRow);
+                    currentRow = [];
+                    currentCell = '';
+                } 
+                // Normal character
+                else {
+                    currentCell += char;
+                }
+            }
+            // Push last cell/row
+            if (currentCell || currentRow.length > 0) {
+                currentRow.push(currentCell.trim());
+                rows.push(currentRow);
+            }
+            return rows;
         }
 
         // --- PROJECT MANAGEMENT ---
@@ -320,7 +363,6 @@
                     };
                     div.appendChild(delBtn);
                 }
-                
                 container.appendChild(div);
             });
         }
@@ -350,9 +392,7 @@
             document.getElementById('header-subtitle').innerText = appData.projects[index].name;
         }
 
-        function getCurrentList() {
-            return appData.projects[appData.activeProjectId].words;
-        }
+        function getCurrentList() { return appData.projects[appData.activeProjectId].words; }
 
         // --- LIST FUNCTIONS ---
         function addVocab() {
@@ -367,7 +407,7 @@
 
             document.getElementById('input-de').value = '';
             document.getElementById('input-lang').value = '';
-            document.getElementById('input-note').value = ''; // Reset Textarea
+            document.getElementById('input-note').value = ''; 
             renderList();
         }
 
@@ -443,7 +483,6 @@
         function exportData() {
             const currentProj = appData.projects[appData.activeProjectId];
             if(currentProj.words.length === 0) { alert("Nichts zu speichern."); return; }
-            
             const blob = new Blob([JSON.stringify(currentProj.words)], { type: "application/json" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -458,30 +497,26 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const text = e.target.result;
-                const lines = text.split('\n');
+                const rows = parseCSV(text); // Nutze den neuen smarten Parser
+                
                 let addedCount = 0;
                 let skippedCount = 0;
-                
                 const list = getCurrentList();
-                let separator = lines[0] && lines[0].includes(';') ? ';' : ',';
 
-                lines.forEach(line => {
-                    const cleanLine = line.trim();
-                    if(cleanLine.length > 0) {
-                        const parts = cleanLine.split(separator);
-                        if(parts.length >= 2) {
-                            const de = parts[0].replace(/^"|"$/g, '').trim();
-                            const lang = parts[1].replace(/^"|"$/g, '').trim();
-                            let note = parts.length >= 3 ? parts[2].replace(/^"|"$/g, '').trim() : '';
+                rows.forEach(parts => {
+                    // Erwarte mind. 2 Spalten
+                    if(parts.length >= 2) {
+                        const de = parts[0];
+                        const lang = parts[1];
+                        const note = parts.length >= 3 ? parts[2] : '';
 
-                            if(de && lang) {
-                                const exists = list.some(w => w.de === de && w.lang === lang);
-                                if (!exists) {
-                                    list.push({ de, lang, note, active: true, priority: false });
-                                    addedCount++;
-                                } else {
-                                    skippedCount++;
-                                }
+                        if(de && lang) {
+                            const exists = list.some(w => w.de === de && w.lang === lang);
+                            if (!exists) {
+                                list.push({ de, lang, note, active: true, priority: false });
+                                addedCount++;
+                            } else {
+                                skippedCount++;
                             }
                         }
                     }
@@ -532,7 +567,6 @@
                     selectionPool.push(index);
                 });
             }
-            
             if (selectionPool.length === 0) return;
 
             const randomIndexInPool = Math.floor(Math.random() * selectionPool.length);
@@ -586,7 +620,7 @@
             if (isCorrect) {
                 feedback.className = 'correct';
                 feedback.innerHTML = `<h3 style="margin:0">Korrekt!</h3>`;
-                if (cleanString(document.getElementById('test-input').value) !== solution && !wasSkipped) {
+                if (cleanString(document.getElementById('test-input').value) !== cleanString(solution) && !wasSkipped) {
                      feedback.innerHTML += `<p style="font-size:0.9rem; margin-top:5px;">Genau: <b>${solution}</b></p>`;
                 }
             } else {
