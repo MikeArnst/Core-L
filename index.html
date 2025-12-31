@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v5.3</title>
+    <title>Core-Learning v5.5</title>
     <style>
         :root {
-            /* Core Theme v5.3 - Style Restoration */
+            /* Core Theme v5.5 - Sequence Tiles Fix */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -136,36 +136,40 @@
         .vocab-col.right { text-align: right; }
         .vocab-col.center { text-align: center; color: var(--text-muted); font-size: 0.9rem; opacity: 0.5; padding-top: 3px; }
 
-        /* --- NOTE STYLE RESTORATION (Bild 3) --- */
+        /* --- NOTE STYLE (RETRO) --- */
         .vocab-note-area {
             margin-top: 12px; 
             padding-top: 10px; 
-            border-top: 1px solid rgba(255, 255, 255, 0.15); /* Der sichtbare Strich */
-            color: #999; /* Etwas dunklerer Text für Abgrenzung */
+            border-top: 1px solid rgba(255, 255, 255, 0.1); 
+            color: #888; 
             font-size: 0.85rem; 
-            font-style: italic; /* Unterscheidung */
+            font-style: italic; 
             white-space: pre-wrap;
             line-height: 1.4; 
             text-align: left;
         }
 
-        /* --- SEQUENCE STEPS STYLE (Bild 4 Kachel) --- */
         .seq-header { cursor: pointer; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
         .seq-title { font-weight: 500; color: var(--accent-seq); font-size: 0.95rem; }
         .seq-steps-container { display: none; padding-top: 5px; }
         
-        /* Das ist der "Kachel"-Look für innere Schritte */
+        /* --- KACHEL LOOK FÜR SEQUENZEN (FIXED) --- */
         .seq-step-row { 
-            border-bottom: 1px solid #333; 
-            padding: 8px 0;
-            margin-bottom: 5px; 
+            background: #1a1a1a; /* Eigener Hintergrund */
+            border: 1px solid #333; /* Eigener Rahmen */
+            border-radius: 8px; /* Abgerundet */
+            padding: 10px;
+            margin-bottom: 8px; /* Abstand zwischen Kacheln */
         }
-        .seq-step-row:last-child { border-bottom: none; }
         .expanded .seq-steps-container { display: block; }
         
         .vocab-actions-wrapper { width: 100%; display: flex; justify-content: flex-end; margin-top: 15px; gap: 8px; padding: 0 16px 16px 16px; box-sizing: border-box; }
-        .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; }
         
+        .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; }
+        .btn-icon:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
+        .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
+        .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); } 
+
         #combine-fab {
             position: fixed; bottom: 25px; right: 25px; 
             background: var(--accent-seq); color: white; 
@@ -176,10 +180,10 @@
         }
         #combine-fab:active { transform: scale(0.95); }
 
-        /* --- TOP BAR FIX (Bild 2) --- */
+        /* --- TOP BAR (3 Spalten) --- */
         .top-management-bar { 
             display: grid; 
-            grid-template-columns: 1.2fr 0.8fr 1fr; /* Custom Ratio: Mehr Platz für Sort, weniger für Import, normal für Auswahl */
+            grid-template-columns: 1fr 1fr 1fr; 
             gap: 8px; 
             margin: 15px 0; 
             padding-bottom: 15px; 
@@ -187,7 +191,7 @@
         }
         .top-management-bar select, .top-management-bar label, .top-management-bar button { 
             height: 40px; 
-            font-size: 11px; /* Etwas kleiner für Sicherheit */
+            font-size: 11px; 
             margin: 0; padding: 0; 
             display: flex; justify-content: center; align-items: center; text-align: center; 
             background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; 
@@ -207,7 +211,6 @@
         .project-card { background: var(--input-bg); padding: 14px 16px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid var(--border); }
         .project-name { font-weight: 500; }
         
-        /* Guide Styles */
         .guide-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
         .guide-section:last-child { border: none; }
         .guide-title { color: var(--text-main); font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; }
@@ -221,7 +224,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v5.3 | Perfect Style</div>
+        <div class="subtitle">v5.5 | Sequence Tiles Fix</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -291,10 +294,11 @@
         
         <div class="top-management-bar">
             <select id="sort-select" onchange="renderList()">
-                <option value="newest">🕒 Neueste oben</option>
-                <option value="oldest">old Älteste oben</option>
-                <option value="box-asc">Box 0 bis 5</option>
-                <option value="box-desc">Box 5 bis 0</option>
+                <option value="newest">🕒 Neueste zuerst</option>
+                <option value="oldest">old Älteste zuerst</option>
+                <option value="box-asc">🔥 Box 0 ➔ 5</option>
+                <option value="box-desc">🏆 Box 5 ➔ 0</option>
+                <option value="fav">⭐ Favoriten oben</option>
             </select>
             
             <select id="type-select" onchange="renderList()">
@@ -304,8 +308,8 @@
             </select>
 
             <label class="file-upload">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)"></label>
-            
-            </div>
+        </div>
+        
         <button class="select-mode-btn" id="btn-select-mode" onclick="toggleSelectMode()" style="margin-bottom:15px;">Auswahl-Modus starten</button>
 
         <div id="vocab-list-container"></div>
@@ -508,21 +512,20 @@
 
             let displayList = list.map((item, index) => ({...item, originalIndex: index}));
             
-            // Filter 1: Type
             if(typeMode === 'single') displayList = displayList.filter(item => item.type !== 'sequence');
             if(typeMode === 'seq') displayList = displayList.filter(item => item.type === 'sequence');
 
-            // Filter 2: Search
             displayList = displayList.filter(item => {
                 if (item.type === 'sequence') return (item.title && item.title.toLowerCase().includes(searchTerm)) || item.steps.some(s => s.de.toLowerCase().includes(searchTerm) || s.lang.toLowerCase().includes(searchTerm));
                 return item.de.toLowerCase().includes(searchTerm) || item.lang.toLowerCase().includes(searchTerm);
             });
 
-            // Sort (Bild 1: Deine Logik)
-            if (sortMode === 'newest') displayList.reverse(); // Standard: Neueste zuerst
-            else if (sortMode === 'oldest') { /* chronologisch */ }
-            else if (sortMode === 'box-asc') displayList.sort((a, b) => (a.box || 0) - (b.box || 0)); // 0 bis 5
-            else if (sortMode === 'box-desc') displayList.sort((a, b) => (b.box || 0) - (a.box || 0)); // 5 bis 0
+            // Sortierung
+            if (sortMode === 'newest') displayList.reverse();
+            else if (sortMode === 'oldest') { /* nix */ }
+            else if (sortMode === 'box-asc') displayList.sort((a, b) => (a.box || 0) - (b.box || 0));
+            else if (sortMode === 'box-desc') displayList.sort((a, b) => (b.box || 0) - (a.box || 0));
+            else if (sortMode === 'fav') displayList.sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0));
 
             document.getElementById('list-count').innerText = list.length; container.innerHTML = '';
             
@@ -564,11 +567,10 @@
                         </div>
                     `;
                 } else {
-                    // Bild 3: Notiz ist wieder abgetrennt und styled
                     contentHtml = `
                         <div class="vocab-content-pad">
                             <div class="vocab-columns-wrapper">
-                                <div class="vocab-col left">${v.priority ? '<span class="badge badge-priority">!</span>' : ''}${!v.active ? '<span class="badge badge-paused">⏸</span>' : ''}${v.de}</div>
+                                <div class="vocab-col left">${v.de}</div>
                                 <div class="vocab-col center">➜</div>
                                 <div class="vocab-col right">${v.lang}</div>
                             </div>
@@ -645,6 +647,7 @@
         }
 
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
+        // Changed "Priority" to "Favorites" in comments, logic same
         function togglePriority(index) { const list = getCurrentList(); list[index].priority = !list[index].priority; save(); renderList(); }
         function toggleActive(index) { const list = getCurrentList(); list[index].active = !list[index].active; if (!list[index].active) cooldownQueue = cooldownQueue.filter(i => i !== index); save(); renderList(); }
         function deleteVocab(index) { if(confirm("Löschen?")) { getCurrentList().splice(index, 1); cooldownQueue = []; save(); renderList(); updateDashboardStats(); } }
