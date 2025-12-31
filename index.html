@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v5.8</title>
+    <title>Core-Learning v5.9</title>
     <style>
         :root {
-            /* Core Theme v5.8 - Split Sequence & Sort Fix */
+            /* Core Theme v5.9 - Stability & Spacing */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -85,7 +85,6 @@
         button.select-mode-btn { background-color: var(--accent-seq); color: white; border: none; }
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         
-        /* New Split Button */
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
         /* --- DASHBOARD STATS --- */
@@ -164,7 +163,6 @@
         }
         .expanded .seq-steps-container { display: block; }
         
-        /* FOOTER AUF KARTE */
         .vocab-footer {
             display: flex; justify-content: space-between; align-items: flex-end;
             margin-top: 15px; padding: 0 16px 16px 16px; box-sizing: border-box;
@@ -176,7 +174,6 @@
         .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
         .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); } 
 
-        /* INLINE COMBINE BUTTON */
         .btn-connect-inline {
             background: var(--accent-seq); color: white; border: none; padding: 6px 12px; 
             border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
@@ -215,13 +212,28 @@
         .guide-legend { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #ccc; }
         .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        
+        /* FIX SPACING IN QUESTION AREA */
+        #question-display { 
+            font-size: 1.3rem; text-align: center; font-weight: 500; color: white; 
+            white-space: pre-wrap; line-height: 1.4; 
+            margin: 40px 0 40px 0; /* Mehr Platz oben und unten! */
+        }
+        #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
+        .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #113311; }
+        .wrong { background-color: var(--error-bg); color: var(--error-text); border: 1px solid #331111; }
+        .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--text-muted); font-size: 14px; color: var(--text-muted); text-align: left; white-space: pre-wrap; line-height: 1.5; border-radius: 4px;}
+
+        hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
+        .file-upload { display: block; border: 1px dashed var(--border); text-align: center; border-radius: 6px; cursor: pointer; color: var(--text-muted); }
+        .file-upload:hover { border-color: #aaaaaa; color: #ffffff; background: var(--input-bg);}
     </style>
 </head>
 <body>
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v5.8 | Split & Sort Fix</div>
+        <div class="subtitle">v5.9 | Stability & Spacing</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -387,6 +399,7 @@
                 else { appData.projects.push({ name: "Start Projekt", words: [] }); }
                 if (appData.streak === undefined) appData.streak = 0;
                 if (!appData.projects) appData.projects = [];
+                // Aggressive Repair on Load to fix broken items causing freezes
                 repairAllData(); checkStreakLogic(); showProjects(); 
             } catch(e) { appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] }; save(); showProjects(); }
         }
@@ -398,10 +411,21 @@
                         proj.words.forEach(word => {
                             if(!word.type) word.type = 'word';
                             if(word.box === undefined) word.box = 0;
-                            if(word.type === 'word') { word.de = cleanDisplay(word.de); word.lang = cleanDisplay(word.lang); }
-                            if(word.type === 'sequence' && !word.title) word.title = ""; 
+                            if(word.type === 'word') { 
+                                word.de = cleanDisplay(word.de || ""); 
+                                word.lang = cleanDisplay(word.lang || ""); 
+                            }
+                            if(word.type === 'sequence') {
+                                if(!word.title) word.title = "";
+                                if(!Array.isArray(word.steps)) word.steps = [];
+                            }
                         });
-                        proj.words = proj.words.filter(w => (w.type === 'word' && (w.de || w.lang)) || (w.type === 'sequence' && w.steps.length > 0));
+                        // Filter out completely broken items that cause crashes
+                        proj.words = proj.words.filter(w => {
+                            if(w.type === 'word') return (w.de && w.lang);
+                            if(w.type === 'sequence') return (w.steps && w.steps.length > 0 && w.steps[0].de);
+                            return false;
+                        });
                     }
                 });
             }
@@ -554,6 +578,7 @@
                     div.classList.add(isSel ? 'selected' : 'unselected');
                     selectHtml = `<div class="select-overlay" onclick="selectItem(${realIndex})"><div class="select-checkbox">${isSel ? '✓' : ''}</div></div>`;
                     
+                    // INLINE BUTTON: Only show if selected and > 1 items total selected
                     if (isSel && selectedIndices.size >= 2) {
                         connectButtonHtml = `<button class="btn-connect-inline" onclick="event.stopPropagation(); combineSelected()">🔗 Verbinden</button>`;
                     }
@@ -561,7 +586,7 @@
 
                 let contentHtml = '';
                 if (v.type === 'sequence') {
-                    let displayTitle = v.title || (v.steps[0].de.substring(0, 25) + "...");
+                    let displayTitle = v.title || (v.steps[0] ? (v.steps[0].de.substring(0, 25) + "...") : "Leere Sequenz");
                     contentHtml = `
                         <div class="vocab-content-pad ${v.expanded ? 'expanded' : ''}">
                             <div class="seq-header" onclick="this.parentElement.classList.toggle('expanded')">
@@ -603,7 +628,14 @@
                     </div>
                 `;
                 
-                const footerHtml = `<div class="vocab-footer"><div>${connectButtonHtml}</div>${actionsHtml}</div>`;
+                // Footer Layout
+                const footerHtml = `
+                    <div class="vocab-footer">
+                        <div>${connectButtonHtml}</div>
+                        ${actionsHtml}
+                    </div>
+                `;
+
                 div.innerHTML = selectHtml + statusHtml + contentHtml + footerHtml;
                 container.appendChild(div);
             });
@@ -638,20 +670,14 @@
             return `<div class="edit-seq-item" id="seq-edit-${i}"><div class="edit-seq-tools"><button class="tiny-btn" onclick="moveStep(${i}, -1)" ${i===0?'disabled':''}>▲</button><button class="tiny-btn" onclick="moveStep(${i}, 1)" ${i===total-1?'disabled':''}>▼</button><button class="tiny-btn" style="background:#722" onclick="removeStep(${i})">x</button></div><div class="edit-seq-inputs"><input type="text" class="step-de" value="${de}" placeholder="DE"><input type="text" class="step-lang" value="${lang}" placeholder="Lang"><input type="text" class="step-note" value="${note}" placeholder="Note" style="font-size:10px; height:25px;"></div></div>`;
         }
 
-        // --- NEW: DISSOLVE SEQUENCE ---
         function dissolveSequence() {
-            if(!confirm("Sequenz wirklich auflösen? Alle Schritte werden zu einzelnen Karten.")) return;
+            if(!confirm("Sequenz wirklich auflösen?")) return;
             const list = getCurrentList();
             const item = list[editIndex];
-            
-            // Convert steps to single cards
             item.steps.forEach(step => {
                 list.push({ type: 'word', de: step.de, lang: step.lang, note: step.note, active: true, priority: false, box: 0 });
             });
-            
-            // Remove original
             list.splice(editIndex, 1);
-            
             save(); closeEditModal(); renderList(); alert("Sequenz aufgelöst!");
         }
 
@@ -703,8 +729,10 @@
             }; reader.readAsText(file);
         }
 
-        // --- TRAINING LOGIC v5.0 (Sequences) ---
+        // --- TRAINING LOGIC v5.9 (STABILITY FIX) ---
         function startTest() {
+            // Safety: Ensure data is clean before starting
+            repairAllData();
             const list = getCurrentList(); const activeWords = list.filter(v => v.active); 
             if (activeWords.length === 0) { alert("Keine Wörter."); switchTab('dashboard'); return; }
             document.getElementById('test-project-name').innerText = appData.projects[appData.activeProjectId].name; nextQuestion();
@@ -718,6 +746,10 @@
             let selectionPool = [];
             list.forEach((word, index) => { 
                 if (!word.active || cooldownQueue.includes(index)) return; 
+                // Extra Safety Check for Valid Word
+                if (word.type === 'word' && (!word.de || !word.lang)) return;
+                if (word.type === 'sequence' && (!word.steps || word.steps.length === 0)) return;
+
                 let weight = 10;
                 const box = word.box || 0;
                 if (box === 0) weight = 50; else if (box === 1) weight = 25; else if (box === 5) weight = 1; else weight = 10;
@@ -725,14 +757,27 @@
                 for(let i=0; i<weight; i++) selectionPool.push(index);
             });
             
-            if (selectionPool.length === 0) { cooldownQueue = []; list.forEach((word, index) => { if (word.active) selectionPool.push(index); }); }
-            if (selectionPool.length === 0) return;
+            if (selectionPool.length === 0) { 
+                cooldownQueue = []; 
+                // Fallback fill
+                list.forEach((word, index) => { if (word.active) selectionPool.push(index); }); 
+            }
+            
+            if (selectionPool.length === 0) return; // Empty list
 
             currentQuestionIndex = selectionPool[Math.floor(Math.random() * selectionPool.length)];
             const word = list[currentQuestionIndex];
             
-            if (word.type === 'sequence') { isSequenceActive = true; currentSequenceStep = 0; showSequenceStep(word); } 
-            else { isSequenceActive = false; showStandardCard(word); }
+            // Robust Type Checking
+            if (word.type === 'sequence' && word.steps && word.steps.length > 0) { 
+                isSequenceActive = true; currentSequenceStep = 0; showSequenceStep(word); 
+            } 
+            else if (word.type === 'word' && word.de && word.lang) { 
+                isSequenceActive = false; showStandardCard(word); 
+            } else {
+                // If invalid word selected, skip it recursively
+                nextQuestion();
+            }
         }
 
         function showStandardCard(word) {
@@ -740,28 +785,42 @@
             direction = Math.random() < 0.5 ? 0 : 1; 
             if (word.priority) document.getElementById('priority-indicator').style.visibility = 'visible';
             document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
-            document.getElementById('question-display').innerText = direction === 0 ? word.de : word.lang;
+            
+            // Safety Text Set
+            const txt = direction === 0 ? word.de : word.lang;
+            document.getElementById('question-display').innerText = txt || "Fehler";
+            
             setTimeout(() => document.getElementById('test-input').focus(), 100);
         }
 
         function showSequenceStep(word) {
             const step = word.steps[currentSequenceStep];
+            if(!step) { nextQuestion(); return; } // Safety
+            
             direction = 0; 
             document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
             document.getElementById('seq-progress').innerText = `Teil ${currentSequenceStep + 1} / ${word.steps.length}`;
             document.getElementById('seq-progress').style.display = 'block';
-            document.getElementById('question-display').innerText = step.de;
+            document.getElementById('question-display').innerText = step.de || "Fehler";
             setTimeout(() => document.getElementById('test-input').focus(), 100);
         }
 
         function checkAnswer() {
-            const input = document.getElementById('test-input').value.trim(); const list = getCurrentList(); const word = list[currentQuestionIndex];
+            // Safety Check: if currentQuestionIndex is invalid, do nothing
+            const list = getCurrentList();
+            if (currentQuestionIndex === null || !list[currentQuestionIndex]) return;
+
+            const input = document.getElementById('test-input').value.trim(); 
+            const word = list[currentQuestionIndex];
             
             let correctSolution = ""; let note = ""; let isCorrect = false;
 
             if (isSequenceActive) {
-                const step = word.steps[currentSequenceStep]; correctSolution = step.lang; note = step.note;
+                const step = word.steps[currentSequenceStep]; 
+                if(!step) return; // Safety
+                correctSolution = step.lang; note = step.note;
                 isCorrect = cleanString(input) === cleanString(correctSolution);
+                
                 if (!isCorrect) {
                     word.box = 0; word.lastWrong = true; save();
                     showResult(false, correctSolution, note, input, false, true); 
@@ -785,9 +844,12 @@
         }
 
         function solve() {
-            const list = getCurrentList(); const word = list[currentQuestionIndex];
+            const list = getCurrentList(); if(currentQuestionIndex === null) return;
+            const word = list[currentQuestionIndex];
+            
             if(isSequenceActive) {
-                const step = word.steps[currentSequenceStep]; word.box = 0; word.lastWrong = true; save();
+                const step = word.steps[currentSequenceStep];
+                word.box = 0; word.lastWrong = true; save();
                 showResult(false, step.lang, step.note, "", true, true);
             } else {
                 const sol = direction === 0 ? word.lang : word.de;
