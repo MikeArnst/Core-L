@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v5.6</title>
+    <title>Core-Learning v5.7</title>
     <style>
         :root {
-            /* Core Theme v5.6 - Dashboard & FAB Fix */
+            /* Core Theme v5.7 - Dashboard Restore & Inline Combine */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -85,7 +85,7 @@
         button.select-mode-btn { background-color: var(--accent-seq); color: white; border: none; }
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
 
-        /* --- DASHBOARD STATS (RESTORED & MODERN) --- */
+        /* --- DASHBOARD STATS (BOX DESIGN) --- */
         .stats-row { 
             display: flex; 
             gap: 15px; 
@@ -132,7 +132,7 @@
 
         /* --- CARDS & SEQUENCES --- */
         .vocab-item {
-            border: 1px solid var(--border); padding: 0 0 20px 0; margin-bottom: 20px;
+            border: 1px solid var(--border); padding: 0 0 0 0; margin-bottom: 20px;
             display: flex; flex-direction: column; border-radius: 10px; background: #151515;
             transition: opacity 0.3s; overflow: hidden; position: relative;
         }
@@ -194,25 +194,37 @@
         }
         .expanded .seq-steps-container { display: block; }
         
-        .vocab-actions-wrapper { width: 100%; display: flex; justify-content: flex-end; margin-top: 15px; gap: 8px; padding: 0 16px 16px 16px; box-sizing: border-box; }
+        /* FOOTER AUF KARTE (Links: Verbinden, Rechts: Actions) */
+        .vocab-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 15px; 
+            padding: 0 16px 16px 16px; 
+            box-sizing: border-box;
+        }
+
+        .vocab-actions-wrapper { display: flex; justify-content: flex-end; gap: 8px; }
         
         .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; }
         .btn-icon:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
         .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
         .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); } 
 
-        /* --- FIXED FLOATING BUTTON --- */
-        #combine-fab {
-            position: fixed; 
-            bottom: 80px; /* HÖHER GESETZT FÜR HANDY-LEISTEN */
-            right: 25px; 
-            background: var(--accent-seq); color: white; 
-            padding: 12px 24px; border-radius: 50px; 
-            font-weight: 600; box-shadow: 0 8px 25px rgba(0,0,0,0.7);
-            z-index: 2000; cursor: pointer; border: 2px solid rgba(255,255,255,0.1);
-            transform: scale(1); transition: transform 0.2s;
+        /* INLINE COMBINE BUTTON */
+        .btn-connect-inline {
+            background: var(--accent-seq); 
+            color: white; 
+            border: none; 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4);
+            z-index: 20; /* Over overlay */
+            position: relative;
         }
-        #combine-fab:active { transform: scale(0.95); }
 
         .top-management-bar { 
             display: grid; 
@@ -257,7 +269,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v5.6 | Button Fix & Dashboard</div>
+        <div class="subtitle">v5.7 | Inline Fix</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -358,8 +370,6 @@
             <button class="outline" onclick="exportData()">⬇️ Backup</button>
             <button class="danger" onclick="clearCurrentProjectData()">Leeren</button>
         </div>
-        
-        <div id="combine-fab" class="hidden" onclick="combineSelected()">Verbinden (<span id="sel-count">0</span>)</div>
     </div>
 
     <div id="edit-modal" class="modal-overlay hidden">
@@ -511,20 +521,18 @@
         function toggleSelectMode(forceState) {
             if (forceState !== undefined) isSelectMode = forceState; else isSelectMode = !isSelectMode;
             const btn = document.getElementById('btn-select-mode');
-            const fab = document.getElementById('combine-fab');
             if (isSelectMode) {
-                btn.classList.add('select-mode-active'); fab.classList.remove('hidden'); selectedIndices.clear(); updateFab();
+                btn.classList.add('select-mode-active'); selectedIndices.clear();
             } else {
-                btn.classList.remove('select-mode-active'); fab.classList.add('hidden');
+                btn.classList.remove('select-mode-active');
             }
             renderList();
         }
 
         function selectItem(index) {
             if (selectedIndices.has(index)) selectedIndices.delete(index); else selectedIndices.add(index);
-            renderList(); updateFab();
+            renderList(); 
         }
-        function updateFab() { document.getElementById('sel-count').innerText = selectedIndices.size; }
 
         function combineSelected() {
             if (selectedIndices.size < 2) { alert("Wähle mindestens 2 Karten."); return; }
@@ -578,10 +586,17 @@
                 const statusHtml = `<div class="status-bar ${boxClass} ${v.type==='sequence'?'seq-tag':''}"><div style="flex:1">${v.type==='sequence'?'SEQUENZ':''}</div><div style="flex:1; text-align:center;">${v.box || 0}</div><div style="flex:1; text-align:right;">${v.lastWrong ? '⚠️' : ''}</div></div>`;
 
                 let selectHtml = '';
+                let connectButtonHtml = '';
+                
                 if (isSelectMode) {
                     const isSel = selectedIndices.has(realIndex);
                     div.classList.add(isSel ? 'selected' : 'unselected');
                     selectHtml = `<div class="select-overlay" onclick="selectItem(${realIndex})"><div class="select-checkbox">${isSel ? '✓' : ''}</div></div>`;
+                    
+                    // NEW: Inline Combine Button Logic
+                    if (isSel && selectedIndices.size >= 2) {
+                        connectButtonHtml = `<button class="btn-connect-inline" onclick="event.stopPropagation(); combineSelected()">🔗 Verbinden</button>`;
+                    }
                 }
 
                 let contentHtml = '';
@@ -627,8 +642,17 @@
                         <button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})">✕</button>
                     </div>
                 `;
+                
+                // Footer Layout: Left = Connect Button, Right = Actions
+                const footerHtml = `
+                    <div class="vocab-footer">
+                        <div>${connectButtonHtml}</div>
+                        ${actionsHtml}
+                    </div>
+                `;
 
-                div.innerHTML = selectHtml + statusHtml + contentHtml + actionsHtml;
+                // Re-assemble: status + content + footer
+                div.innerHTML = selectHtml + statusHtml + contentHtml + footerHtml;
                 container.appendChild(div);
             });
         }
