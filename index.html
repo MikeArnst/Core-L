@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v3.1</title>
+    <title>Core-Learning v3.2</title>
     <style>
         :root {
-            /* Core Theme v3.1 - Clean Layout & Structure */
+            /* Core Theme v3.2 - Auto-Repair & Stable Grid */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -125,7 +125,7 @@
         .btn-edit { color: #60a5fa; }
         .btn-delete-small { color: #ef4444; }
 
-        /* --- VOKABEL KARTEN v3.1 --- */
+        /* --- VOKABEL KARTEN v3.2 (Fixierte Spalten) --- */
         .vocab-item {
             border: 1px solid var(--border); 
             padding: 16px;
@@ -138,22 +138,23 @@
         }
         .vocab-item.paused { opacity: 0.4; }
         
+        /* Das Grid: 3 Spalten. Links und Rechts teilen sich den Platz, Mitte ist fix */
         .vocab-columns-wrapper {
             display: grid;
-            grid-template-columns: 1fr 20px 1fr; /* 20px für Pfeil */
+            grid-template-columns: 1fr 24px 1fr; 
             gap: 12px;
-            align-items: start; /* Wichtig: Oben bündig */
+            align-items: start; /* Ganz wichtig: Startet oben bündig */
             width: 100%;
         }
 
         .vocab-col {
             word-wrap: break-word;
             overflow-wrap: break-word;
-            white-space: pre-wrap; /* Zeilenumbrüche erhalten */
+            white-space: pre-wrap; /* Wichtig für Zeilenumbrüche */
             font-size: 0.95rem;
-            line-height: 1.5; /* Gute Lesbarkeit */
+            line-height: 1.5; 
             color: var(--text-main);
-            font-weight: 400;
+            font-weight: 400; /* Nicht fett */
         }
 
         .vocab-col.left { text-align: left; }
@@ -165,7 +166,6 @@
             color: var(--text-muted);
             font-size: 0.9rem;
             opacity: 0.5;
-            /* WICHTIG: Visuelle Korrektur, damit er auf Höhe der ersten Zeile sitzt */
             padding-top: 3px; 
         }
 
@@ -179,7 +179,7 @@
             width: 100%; display: flex; justify-content: flex-end; margin-top: 10px; gap: 6px;
         }
 
-        /* Management Bar */
+        /* Management Bar (Oben) */
         .management-bar {
             display: flex; gap: 8px; margin-bottom: 15px; margin-top: 15px;
             border-top: 1px solid var(--border); padding-top: 15px;
@@ -195,7 +195,6 @@
 
         .hidden { display: none !important; }
         
-        /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9); z-index: 200;
@@ -231,7 +230,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v3.1 | Clean Edition</div>
+        <div class="subtitle">v3.2 | Auto-Repair</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -313,7 +312,7 @@
         </div>
 
         <div id="question-area">
-            <p style="text-align:center; color:var(--text-muted); margin-top:25px; font-size: 0.85rem;">Übersetze:</p>
+            <p style="text-align:center; color:var(--text-muted); margin-top:10px; font-size: 0.85rem;">Übersetze:</p>
             <div id="question-display">...</div>
             <div id="priority-indicator" style="text-align:center; margin-bottom:10px; font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
             <input type="text" id="test-input" placeholder="Antwort..." autocomplete="off">
@@ -348,8 +347,44 @@
                 }
                 if (appData.streak === undefined) appData.streak = 0;
                 if (!appData.projects) appData.projects = [];
+                
+                // AUTO REPAIR ON START
+                repairAllData();
+                
                 checkStreakLogic(); showProjects(); 
             } catch(e) { appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [{ name: "Neu", words: [] }] }; save(); showProjects(); }
+        }
+
+        // --- NEW: AUTO REPAIR FUNCTION ---
+        function repairAllData() {
+            let changeMade = false;
+            if(appData.projects) {
+                appData.projects.forEach(proj => {
+                    if(proj.words) {
+                        proj.words.forEach(word => {
+                            // Bereinige JEDES Wort automatisch beim Start
+                            const cleanDe = cleanDisplay(word.de);
+                            const cleanLang = cleanDisplay(word.lang);
+                            const cleanNote = cleanDisplay(word.note);
+                            
+                            if(word.de !== cleanDe || word.lang !== cleanLang || word.note !== cleanNote) {
+                                word.de = cleanDe;
+                                word.lang = cleanLang;
+                                word.note = cleanNote;
+                                changeMade = true;
+                            }
+                        });
+                        // Leere Einträge entfernen
+                        const beforeCount = proj.words.length;
+                        proj.words = proj.words.filter(w => w.de || w.lang);
+                        if(proj.words.length !== beforeCount) changeMade = true;
+                    }
+                });
+            }
+            if(changeMade) {
+                save();
+                console.log("Daten automatisch repariert.");
+            }
         }
 
         function save() { localStorage.setItem('core_l_data_v2', JSON.stringify(appData)); }
@@ -367,18 +402,17 @@
         // --- DEEP CLEANER (Zeilenweise) ---
         function cleanString(str) {
             if(!str) return "";
-            // Splitte nach Zeilen, trimme JEDE Zeile einzeln und füge wieder zusammen
             return str.split('\n')
                       .map(line => line.trim())
-                      .filter(line => line.length > 0) // Leere Zeilen entfernen
+                      .filter(line => line.length > 0)
                       .join('\n')
                       .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ä/g, 'ae').replace(/ö/g, 'o').replace(/ß/g, 'ss').replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ı/g, 'i').replace(/İ/g, 'i')
-                      .toLowerCase(); // Für Vergleich
+                      .toLowerCase();
         }
         
-        // Reine Display Funktion (ohne lowercase für Anzeige)
         function cleanDisplay(str) {
             if(!str) return "";
+            // Entfernt Leerzeichen am Anfang/Ende jeder Zeile und leere Zeilen
             return str.split('\n').map(l => l.trim()).filter(l => l.length > 0).join('\n');
         }
 
@@ -435,7 +469,6 @@
         function getCurrentList() { return appData.projects[appData.activeProjectId].words; }
         
         function addVocab() {
-            // Cleaner beim Hinzufügen anwenden
             const deRaw = document.getElementById('input-de').value;
             const langRaw = document.getElementById('input-lang').value;
             const noteRaw = document.getElementById('input-note').value;
@@ -512,7 +545,6 @@
         // --- CSV PARSER (Fix for Empty Lines) ---
         function parseCSV(text) {
             const rows = []; let currentRow = []; let currentCell = ''; let inQuotes = false;
-            // Normalize Line Endings
             const chars = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
             for (let i = 0; i < chars.length; i++) {
                 const char = chars[i]; const nextChar = chars[i+1];
@@ -531,12 +563,11 @@
                 
                 rows.forEach(parts => {
                     if(parts.length >= 2) {
-                        // Clean Strings immediately
                         const de = cleanDisplay(parts[0]); 
                         const lang = cleanDisplay(parts[1]); 
                         const note = parts.length >= 3 ? cleanDisplay(parts[2]) : '';
 
-                        if(!de && !lang) { skipped++; return; } // Completely empty row check
+                        if(!de && !lang) { skipped++; return; } 
                         
                         if (!list.some(w => w.de === de && w.lang === lang)) { 
                             list.push({ de, lang, note, active: true, priority: false, successCount: 0 }); added++; 
