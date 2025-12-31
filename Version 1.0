@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Core-L</title>
+    <style>
+        :root {
+            /* Modern Dark Palette - Core Theme */
+            --bg-app: #0f172a;       
+            --bg-card: #1e293b;      
+            --primary: #3b82f6;      
+            --text-main: #f1f5f9;    
+            --text-muted: #94a3b8;   
+            --input-bg: #334155;     
+            --border: #475569;
+            
+            --success-bg: #064e3b;
+            --success-text: #34d399;
+            --error-bg: #450a0a;
+            --error-text: #f87171;
+            
+            --star-color: #eab308; /* Gold für Fokus */
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding-bottom: 90px; 
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--text-main); /* Helles Weiß für den Core-L Look */
+            margin-bottom: 5px;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.3); /* Leichter Glow */
+        }
+        
+        .subtitle {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--bg-card);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            border: 1px solid var(--border);
+        }
+
+        h3 { margin-top: 0; margin-bottom: 15px; font-size: 1.1rem; font-weight: 600; }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            background-color: var(--input-bg);
+            border: 1px solid transparent;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--primary); background-color: #1e293b; }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: transform 0.1s;
+        }
+        button:active { transform: scale(0.98); }
+        button.secondary { background-color: var(--input-bg); color: var(--text-muted); }
+        button.danger { background-color: transparent; border: 1px solid #ef4444; color: #ef4444; margin-top: 15px; }
+        button.outline { background-color: transparent; border: 1px solid var(--primary); color: var(--primary); }
+
+        /* Icon Buttons in Liste */
+        .action-row {
+            display: flex;
+            gap: 8px;
+            margin-left: 10px;
+        }
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            margin: 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: var(--input-bg);
+            color: var(--text-muted);
+        }
+        .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.3); }
+        .btn-icon.active-pause { color: var(--text-muted); opacity: 0.5; } 
+        .btn-icon.is-paused { color: #f97316; border: 1px solid #f97316; } 
+        
+        .btn-delete-small {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .vocab-item {
+            border-bottom: 1px solid var(--border);
+            padding: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: opacity 0.3s;
+        }
+        .vocab-item.paused { opacity: 0.5; }
+        .vocab-item:last-child { border-bottom: none; }
+        
+        .vocab-text { font-size: 15px; font-weight: 500; }
+        .vocab-note { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+
+        .badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .badge-priority { background: var(--star-color); color: #000; }
+        .badge-paused { background: var(--text-muted); color: #000; }
+
+        .hidden { display: none; }
+        #question-display { font-size: 1.5rem; text-align: center; margin: 20px 0; font-weight: 800; color: white; }
+        #feedback-area { margin-top: 20px; padding: 15px; border-radius: 12px; text-align: center; }
+        .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid var(--success-bg); }
+        .wrong { background-color: var(--error-bg); color: var(--error-text); border: 1px solid var(--error-bg); }
+        .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--primary); font-size: 14px; color: var(--text-muted); text-align: left; }
+
+        .nav-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+            display: flex; padding: 15px 10px; box-sizing: border-box;
+            justify-content: space-around; z-index: 100;
+        }
+        .nav-btn { background: transparent; color: var(--text-muted); font-size: 14px; width: auto; margin: 0; padding: 0; font-weight: normal; }
+        .nav-btn.active { color: var(--primary); font-weight: 600; }
+        
+        hr { border: 0; border-top: 1px solid var(--border); margin: 25px 0; }
+        .file-upload { display: block; margin-top: 10px; padding: 15px; border: 2px dashed var(--border); text-align: center; border-radius: 10px; cursor: pointer; color: var(--text-muted); font-size: 14px; }
+
+    </style>
+</head>
+<body>
+
+    <h1>Core-L</h1>
+    <div class="subtitle">Core Learning System</div>
+
+    <div id="view-list" class="container">
+        <h3>Neues Wort</h3>
+        <input type="text" id="input-de" placeholder="🇩🇪 Deutsch">
+        <input type="text" id="input-lang" placeholder="🌍 Fremdsprache">
+        <input type="text" id="input-note" placeholder="💡 Notiz / Info">
+        <button onclick="addVocab()">Hinzufügen</button>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; margin-bottom:10px;">
+            <h3>Deine Liste</h3>
+            <span style="background:var(--input-bg); padding:2px 8px; border-radius:6px; font-size:12px; color:var(--text-muted);">
+                <span id="count">0</span> Wörter
+            </span>
+        </div>
+        
+        <div id="vocab-list-container"></div>
+        <button class="danger" onclick="clearAllData()">Alles löschen</button>
+
+        <hr>
+        <button class="outline" onclick="exportData()">⬇️ Datenbank speichern</button>
+        <label class="file-upload">
+            ⬆️ Datenbank laden
+            <input type="file" id="file-input" style="display: none;" onchange="importData(this)">
+        </label>
+    </div>
+
+    <div id="view-test" class="container hidden">
+        <div style="display:flex; justify-content:space-between; color:var(--text-muted); font-size:0.9rem;">
+            <span>Training</span>
+            <span id="test-direction">Zufall</span>
+        </div>
+        
+        <div id="question-area">
+            <p style="text-align:center; color:var(--text-muted); margin-top:30px;">Input:</p>
+            <div id="question-display">...</div>
+            
+            <div id="priority-indicator" style="text-align:center; margin-bottom:10px; font-size:0.8rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ High Priority</div>
+
+            <input type="text" id="test-input" placeholder="Antwort..." autocomplete="off">
+            <button onclick="checkAnswer()">Prüfen</button>
+            <button class="secondary" onclick="solve()">Lösung anzeigen</button>
+        </div>
+
+        <div id="result-area" class="hidden">
+            <div id="feedback-message"></div>
+            <div id="notes-display" class="hint-box hidden"></div>
+            <br>
+            <button onclick="nextQuestion()">Weiter</button>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <button class="nav-btn active" onclick="switchTab('list')" id="nav-list">DATABASE</button>
+        <button class="nav-btn" onclick="switchTab('test')" id="nav-test">LEARN</button>
+    </div>
+
+    <script>
+        // --- CORE-L SYSTEM LOGIC ---
+        
+        let vocabList = JSON.parse(localStorage.getItem('myVocabApp_v1')) || [];
+        let cooldownQueue = []; 
+        let currentQuestionIndex = null;
+        let direction = 0; 
+
+        // Migration Check
+        vocabList.forEach(v => {
+            if(v.active === undefined) v.active = true;
+            if(v.priority === undefined) v.priority = false;
+        });
+
+        renderList();
+
+        function save() {
+            localStorage.setItem('myVocabApp_v1', JSON.stringify(vocabList));
+            renderList();
+        }
+
+        // --- EXPORT / IMPORT ---
+        function exportData() {
+            if(vocabList.length === 0) { alert("Datenbank leer."); return; }
+            const blob = new Blob([JSON.stringify(vocabList)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = "core-l-backup.json";
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function importData(elem) {
+            const file = elem.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (Array.isArray(data)) {
+                        if(confirm("Datenbank überschreiben?")) {
+                            vocabList = data;
+                            vocabList.forEach(v => {
+                                if(v.active === undefined) v.active = true;
+                                if(v.priority === undefined) v.priority = false;
+                            });
+                            save();
+                            alert("Daten erfolgreich geladen.");
+                        }
+                    }
+                } catch (err) { alert("Fehler beim Lesen der Datei."); }
+                elem.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        // --- CORE FUNCTIONS ---
+        function addVocab() {
+            const de = document.getElementById('input-de').value.trim();
+            const lang = document.getElementById('input-lang').value.trim();
+            const note = document.getElementById('input-note').value.trim();
+
+            if (!de || !lang) { alert("Bitte Eingabefelder füllen."); return; }
+            
+            vocabList.push({ de, lang, note, active: true, priority: false });
+            save();
+
+            document.getElementById('input-de').value = '';
+            document.getElementById('input-lang').value = '';
+            document.getElementById('input-note').value = '';
+        }
+
+        function togglePriority(index) {
+            vocabList[index].priority = !vocabList[index].priority;
+            save();
+        }
+
+        function toggleActive(index) {
+            vocabList[index].active = !vocabList[index].active;
+            if (!vocabList[index].active) {
+                cooldownQueue = cooldownQueue.filter(i => i !== index);
+            }
+            save();
+        }
+
+        function deleteVocab(index) {
+            if(confirm("Eintrag löschen?")) {
+                vocabList.splice(index, 1);
+                cooldownQueue = []; 
+                save();
+            }
+        }
+
+        function clearAllData() {
+            if(confirm("Gesamte Datenbank löschen?")) {
+                localStorage.removeItem('myVocabApp_v1');
+                vocabList = []; cooldownQueue = [];
+                renderList();
+            }
+        }
+
+        function renderList() {
+            const container = document.getElementById('vocab-list-container');
+            document.getElementById('count').innerText = vocabList.length;
+            container.innerHTML = '';
+
+            if (vocabList.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:var(--text-muted); margin-top:20px;">Keine Einträge.</p>';
+                return;
+            }
+
+            vocabList.forEach((v, index) => {
+                const div = document.createElement('div');
+                div.className = `vocab-item ${!v.active ? 'paused' : ''}`;
+                
+                div.innerHTML = `
+                    <div style="flex:1; overflow:hidden;">
+                        <div class="vocab-text">
+                            ${v.priority ? '<span class="badge badge-priority">CORE</span>' : ''}
+                            ${!v.active ? '<span class="badge badge-paused">PAUSE</span>' : ''}
+                            ${v.de} <span style="color:var(--text-muted)">➝</span> ${v.lang}
+                        </div>
+                        ${v.note ? `<div class="vocab-note">${v.note}</div>` : ''}
+                    </div>
+                    
+                    <div class="action-row">
+                        <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${index})">
+                            ★
+                        </button>
+                        <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${index})">
+                            ${v.active ? '⏸' : '▶'}
+                        </button>
+                        <button class="btn-icon btn-delete-small" onclick="deleteVocab(${index})">✕</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- TEST LOGIC ---
+        function startTest() {
+            const activeWords = vocabList.filter(v => v.active);
+            if (activeWords.length === 0) {
+                alert("Keine aktiven Wörter. Bitte 'Entpausieren'.");
+                switchTab('list');
+                return;
+            }
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            document.getElementById('question-area').classList.remove('hidden');
+            document.getElementById('result-area').classList.add('hidden');
+            document.getElementById('test-input').value = '';
+            document.getElementById('notes-display').classList.add('hidden');
+            document.getElementById('priority-indicator').style.visibility = 'hidden';
+            
+            let selectionPool = [];
+
+            vocabList.forEach((word, index) => {
+                if (!word.active) return;
+                if (cooldownQueue.includes(index)) return;
+
+                selectionPool.push(index);
+                if (word.priority) {
+                    selectionPool.push(index);
+                    selectionPool.push(index);
+                }
+            });
+
+            if (selectionPool.length === 0) {
+                vocabList.forEach((word, index) => {
+                    if (!word.active) return;
+                    selectionPool.push(index);
+                    if (word.priority) {
+                        selectionPool.push(index);
+                        selectionPool.push(index);
+                    }
+                });
+            }
+
+            const randomIndexInPool = Math.floor(Math.random() * selectionPool.length);
+            currentQuestionIndex = selectionPool[randomIndexInPool];
+
+            cooldownQueue.push(currentQuestionIndex);
+            if (cooldownQueue.length > 5) cooldownQueue.shift();
+
+            direction = Math.random() < 0.5 ? 0 : 1; 
+            const word = vocabList[currentQuestionIndex];
+            
+            if (word.priority) {
+                document.getElementById('priority-indicator').style.visibility = 'visible';
+            }
+
+            const display = direction === 0 ? word.de : word.lang;
+            document.getElementById('question-display').innerText = display;
+            document.getElementById('test-direction').innerText = direction === 0 ? "DE ➝ Fremd" : "Fremd ➝ DE";
+            
+            setTimeout(() => document.getElementById('test-input').focus(), 100);
+        }
+
+        function checkAnswer() {
+            const input = document.getElementById('test-input').value.trim().toLowerCase();
+            const word = vocabList[currentQuestionIndex];
+            const correctSolution = direction === 0 ? word.lang : word.de;
+            
+            const isCorrect = input === correctSolution.toLowerCase();
+            showResult(isCorrect, correctSolution, word.note);
+        }
+
+        function solve() {
+            const word = vocabList[currentQuestionIndex];
+            const correctSolution = direction === 0 ? word.lang : word.de;
+            showResult(false, correctSolution, word.note, true);
+        }
+
+        function showResult(isCorrect, solution, note, wasSkipped = false) {
+            document.getElementById('question-area').classList.add('hidden');
+            const resultArea = document.getElementById('result-area');
+            resultArea.classList.remove('hidden');
+            
+            const feedback = document.getElementById('feedback-message');
+            const noteBox = document.getElementById('notes-display');
+
+            if (isCorrect) {
+                feedback.className = 'correct';
+                feedback.innerHTML = `<h3 style="margin:0">Korrekt!</h3>`;
+            } else {
+                feedback.className = 'wrong';
+                feedback.innerHTML = wasSkipped 
+                    ? `<span style="display:block; font-size:0.9rem; margin-bottom:5px;">Lösung:</span><b style="font-size:1.2rem;">${solution}</b>`
+                    : `<span style="display:block; font-size:0.9rem; margin-bottom:5px;">Falsch. Richtig wäre:</span><b style="font-size:1.2rem;">${solution}</b>`;
+            }
+
+            if (note) {
+                noteBox.innerHTML = `<b>Info:</b> ${note}`;
+                noteBox.classList.remove('hidden');
+            } else {
+                noteBox.classList.add('hidden');
+            }
+        }
+
+        function switchTab(tab) {
+            document.getElementById('view-list').classList.add('hidden');
+            document.getElementById('view-test').classList.add('hidden');
+            document.getElementById('nav-list').classList.remove('active');
+            document.getElementById('nav-test').classList.remove('active');
+
+            if (tab === 'list') {
+                document.getElementById('view-list').classList.remove('hidden');
+                document.getElementById('nav-list').classList.add('active');
+                renderList();
+            } else {
+                document.getElementById('view-test').classList.remove('hidden');
+                document.getElementById('nav-test').classList.add('active');
+                startTest();
+            }
+        }
+    </script>
+</body>
+</html>
