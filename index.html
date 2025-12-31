@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v8.0</title>
+    <title>Core-Learning v8.1</title>
     <style>
         :root {
-            /* Core Theme v8.0 - Bulletproof */
+            /* Core Theme v8.1 - Hotfix */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -221,7 +221,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v8.0 | Bulletproof</div>
+        <div class="subtitle">v8.1 | Hotfix</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -355,6 +355,8 @@
                 <span id="level-indicator" style="font-size:0.7rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:var(--text-muted);">Box 0</span>
             </div>
             
+            <div id="priority-indicator" style="text-align:center; margin-bottom:10px; font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
+            
             <div id="question-display">...</div>
             <div id="seq-progress" style="text-align:center; font-size:0.75rem; color:var(--accent-seq); margin-bottom:5px; display:none;">Teil 1/3</div>
             
@@ -399,16 +401,12 @@
 
         function repairAllData() {
             if(!appData.projects) appData.projects = [];
-            // Remove NULL projects
             appData.projects = appData.projects.filter(p => p !== null && p !== undefined);
             
             appData.projects.forEach(proj => {
                 if(!proj.words) proj.words = [];
-                
-                // 1. Remove complete garbage (nulls)
                 proj.words = proj.words.filter(w => w !== null && w !== undefined);
 
-                // 2. Fix structure
                 proj.words.forEach(word => {
                     if(!word.type) word.type = 'word';
                     if(word.box === undefined) word.box = 0;
@@ -424,7 +422,6 @@
                     }
                 });
                 
-                // 3. Remove logically broken items (empty strings)
                 proj.words = proj.words.filter(w => {
                     if(w.type === 'word') return (w.de && w.lang);
                     if(w.type === 'sequence') return (w.steps && w.steps.length > 0 && w.steps[0].de);
@@ -490,7 +487,6 @@
 
         // --- LIST & SELECTION ---
         function getCurrentList() { 
-            // Safety check in case activeProjectId is invalid
             if(!appData.projects[appData.activeProjectId]) {
                 appData.activeProjectId = 0; 
                 if(!appData.projects[0]) appData.projects.push({name: "Rescue", words:[]});
@@ -737,7 +733,7 @@
             }; reader.readAsText(file);
         }
 
-        // --- TRAINING LOGIC v8.0 (ERROR DISPLAY) ---
+        // --- TRAINING LOGIC v8.1 (FIXED) ---
         function startTest() {
             try {
                 repairAllData();
@@ -761,7 +757,12 @@
         }
 
         function nextQuestion() {
-            document.getElementById('question-area').classList.remove('hidden'); document.getElementById('result-area').classList.add('hidden'); document.getElementById('test-input').value = ''; document.getElementById('notes-display').classList.add('hidden'); document.getElementById('priority-indicator').style.visibility = 'hidden';
+            document.getElementById('question-area').classList.remove('hidden'); document.getElementById('result-area').classList.add('hidden'); document.getElementById('test-input').value = ''; document.getElementById('notes-display').classList.add('hidden'); 
+            
+            // SAFE PRIORITY TOGGLE
+            const prioInd = document.getElementById('priority-indicator');
+            if(prioInd) prioInd.style.visibility = 'hidden';
+            
             document.getElementById('seq-progress').style.display = 'none';
 
             try {
@@ -769,6 +770,7 @@
                 let selectionPool = [];
                 list.forEach((word, index) => { 
                     if (!word.active || cooldownQueue.includes(index)) return; 
+                    
                     let weight = 10;
                     const box = word.box || 0;
                     if (box === 0) weight = 50; else if (box === 1) weight = 25; else if (box === 5) weight = 1; else weight = 10;
@@ -794,7 +796,6 @@
                     isSequenceActive = false; showStandardCard(word); 
                 }
             } catch(e) {
-                // ERROR BLACKBOX
                 document.getElementById('question-display').style.color = '#ff5555';
                 document.getElementById('question-display').innerText = "System Fehler: " + e.message;
             }
@@ -803,13 +804,14 @@
         function showStandardCard(word) {
             cooldownQueue.push(currentQuestionIndex); if (cooldownQueue.length > 5) cooldownQueue.shift();
             direction = Math.random() < 0.5 ? 0 : 1; 
-            if (word.priority) document.getElementById('priority-indicator').style.visibility = 'visible';
-            document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
             
+            const prioInd = document.getElementById('priority-indicator');
+            if(prioInd && word.priority) prioInd.style.visibility = 'visible';
+            
+            document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
             const txt = direction === 0 ? word.de : word.lang;
             document.getElementById('question-display').style.color = 'white';
-            document.getElementById('question-display').innerText = txt || "Fehler: Leere Karte";
-            
+            document.getElementById('question-display').innerText = txt || "Fehler";
             setTimeout(() => document.getElementById('test-input').focus(), 100);
         }
 
