@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v6.0</title>
+    <title>Core-Learning v6.1</title>
     <style>
         :root {
-            /* Core Theme v6.0 - Stability Release */
+            /* Core Theme v6.1 - Fix & Space */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -23,12 +23,8 @@
             --star-color: #eab308;
             --fire-color: #fb923c;
             
-            --box-0: #262626; 
-            --box-1: #451a03; 
-            --box-2: #5c2b0c; 
-            --box-3: #172554; 
-            --box-4: #1e1b4b; 
-            --box-5: #422006; 
+            --box-0: #262626; --box-1: #451a03; --box-2: #5c2b0c; 
+            --box-3: #172554; --box-4: #1e1b4b; --box-5: #422006; 
         }
 
         body {
@@ -87,7 +83,7 @@
         
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
-        /* --- DASHBOARD STATS (BOX DESIGN) --- */
+        /* --- DASHBOARD STATS --- */
         .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
         .stat-card {
             flex: 1; background: var(--input-bg); padding: 15px; border-radius: 12px;
@@ -109,7 +105,7 @@
         .action-item:active .list-btn-circle { transform: scale(0.9); }
         .action-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
 
-        /* --- CARDS --- */
+        /* --- CARDS & SEQUENCES --- */
         .vocab-item {
             border: 1px solid var(--border); padding: 0 0 0 0; margin-bottom: 20px;
             display: flex; flex-direction: column; border-radius: 10px; background: #151515;
@@ -160,7 +156,6 @@
         .seq-step-row { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
         .expanded .seq-steps-container { display: block; }
         
-        /* FOOTER AUF KARTE */
         .vocab-footer {
             display: flex; justify-content: space-between; align-items: flex-end;
             margin-top: 15px; padding: 0 16px 16px 16px; box-sizing: border-box;
@@ -211,11 +206,11 @@
         .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #ccc; }
         .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
         
-        /* FIX SPACING IN QUESTION AREA */
+        /* FIX SPACING IN QUESTION AREA (80px) */
         #question-display { 
-            font-size: 1.3rem; text-align: center; font-weight: 500; color: white; 
+            font-size: 1.4rem; text-align: center; font-weight: 500; color: white; 
             white-space: pre-wrap; line-height: 1.4; 
-            margin: 60px 0 60px 0; /* VIEL PLATZ */
+            margin: 80px 0 80px 0; /* MAXIMALER PLATZ */
         }
         #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
         .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #113311; }
@@ -231,7 +226,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v6.0 | Stability & Fixes</div>
+        <div class="subtitle">v6.1 | Emergency Fix</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -408,6 +403,8 @@
                         proj.words.forEach(word => {
                             if(!word.type) word.type = 'word';
                             if(word.box === undefined) word.box = 0;
+                            if(word.lastWrong === undefined) word.lastWrong = false;
+                            
                             if(word.type === 'word') { 
                                 word.de = cleanDisplay(word.de || ""); 
                                 word.lang = cleanDisplay(word.lang || ""); 
@@ -417,10 +414,10 @@
                                 if(!Array.isArray(word.steps)) word.steps = [];
                             }
                         });
-                        // Filter out completely broken items
+                        // Soft Filter: Remove only completely broken items
                         proj.words = proj.words.filter(w => {
-                            if(w.type === 'word') return (w.de && w.lang);
-                            if(w.type === 'sequence') return (w.steps && w.steps.length > 0 && w.steps[0].de);
+                            if(w.type === 'word') return (w.de || w.lang); // Keep if at least one side exists
+                            if(w.type === 'sequence') return (w.steps && w.steps.length > 0);
                             return false;
                         });
                     }
@@ -491,7 +488,19 @@
             const lang = cleanDisplay(document.getElementById('input-lang').value);
             const note = cleanDisplay(document.getElementById('input-note').value);
             if (!de || !lang) { alert("Bitte ausfüllen."); return; }
-            getCurrentList().push({ type: 'word', de, lang, note, active: true, priority: false, box: 0 });
+            
+            // FULLY DEFINED OBJECT TO PREVENT CRASHES
+            getCurrentList().push({ 
+                type: 'word', 
+                de: de, 
+                lang: lang, 
+                note: note, 
+                active: true, 
+                priority: false, 
+                box: 0, 
+                lastWrong: false 
+            });
+            
             save(); document.getElementById('input-de').value = ''; document.getElementById('input-lang').value = ''; document.getElementById('input-note').value = ''; 
             alert("Gespeichert!"); updateDashboardStats();
         }
@@ -710,10 +719,8 @@
                 const text = e.target.result; 
                 const rows = text.split('\n'); 
                 let added=0;
-                
-                // Detect Separator
                 const firstLine = rows[0] || "";
-                const separator = firstLine.includes(';') ? ';' : ',';
+                const separator = firstLine.includes(';') ? ';' : ','; // Auto-detect
 
                 rows.forEach(r => {
                     const p = r.split(separator); 
@@ -721,7 +728,7 @@
                         const de = cleanDisplay(p[0]);
                         const lang = cleanDisplay(p[1]);
                         if(de && lang) {
-                            getCurrentList().push({ type:'word', de: de, lang: lang, note: p[2]?cleanDisplay(p[2]):'', box:0, active:true });
+                            getCurrentList().push({ type:'word', de: de, lang: lang, note: p[2]?cleanDisplay(p[2]):'', box:0, active:true, lastWrong:false });
                             added++;
                         }
                     }
@@ -730,21 +737,19 @@
             }; reader.readAsText(file);
         }
 
-        // --- TRAINING LOGIC v6.0 ---
+        // --- TRAINING LOGIC v6.1 (CRASH FIX) ---
         function startTest() {
             repairAllData();
             const list = getCurrentList(); 
             const activeWords = list.filter(v => v.active); 
             
-            // FEEDBACK IF EMPTY
             if (activeWords.length === 0) { 
-                switchTab('test'); // Show Test Screen anyway
-                document.getElementById('question-display').innerText = "Keine Vokabeln gefunden.\nBitte hinzufügen oder importieren.";
-                document.getElementById('test-input').style.display = 'none'; // Hide inputs
+                switchTab('test'); 
+                document.getElementById('question-display').innerText = "Keine Vokabeln gefunden.";
+                document.getElementById('test-input').style.display = 'none'; 
                 return; 
             }
             
-            // Reset UI if valid
             document.getElementById('test-input').style.display = 'block'; 
             document.getElementById('test-project-name').innerText = appData.projects[appData.activeProjectId].name; 
             nextQuestion();
@@ -758,8 +763,12 @@
             let selectionPool = [];
             list.forEach((word, index) => { 
                 if (!word.active || cooldownQueue.includes(index)) return; 
-                if (word.type === 'word' && (!word.de || !word.lang)) return; // Skip broken
-                if (word.type === 'sequence' && (!word.steps || word.steps.length === 0)) return;
+                
+                // CRASH PREVENT: Loose Check
+                let valid = false;
+                if (word.type === 'word') valid = true; // accept even if empty to prevent recursion loop
+                if (word.type === 'sequence') valid = true; 
+                if(!valid) return;
 
                 let weight = 10;
                 const box = word.box || 0;
@@ -773,18 +782,21 @@
                 list.forEach((word, index) => { if (word.active) selectionPool.push(index); }); 
             }
             
-            if (selectionPool.length === 0) return; 
+            // If still empty (no active words)
+            if (selectionPool.length === 0) {
+                 document.getElementById('question-display').innerText = "Alles gelernt! (Keine aktiven Karten)";
+                 return;
+            }
 
             currentQuestionIndex = selectionPool[Math.floor(Math.random() * selectionPool.length)];
             const word = list[currentQuestionIndex];
             
+            // ROBUST RENDER
             if (word.type === 'sequence' && word.steps && word.steps.length > 0) { 
                 isSequenceActive = true; currentSequenceStep = 0; showSequenceStep(word); 
-            } 
-            else if (word.type === 'word' && word.de && word.lang) { 
-                isSequenceActive = false; showStandardCard(word); 
             } else {
-                nextQuestion(); // Try again if glitch
+                // Fallback for everything else
+                isSequenceActive = false; showStandardCard(word); 
             }
         }
 
@@ -795,19 +807,18 @@
             document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
             
             const txt = direction === 0 ? word.de : word.lang;
-            document.getElementById('question-display').innerText = txt;
+            document.getElementById('question-display').innerText = txt || "(Leere Karte)";
             
             setTimeout(() => document.getElementById('test-input').focus(), 100);
         }
 
         function showSequenceStep(word) {
             const step = word.steps[currentSequenceStep];
-            if(!step) { nextQuestion(); return; }
             direction = 0; 
             document.getElementById('level-indicator').innerText = "Box " + (word.box || 0);
             document.getElementById('seq-progress').innerText = `Teil ${currentSequenceStep + 1} / ${word.steps.length}`;
             document.getElementById('seq-progress').style.display = 'block';
-            document.getElementById('question-display').innerText = step.de;
+            document.getElementById('question-display').innerText = step.de || "(Leerer Schritt)";
             setTimeout(() => document.getElementById('test-input').focus(), 100);
         }
 
@@ -822,7 +833,6 @@
 
             if (isSequenceActive) {
                 const step = word.steps[currentSequenceStep]; 
-                if(!step) return; 
                 correctSolution = step.lang; note = step.note;
                 isCorrect = cleanString(input) === cleanString(correctSolution);
                 
