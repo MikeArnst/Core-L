@@ -217,7 +217,7 @@
         
         #question-display { 
             font-size: 1.4rem; text-align: center; 
-            font-weight: 400; /* GEÄNDERT: Nicht mehr fett (war 500) */
+            font-weight: 400; /* NICHT FETT */
             color: white; 
             white-space: pre-wrap; line-height: 1.4; margin: 10px 0;
         }
@@ -231,7 +231,7 @@
         .gold-trans { 
             color: var(--gold-text); 
             font-style: italic;
-            font-weight: 400; /* GEÄNDERT: Nicht mehr fett */
+            font-weight: 400; /* NICHT FETT */
         }
 
         #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
@@ -414,6 +414,8 @@
             
             <button onclick="saveEdit()">Speichern</button>
             <button class="secondary" onclick="closeEditModal()">Abbrechen</button>
+            
+            <button class="danger" style="margin-top:10px;" onclick="deleteCurrentCardFromEdit()">🗑️ Karte löschen</button>
         </div>
     </div>
 
@@ -800,6 +802,29 @@
             }
         }
 
+        // NEU: Löschen direkt aus dem Bearbeiten-Fenster
+        function deleteCurrentCardFromEdit() {
+            if(!confirm("Karte wirklich unwiderruflich löschen?")) return;
+            
+            const list = getCurrentList();
+            list.splice(editIndex, 1);
+            save();
+            closeEditModal();
+            renderList(); // Update DB view if open
+            
+            // Wenn wir gerade im Training sind und diese Karte aktiv war
+            if(!document.getElementById('view-test').classList.contains('hidden') && currentQuestionIndex === editIndex) {
+               // Wenn es noch Karten gibt, weiter zur nächsten
+               const activeWords = list.filter(w => w.active);
+               if (activeWords.length > 0) {
+                   nextQuestion();
+               } else {
+                   alert("Keine Karten mehr im Set.");
+                   switchTab('dashboard');
+               }
+            }
+        }
+
         function createStepEditHTML(i, de, lang, note, total) {
             return `<div class="edit-seq-item" id="seq-edit-${i}"><div class="edit-seq-tools"><button class="tiny-btn" onclick="moveStep(${i}, -1)" ${i===0?'disabled':''}>▲</button><button class="tiny-btn" onclick="moveStep(${i}, 1)" ${i===total-1?'disabled':''}>▼</button><button class="tiny-btn" style="background:#722" onclick="removeStep(${i})">x</button></div><div class="edit-seq-inputs"><input type="text" class="step-de" value="${de}" placeholder="DE"><input type="text" class="step-lang" value="${lang}" placeholder="Lang"><input type="text" class="step-note" value="${note}" placeholder="Note" style="font-size:10px; height:25px;"></div></div>`;
         }
@@ -968,7 +993,8 @@
         function checkAnswer() {
             const list = getCurrentList();
             const item = list[currentQuestionIndex];
-            const input = cleanString(document.getElementById('test-input').value);
+            const rawInput = document.getElementById('test-input').value; // Original Input für Anzeige
+            const input = cleanString(rawInput); // Clean Input für Logik
             
             let correctStr = "";
             let noteStr = "";
@@ -983,10 +1009,10 @@
 
             // Toleranz-Vergleich
             const isCorrect = input === cleanString(correctStr);
-            showResult(isCorrect, correctStr, noteStr, item);
+            showResult(isCorrect, correctStr, noteStr, item, rawInput);
         }
 
-        function showResult(success, correctAns, note, item) {
+        function showResult(success, correctAns, note, item, userRawAnswer) {
             document.getElementById('input-area').classList.add('hidden'); // Versteckt Input
             document.getElementById('result-area').classList.remove('hidden'); // Zeigt Ergebnis
             
@@ -997,10 +1023,15 @@
             const oldBox = item.box || 0;
             let newBox = oldBox;
 
+            // ANZEIGE DEINER ANTWORT (NEU)
+            // Falls leer, zeigen wir "(Keine Antwort)"
+            const userDisplay = userRawAnswer ? userRawAnswer : "(Keine Antwort)";
+            let userHtml = `<div style="color:#aaa; font-size:0.9rem; margin-bottom:5px;">Deine Antwort: <span style="color:#fff">${userDisplay}</span></div>`;
+
             if (success) {
                 fb.innerHTML = `<div class="feedback-box correct"><h3>Richtig! 🎉</h3></div>`;
-                // FETTE SCHRIFT ENTFERNT
-                fb.innerHTML += `<div style="margin-top:10px; color:#aaa;">Lösung: ${correctAns}</div>`;
+                fb.innerHTML += userHtml;
+                fb.innerHTML += `<div style="margin-top:5px; color:#aaa;">Lösung: ${correctAns}</div>`;
                 ovr.innerHTML = '';
                 
                 // Box Logik
@@ -1021,8 +1052,8 @@
             } else {
                 newBox = 0;
                 fb.innerHTML = `<div class="feedback-box wrong"><h3>Leider falsch</h3></div>`;
-                // FETTE SCHRIFT ENTFERNT, Farbe bleibt
-                fb.innerHTML += `<div style="margin-top:10px; font-size:1.1rem;">Lösung:<br><span style="color:var(--success-text)">${correctAns}</span></div>`;
+                fb.innerHTML += userHtml;
+                fb.innerHTML += `<div style="margin-top:5px; font-size:1.1rem;">Lösung:<br><span style="color:var(--success-text)">${correctAns}</span></div>`;
                 ovr.innerHTML = `<button class="override-btn" onclick="overrideResult()">War doch richtig (Tippfehler)</button>`;
                 
                 // Bei Fehler: Box 0
