@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v5.0</title>
+    <title>Core-Learning v5.0 Final Polish</title>
     <style>
         :root {
             /* Core Theme v5.0 - Final Polish */
@@ -22,6 +22,7 @@
             --error-text: #f87171;
             --star-color: #eab308;
             --fire-color: #fb923c;
+            --gold-text: #ffd700;
             
             --box-0: #262626; --box-1: #451a03; --box-2: #5c2b0c; 
             --box-3: #172554; --box-4: #1e1b4b; --box-5: #422006; 
@@ -80,6 +81,14 @@
         button.select-mode-btn { background-color: var(--accent-seq); color: white; border: none; }
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
+
+        /* Training Edit Button */
+        .train-edit-btn {
+            background: transparent; border: 1px solid #333; color: #666;
+            width: 30px; height: 30px; padding: 0; border-radius: 50%;
+            font-size: 14px; margin-left: 10px; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .train-edit-btn:hover { background: #222; color: white; }
 
         /* DASHBOARD STATS */
         .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
@@ -208,13 +217,19 @@
         
         #question-display { 
             font-size: 1.4rem; text-align: center; font-weight: 500; color: white; 
-            white-space: pre-wrap; line-height: 1.4; 
-            margin: 80px 0 80px 0; 
+            white-space: pre-wrap; line-height: 1.4; margin: 10px 0;
         }
+        
+        /* Persistent Training Header */
+        .persistent-header { margin: 40px 0 20px 0; text-align: center; }
+
         #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
         .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #113311; }
         .wrong { background-color: var(--error-bg); color: var(--error-text); border: 1px solid #331111; }
         .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--text-muted); font-size: 14px; color: var(--text-muted); text-align: left; white-space: pre-wrap; line-height: 1.5; border-radius: 4px;}
+
+        /* Gold Box Info */
+        .gold-transition { color: var(--gold-text); font-weight: bold; margin-top: 5px; font-size: 0.9rem; display: block; font-style: italic; }
 
         hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
         .file-upload { display: block; border: 1px dashed var(--border); text-align: center; border-radius: 6px; cursor: pointer; color: var(--text-muted); }
@@ -400,21 +415,26 @@
             <span style="color:var(--text-muted); font-size:0.8rem;" id="test-project-name">Training</span>
         </div>
 
-        <div id="question-area">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <p style="text-align:left; color:var(--text-muted); font-size: 0.85rem; margin:0;">Übersetze:</p>
+        <div class="persistent-header">
+            <div style="display:flex; justify-content:center; align-items:center; gap: 10px; margin-bottom: 5px;">
                 <span id="level-indicator" style="font-size:0.7rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:var(--text-muted);">Box 0</span>
+                <div id="priority-indicator" style="font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
             </div>
             
-            <div id="priority-indicator" style="text-align:center; margin-bottom:10px; font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
-            
-            <div id="question-display">...</div>
+            <div style="display:flex; justify-content:center; align-items:center;">
+                <div id="question-display">...</div>
+                <button class="train-edit-btn" onclick="editCurrentCard()">✏️</button>
+            </div>
             <div id="seq-progress" style="text-align:center; font-size:0.75rem; color:var(--accent-seq); margin-bottom:5px; display:none;">Teil 1/3</div>
-            
+        </div>
+
+        <div id="input-area">
+            <div style="text-align:left; color:var(--text-muted); font-size: 0.85rem; margin-bottom:5px;">Übersetze:</div>
             <input type="text" id="test-input" placeholder="Antwort..." autocomplete="off">
             <button onclick="checkAnswer()">Prüfen</button>
             <button class="secondary" onclick="solve()">Lösung</button>
         </div>
+
         <div id="result-area" class="hidden">
             <div id="feedback-message"></div>
             <div id="override-container"></div> 
@@ -500,8 +520,11 @@
             }
         }
         
+        // TOLERANZ-UPDATE: Ignoriert Punkte, Kommas, etc.
         function cleanString(str) { 
             return str ? str.trim().toLowerCase()
+                .replace(/[.,?!]/g, '') // Entfernt Satzzeichen
+                .replace(/\s+/g, ' ') // Entfernt doppelte Leerzeichen
                 .replace(/ğ/g, 'g')
                 .replace(/ü/g, 'u')
                 .replace(/ä/g, 'ae')
@@ -760,6 +783,13 @@
             document.getElementById('edit-modal').classList.remove('hidden');
         }
 
+        // Direktes Bearbeiten im Training
+        function editCurrentCard() {
+            if(currentQuestionIndex !== null) {
+                openEditModal(currentQuestionIndex);
+            }
+        }
+
         function createStepEditHTML(i, de, lang, note, total) {
             return `<div class="edit-seq-item" id="seq-edit-${i}"><div class="edit-seq-tools"><button class="tiny-btn" onclick="moveStep(${i}, -1)" ${i===0?'disabled':''}>▲</button><button class="tiny-btn" onclick="moveStep(${i}, 1)" ${i===total-1?'disabled':''}>▼</button><button class="tiny-btn" style="background:#722" onclick="removeStep(${i})">x</button></div><div class="edit-seq-inputs"><input type="text" class="step-de" value="${de}" placeholder="DE"><input type="text" class="step-lang" value="${lang}" placeholder="Lang"><input type="text" class="step-note" value="${note}" placeholder="Note" style="font-size:10px; height:25px;"></div></div>`;
         }
@@ -817,7 +847,14 @@
                 item.lang = cleanDisplay(document.getElementById('edit-lang').value);
                 item.note = cleanDisplay(document.getElementById('edit-note').value);
             }
-            save(); closeEditModal(); renderList();
+            save(); 
+            closeEditModal(); 
+            renderList();
+            
+            // Falls wir gerade im Training sind und genau diese Karte bearbeiten, Anzeige aktualisieren
+            if(!document.getElementById('view-test').classList.contains('hidden') && editIndex === currentQuestionIndex) {
+                displayQuestion(item, item.type === 'sequence');
+            }
         }
         
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
@@ -833,14 +870,14 @@
         }
 
         function nextQuestion() {
-            document.getElementById('question-area').classList.remove('hidden');
+            document.getElementById('input-area').classList.remove('hidden');
             document.getElementById('result-area').classList.add('hidden');
             document.getElementById('test-input').value = '';
             document.getElementById('test-input').focus();
             
             const list = getCurrentList();
             
-            // Wenn Sequenz aktiv ist, mach einfach den nächsten Schritt
+            // Wenn Sequenz aktiv ist
             if (isSequenceActive && currentQuestionIndex !== null) {
                 const seqItem = list[currentQuestionIndex];
                 currentSequenceStep++;
@@ -852,7 +889,6 @@
                     // Sequenz beendet
                     isSequenceActive = false;
                     currentSequenceStep = 0;
-                    // Normale Logik folgt unten...
                 }
             }
             
@@ -865,7 +901,6 @@
             // Cooldown Check
             if (cooldownQueue.length > 0) {
                 const cooledIndex = cooldownQueue.shift();
-                // Prüfen ob noch im aktiven Set
                 const exists = activeWords.find(w => w.idx === cooledIndex);
                 if (exists) {
                     currentQuestionIndex = cooledIndex;
@@ -875,11 +910,11 @@
                 }
             }
 
-            // Algorithmus: Priority > Box 0 > Random
+            // Algorithmus: Priority > Box 0 > Box < 5 > Random
             let candidates = activeWords.filter(w => w.priority);
             if (candidates.length === 0) candidates = activeWords.filter(w => w.box === 0);
             if (candidates.length === 0) candidates = activeWords.filter(w => w.box < 5);
-            if (candidates.length === 0) candidates = activeWords; // Alles gelernt? Zufall.
+            if (candidates.length === 0) candidates = activeWords; 
 
             const picked = candidates[Math.floor(Math.random() * candidates.length)];
             currentQuestionIndex = picked.idx;
@@ -888,7 +923,7 @@
             if (picked.type === 'sequence') {
                 isSequenceActive = true;
                 currentSequenceStep = 0;
-                direction = 0; // Sequenzen immer DE->Lang (meistens sinnvoller)
+                direction = 0; // Sequenzen immer DE->Lang
                 displayQuestion(picked, true);
             } else {
                 direction = Math.random() < 0.5 ? 0 : 1;
@@ -931,6 +966,7 @@
                 noteStr = item.note;
             }
 
+            // Toleranz-Vergleich
             const isCorrect = input === cleanString(correctStr);
             showResult(isCorrect, correctStr, noteStr, item);
         }
@@ -948,16 +984,19 @@
                 correctStr = direction === 0 ? item.lang : item.de;
                 noteStr = item.note;
             }
-            showResult(false, correctStr, noteStr, item); // Als falsch werten
+            showResult(false, correctStr, noteStr, item); 
         }
 
         function showResult(success, correctAns, note, item) {
-            document.getElementById('question-area').classList.add('hidden');
-            document.getElementById('result-area').classList.remove('hidden');
+            document.getElementById('input-area').classList.add('hidden'); // Versteckt Input
+            document.getElementById('result-area').classList.remove('hidden'); // Zeigt Ergebnis
             
             const fb = document.getElementById('feedback-message');
             const ovr = document.getElementById('override-container');
             const noteDiv = document.getElementById('notes-display');
+            
+            const oldBox = item.box || 0;
+            let newBox = oldBox;
 
             if (success) {
                 fb.innerHTML = `<div class="feedback-box correct"><h3>Richtig! 🎉</h3></div>`;
@@ -965,39 +1004,34 @@
                 ovr.innerHTML = '';
                 
                 // Box Logik
-                // Bei Sequenz: Nur am ENDE die Box erhöhen? Oder pro Schritt? 
-                // Core-Logic: Wenn ein Fehler in der Sequenz passiert, ganze Sequenz falsch.
-                // Wenn richtig, passiert noch nichts mit Box, erst am Ende der Sequenz.
-                
                 if (item.type !== 'sequence') {
-                    if (item.box < 5) item.box++;
+                    if (item.box < 5) newBox++;
+                    item.box = newBox;
                     item.lastWrong = false;
                     updateStreak();
                 } else {
-                    // Sequenz Step richtig
                     if (currentSequenceStep === item.steps.length - 1) {
-                         // Letzter Schritt richtig -> Ganze Sequenz hoch
-                         if (item.box < 5) item.box++;
+                         if (item.box < 5) newBox++;
+                         item.box = newBox;
                          item.lastWrong = false;
                          updateStreak();
                     }
                 }
 
             } else {
+                newBox = 0;
                 fb.innerHTML = `<div class="feedback-box wrong"><h3>Leider falsch</h3></div>`;
                 fb.innerHTML += `<div style="margin-top:10px; font-size:1.1rem;">Lösung:<br><b style="color:var(--success-text)">${correctAns}</b></div>`;
-                
-                // Override Button
                 ovr.innerHTML = `<button class="override-btn" onclick="overrideResult()">War doch richtig (Tippfehler)</button>`;
                 
-                // Reset Box
+                // Bei Fehler: Box 0
                 item.box = 0;
                 item.lastWrong = true;
-                cooldownQueue.push(currentQuestionIndex); // Gleich nochmal abfragen
-                
-                // Wenn Sequenz falsch, brich ab oder lass weitermachen? 
-                // Wir lassen weitermachen, aber Box ist schon 0.
+                cooldownQueue.push(currentQuestionIndex); 
             }
+
+            // GOLD INFO
+            fb.innerHTML += `<span class="gold-transition">Box ${oldBox} ➔ Box ${newBox}</span>`;
 
             if(note) {
                 noteDiv.innerText = "💡 " + note;
@@ -1013,11 +1047,10 @@
             const list = getCurrentList();
             const item = list[currentQuestionIndex];
             
-            // Queue entfernen
             const qIdx = cooldownQueue.indexOf(currentQuestionIndex);
             if(qIdx > -1) cooldownQueue.splice(qIdx, 1);
             
-            // Box wiederherstellen (einfache Logik: einfach auf 1 setzen oder +1, wir machen +1 um Frust zu vermeiden, max 5)
+            // Manuelle Korrektur erhöht Box + 1
             if(item.box < 5) item.box++; 
             item.lastWrong = false;
             
@@ -1053,7 +1086,6 @@
                 const lines = text.split('\n');
                 let count = 0;
                 
-                // Erkenne Trennzeichen (Semikolon oder Komma)
                 const firstLine = lines[0] || "";
                 const separator = firstLine.includes(';') ? ';' : ',';
 
@@ -1075,7 +1107,7 @@
                     }
                 });
                 save(); renderList(); alert(`${count} Karten importiert!`);
-                input.value = ''; // Reset file input
+                input.value = ''; 
             };
             reader.readAsText(file);
         }
