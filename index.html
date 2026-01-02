@@ -2,531 +2,1083 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Version 5.0 Final Polish</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Core-Learning v5.0</title>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --card-bg: #ffffff;
-            --text-color: #2c3e50;
-            --accent-color: #3498db;
-            --accent-hover: #2980b9;
-            --success-color: #27ae60;
-            --error-color: #e74c3c;
-            --gold-text: #b7950b;
-            --shadow: 0 10px 25px rgba(0,0,0,0.1);
-            --radius: 15px;
+            /* Core Theme v5.0 - Final Polish */
+            --bg-app: #050505;
+            --bg-card: #121212;
+            --input-bg: #1e1e1e;
+            --border: #333333;
+            --text-main: #e0e0e0;    
+            --text-muted: #888888;
+            --primary: #9ca3af;
+            --accent-seq: #3b82f6; 
+            
+            --success-bg: #0f291e;
+            --success-text: #4ade80;
+            --error-bg: #2f1515;
+            --error-text: #f87171;
+            --star-color: #eab308;
+            --fire-color: #fb923c;
+            
+            --box-0: #262626; --box-1: #451a03; --box-2: #5c2b0c; 
+            --box-3: #172554; --box-4: #1e1b4b; --box-5: #422006; 
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-app);
+            color: var(--text-main);
             margin: 0;
-            padding: 20px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        h1 { margin-bottom: 5px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
-        .subtitle { font-size: 0.9em; color: #7f8c8d; margin-bottom: 30px; }
+        .fade-in { animation: fadeIn 0.25s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- LAYOUT CONTAINER --- */
-        .view-section {
-            display: none; /* Alle erst mal ausblenden */
-            width: 100%;
-            max-width: 700px;
-            flex-direction: column;
-            align-items: center;
-            animation: fadeIn 0.4s ease;
+        #app-header { text-align: center; margin-bottom: 25px; margin-top: 10px; cursor: pointer; user-select: none; }
+        #app-header h1 { font-size: 1.5rem; letter-spacing: 2px; margin: 0; font-weight: 400; text-shadow: 0 0 15px rgba(255,255,255,0.05); }
+        .fat-spot { font-weight: 700; text-transform: uppercase; color: #ffffff; }
+        .subtitle { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; font-weight: 500; }
+
+        .container {
+            width: 100%; max-width: 500px; background: var(--bg-card);
+            padding: 18px; border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            margin-bottom: 15px; box-sizing: border-box; border: 1px solid var(--border);
         }
 
-        /* --- DASHBOARD (STARTSEITE) --- */
-        .deck-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            width: 100%;
+        h3 { margin-top: 0; margin-bottom: 12px; font-size: 0.9rem; font-weight: 500; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
+
+        input, select, textarea {
+            width: 100%; padding: 12px; margin-bottom: 10px; background-color: var(--input-bg);
+            border: 1px solid var(--border); border-radius: 8px; color: #ffffff;
+            font-size: 15px; box-sizing: border-box; font-family: inherit; font-weight: 400;
         }
-
-        .deck-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 120px;
-        }
-
-        .deck-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
-        .deck-title { font-weight: bold; font-size: 1.2em; margin-bottom: 10px; color: var(--accent-color); }
-        .deck-info { font-size: 0.85em; color: #7f8c8d; }
-        
-        .btn-delete-deck {
-            position: absolute;
-            top: 10px; right: 10px;
-            background: none; border: none; color: #e74c3c;
-            font-size: 1.2em; cursor: pointer; opacity: 0.5;
-        }
-        .btn-delete-deck:hover { opacity: 1; }
-
-        .add-deck-card {
-            border: 2px dashed #bdc3c7;
-            background: transparent;
-            box-shadow: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #7f8c8d;
-            font-weight: bold;
-        }
-        .add-deck-card:hover { border-color: var(--accent-color); color: var(--accent-color); }
-
-        /* --- EDITOR --- */
-        .editor-box {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            width: 100%;
-        }
-        
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        
-        input[type="text"], textarea {
-            width: 100%; padding: 12px;
-            border: 2px solid #ecf0f1; border-radius: 8px;
-            font-family: inherit; box-sizing: border-box;
-        }
-        input[type="text"]:focus, textarea:focus { border-color: var(--accent-color); outline: none; }
-        textarea { height: 150px; resize: vertical; }
-
-        /* --- GAME UI --- */
-        .stats-bar { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
-        .stat-badge { background: var(--card-bg); padding: 5px 12px; border-radius: 15px; font-size: 0.8em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-        .flashcard {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            width: 100%;
-            text-align: center;
-        }
-
-        .question-text { font-size: 1.6em; font-weight: 700; margin-bottom: 30px; color: var(--text-color); }
-
-        .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        textarea { resize: vertical; min-height: 45px; line-height: 1.4; white-space: pre-wrap; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #666; background-color: #252525; }
 
         button {
-            padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;
-            font-size: 1em; font-weight: 600; transition: background 0.2s;
-            color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%; padding: 12px; background-color: var(--primary);
+            color: #000000; border: none; border-radius: 8px; font-size: 14px;
+            font-weight: 600; cursor: pointer; margin-bottom: 8px; transition: transform 0.1s;
         }
-        .btn-primary { background-color: var(--accent-color); }
-        .btn-primary:hover { background-color: var(--accent-hover); }
-        .btn-secondary { background-color: #95a5a6; }
-        .btn-secondary:hover { background-color: #7f8c8d; }
-        .btn-edit { background-color: #f39c12; }
-        .btn-edit:hover { background-color: #e67e22; }
+        button:active { transform: scale(0.97); }
         
-        /* Feedback styles */
-        .feedback-area { margin-top: 15px; min-height: 50px; }
-        .msg-correct { color: var(--success-color); font-weight: bold; font-size: 1.2em; }
-        .msg-wrong { color: var(--error-color); font-weight: bold; font-size: 1.2em; }
-        .gold-info { color: var(--gold-text); font-weight: bold; font-style: italic; display: block; margin-top: 5px; }
+        button.secondary { background-color: var(--input-bg); color: var(--text-muted); border: 1px solid var(--border); }
+        button.danger { background-color: rgba(60, 20, 20, 0.5); border: 1px solid #552222; color: #ff9999; }
+        button.outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+        button.override-btn { background-color: rgba(20, 60, 30, 0.5); border: 1px solid #225522; color: #88cc88; margin-top: 15px; }
+        button.select-mode-btn { background-color: var(--accent-seq); color: white; border: none; }
+        button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
+        button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
-        /* --- OVERLAY --- */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
-            display: none; justify-content: center; align-items: center; z-index: 1000;
+        /* DASHBOARD STATS */
+        .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
+        .stat-card {
+            flex: 1; background: var(--input-bg); padding: 15px; border-radius: 12px;
+            border: 1px solid var(--border); text-align: center; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .overlay-content {
-            background: white; padding: 30px; border-radius: var(--radius);
-            width: 90%; max-width: 450px; text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            animation: popIn 0.3s;
+        .stat-val { font-size: 1.8rem; font-weight: 700; display: block; line-height: 1.2; margin-bottom: 5px; }
+        .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+
+        .dashboard-actions { display: flex; justify-content: center; gap: 30px; margin-top: 25px; margin-bottom: 10px; }
+        .action-item { text-align: center; cursor: pointer; width: 80px; }
+        .list-btn-circle {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: var(--input-bg); color: var(--text-main); font-size: 24px; border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 8px auto; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s;
         }
-        .correction-box { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: left; margin: 15px 0; color: #555; }
+        .action-item:active .list-btn-circle { transform: scale(0.9); }
+        .action-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+
+        /* CARDS */
+        .vocab-item {
+            border: 1px solid var(--border); padding: 0 0 0 0; margin-bottom: 20px;
+            display: flex; flex-direction: column; border-radius: 10px; background: #151515;
+            transition: opacity 0.3s; overflow: hidden; position: relative;
+        }
+        .vocab-item.sequence { border-left: 4px solid var(--accent-seq); } 
+        .vocab-item.paused { opacity: 0.4; }
+
+        .select-overlay {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.6); z-index: 10; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .select-checkbox {
+            width: 30px; height: 30px; border-radius: 50%; border: 2px solid white;
+            display: flex; align-items: center; justify-content: center; font-size: 20px; color: transparent;
+        }
+        .selected .select-checkbox { background: var(--accent-seq); border-color: var(--accent-seq); color: white; }
+
+        .status-bar {
+            width: 100%; height: 16px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 10px; font-size: 9px; font-weight: 400; color: rgba(255,255,255,0.7); margin-bottom: 12px;
+        }
+        .box-0 { background: var(--box-0); }
+        .box-1 { background: var(--box-1); }
+        .box-2 { background: var(--box-2); }
+        .box-3 { background: var(--box-3); }
+        .box-4 { background: var(--box-4); }
+        .box-5 { background: var(--box-5); color: #fbbf24; }
+        .seq-tag { background: #222; border-bottom: 1px solid var(--accent-seq); }
+
+        .vocab-content-pad { padding: 0 16px 5px 16px; }
+        .vocab-columns-wrapper { display: grid; grid-template-columns: 1fr 20px 1fr; gap: 12px; align-items: start; width: 100%; }
+        .vocab-col { word-wrap: break-word; white-space: pre-wrap; font-size: 0.95rem; line-height: 1.5; color: var(--text-main); }
+        .vocab-col.left { text-align: left; }
+        .vocab-col.right { text-align: right; }
+        .vocab-col.center { text-align: center; color: var(--text-muted); font-size: 0.9rem; opacity: 0.5; padding-top: 3px; }
+
+        .vocab-note-area {
+            margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1); 
+            color: #888; font-size: 0.85rem; font-style: italic; white-space: pre-wrap;
+            line-height: 1.4; text-align: left;
+        }
+
+        .seq-header { cursor: pointer; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .seq-title { font-weight: 500; color: var(--accent-seq); font-size: 0.95rem; }
+        .seq-steps-container { display: none; padding-top: 5px; }
+        .seq-step-row { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+        .expanded .seq-steps-container { display: block; }
         
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .vocab-footer {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-top: 15px; padding: 0 16px 16px 16px; box-sizing: border-box;
+        }
+        .vocab-actions-wrapper { display: flex; justify-content: flex-end; gap: 8px; }
+        
+        .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; }
+        .btn-icon:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
+        .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
+        .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); } 
 
+        /* INLINE BUTTONS */
+        .btn-inline {
+            border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.4); z-index: 20; position: relative;
+        }
+        .btn-connect { background: var(--accent-seq); color: white; }
+        .btn-delete-multi { background: rgba(60, 20, 20, 0.9); border: 1px solid #552222; color: #ff9999; }
+
+        .top-management-bar { 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 15px 0; padding-bottom: 15px; border-bottom: 1px solid var(--border); 
+        }
+        .top-management-bar select, .top-management-bar label, .top-management-bar button { 
+            height: 40px; font-size: 11px; margin: 0; padding: 0; 
+            display: flex; justify-content: center; align-items: center; text-align: center; 
+            background: var(--input-bg); border: 1px solid var(--border); border-radius: 8px; 
+            color: var(--text-muted); white-space: nowrap; overflow: hidden;
+        }
+        .top-management-bar select { text-align-last: center; }
+        
+        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23AAAAAA%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 10px auto; }
+
+        .edit-seq-item { display: flex; gap: 5px; margin-bottom: 10px; align-items: flex-start; background: #222; padding: 5px; border-radius: 6px; }
+        .edit-seq-inputs { flex: 1; }
+        .edit-seq-tools { display: flex; flex-direction: column; gap: 2px; }
+        .tiny-btn { height: 20px; width: 20px; font-size: 10px; padding: 0; margin: 0; background: #444; border: 1px solid #555; color: white; }
+
+        .hidden { display: none !important; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--bg-card); width: 95%; max-width: 400px; padding: 20px; border-radius: 12px; border: 1px solid var(--border); max-height: 80vh; overflow-y: auto; }
+
+        .project-card { background: var(--input-bg); padding: 14px 16px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid var(--border); }
+        .project-name { font-weight: 500; }
+        
+        .guide-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
+        .guide-section:last-child { border: none; }
+        .guide-title { color: var(--text-main); font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; }
+        .guide-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+        .guide-legend { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #ccc; }
+        .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        
+        #question-display { 
+            font-size: 1.4rem; text-align: center; font-weight: 500; color: white; 
+            white-space: pre-wrap; line-height: 1.4; 
+            margin: 80px 0 80px 0; 
+        }
+        #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
+        .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #113311; }
+        .wrong { background-color: var(--error-bg); color: var(--error-text); border: 1px solid #331111; }
+        .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--text-muted); font-size: 14px; color: var(--text-muted); text-align: left; white-space: pre-wrap; line-height: 1.5; border-radius: 4px;}
+
+        hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
+        .file-upload { display: block; border: 1px dashed var(--border); text-align: center; border-radius: 6px; cursor: pointer; color: var(--text-muted); }
+        .file-upload:hover { border-color: #aaaaaa; color: #ffffff; background: var(--input-bg);}
     </style>
 </head>
 <body>
 
-    <h1>Version 5.0 Final Polish</h1>
-    <div class="subtitle">Das ultimative Leitner-Lernsystem</div>
-
-    <div id="view-dashboard" class="view-section" style="display: flex;">
-        <h2 style="margin-top:0;">Meine Lernsets</h2>
-        <div id="deck-list" class="deck-grid">
-            </div>
+    <div id="app-header" onclick="showProjects()">
+        <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
+        <div class="subtitle">v5.0 | Final Polish</div>
     </div>
 
-    <div id="view-editor" class="view-section">
-        <div class="editor-box">
-            <h2 id="editor-title" style="margin-top:0;">Neues Set erstellen</h2>
-            
-            <div class="input-group">
-                <label>Name des Sets</label>
-                <input type="text" id="set-name" placeholder="z.B. Englisch Vokabeln">
-            </div>
+    <div id="view-projects" class="container fade-in">
+        <h3>Deine Projekte</h3>
+        <div id="project-list-container"></div>
+        <div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <input type="text" id="new-project-name" placeholder="Neues Projekt...">
+            <button class="outline" onclick="createNewProject()">+ Projekt erstellen</button>
+        </div>
+        <div style="text-align:center; margin-top:20px;">
+            <button class="secondary" style="width:auto; font-size:0.8rem; padding:8px 15px;" onclick="switchTab('guide')">ℹ️ Wie es funktioniert</button>
+        </div>
+    </div>
 
-            <div class="input-group">
-                <label>Karten (Format: Frage;Antwort)</label>
-                <textarea id="set-data" placeholder="Hund;Dog | Katze;Cat"></textarea>
-                <div style="font-size: 0.8em; color: #888; margin-top: 5px;">Tipp: Trenne Paare mit | und Frage/Antwort mit ;</div>
+    <div id="view-guide" class="container hidden fade-in">
+        <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px;">← Zurück</button>
+        
+        <div class="guide-section">
+            <div class="guide-title">🧠 Das Brain-System</div>
+            <div class="guide-text">
+                Core-L nutzt das <b>Leitner-Prinzip</b>. Neue Wörter (Box 0) kommen oft dran. Wenn du sie kannst, steigen sie auf. In Box 5 hast du sie gemeistert.
+                <br><b>Regel:</b> Ein Fehler? Zurück auf Box 0.
             </div>
+        </div>
 
-            <div class="btn-row">
-                <button class="btn-primary" onclick="saveSet()">Speichern</button>
-                <button class="btn-secondary" onclick="showDashboard()">Abbrechen</button>
+        <div class="guide-section">
+            <div class="guide-title">🎨 Die Farben</div>
+            <div class="guide-legend">
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-0)"></span> Box 0: Neu / Falsch</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-1)"></span> Box 1: Anfänger</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-2)"></span> Box 2: Geht so</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-3)"></span> Box 3: Fortgeschritten</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-4)"></span> Box 4: Profi</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-5); box-shadow:0 0 5px orange;"></span> Box 5: Master</div>
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <div class="guide-title">📂 Import & Export Guide</div>
+            <div class="guide-text">
+                <p>So bekommst du deine Vokabellisten aus <b>Excel</b> oder <b>Google Sheets</b> in die App:</p>
+                
+                <div style="margin-bottom:10px;">
+                    <b>1. Das Tabellen-Format</b><br>
+                    Erstelle eine Tabelle <u>ohne Überschriften</u>.
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Spalte A:</b> Dein Wort / Frage (z.B. Deutsch)</li>
+                        <li><b>Spalte B:</b> Die Lösung / Sprache (z.B. Englisch)</li>
+                        <li><b>Spalte C:</b> (Optional) Notiz oder Eselsbrücke</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <b>2. Als CSV speichern</b><br>
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Google Sheets:</b> <i>Datei</i> → <i>Herunterladen</i> → <i>Kommagetrennte Werte (.csv)</i></li>
+                        <li><b>Excel:</b> <i>Datei</i> → <i>Speichern unter</i> → Dateityp: <i>CSV (Trennzeichen-getrennt) (*.csv)</i></li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <b>3. Importieren</b><br>
+                    Gehe in die <i>Datenbank</i> (📜), klicke auf <b>"📂 Import"</b> und wähle die Datei aus.
+                    <br><span style="font-size:0.8em; color:#666;">(Die App erkennt automatisch, ob Trennzeichen Kommas oder Semikolons sind.)</span>
+                </div>
+
+                <hr style="border-color:#333; margin:15px 0;">
+
+                <div>
+                    <b>💾 Backup (Export)</b><br>
+                    Der Button <b>"⬇️ Backup"</b> speichert deinen kompletten Fortschritt (alle Projekte, Boxen, Streaks) als <code>.json</code> Datei.
+                    Nutze dies, um deine Daten zu sichern oder auf ein anderes Gerät zu übertragen.
+                </div>
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <div class="guide-title">💬 Sequenzen & Power-Features</div>
+            <div class="guide-text">
+                <ul>
+                    <li style="margin-bottom:8px;"><b>Auswahl-Modus:</b> Markiere Karten. Links erscheint <b>Verbinden</b> (erstellt Sequenz), Rechts erscheint <b>Löschen</b> (entfernt alle Markierten).</li>
+                    <li style="margin-bottom:8px;"><b>Sequenzen:</b> Unterhaltungen werden am Stück abgefragt. Im Bearbeiten-Menü kannst du sie mit <b>"♻️ Zerlegen"</b> wieder in Einzelkarten auflösen.</li>
+                </ul>
             </div>
         </div>
     </div>
 
-    <div id="view-learning" class="view-section">
-        <div style="width: 100%; display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <button class="btn-secondary" onclick="showDashboard()" style="padding: 5px 15px; font-size: 0.9em;">&larr; Zurück</button>
-            <span id="active-set-name" style="font-weight:bold; color: var(--accent-color);"></span>
-        </div>
-
-        <div id="stats-display" class="stats-bar"></div>
-
-        <div class="flashcard">
-            <div id="question-text" class="question-text"></div>
-            
-            <input type="text" id="user-answer" placeholder="Deine Antwort..." autocomplete="off" onkeypress="handleEnter(event)">
-            
-            <div class="btn-row">
-                <button class="btn-primary" onclick="checkAnswer()">Überprüfen</button>
-                <button class="btn-edit" onclick="openEditOverlay()">✏️ Bearbeiten</button>
+    <div id="view-dashboard" class="container hidden fade-in">
+        <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 15px; padding: 8px 15px; font-size: 12px;">← Projekte</button>
+        
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-val" style="color:var(--fire-color)"><span id="streak-count">0</span> 🔥</span>
+                <span class="stat-label">Streak</span>
             </div>
-
-            <div id="feedback-container" class="feedback-area"></div>
-        </div>
-    </div>
-
-    <div id="overlay-correction" class="overlay">
-        <div class="overlay-content">
-            <h3 style="color: var(--error-color); margin-top:0;">Nicht ganz...</h3>
-            <div id="correction-details" class="correction-box"></div>
-            <div id="correction-gold" class="gold-info" style="margin-bottom: 20px;"></div>
-            
-            <div class="btn-row">
-                <button class="btn-primary" style="background: var(--success-color);" onclick="overrideCorrect()">Doch, war richtig!</button>
-                <button class="btn-primary" onclick="nextCard()">Weiter</button>
+            <div class="stat-card">
+                <span class="stat-val" style="color:var(--success-text)"><span id="mastery-percent">0</span>%</span>
+                <span class="stat-label">Gelernt</span>
             </div>
+        </div>
+        
+        <h3>Neues Wort</h3>
+        <textarea id="input-de" rows="1" placeholder="🇩🇪 Deutsch"></textarea>
+        <textarea id="input-lang" rows="1" placeholder="🌍 Fremdsprache"></textarea>
+        <textarea id="input-note" rows="2" placeholder="💡 Notiz (Optional)"></textarea>
+        <button onclick="addVocab()">Speichern</button>
+        
+        <div class="dashboard-actions">
+            <div class="action-item" onclick="switchTab('listManager')"><div class="list-btn-circle">📜</div><div class="action-label">Datenbank</div></div>
+            <div class="action-item" onclick="switchTab('test')"><div class="list-btn-circle">🎓</div><div class="action-label">Training</div></div>
         </div>
     </div>
 
-    <div id="overlay-edit" class="overlay">
-        <div class="overlay-content">
-            <h3>Karte bearbeiten</h3>
-            <div class="input-group">
-                <label>Frage</label>
-                <input type="text" id="edit-q">
+    <div id="view-list-manager" class="container hidden fade-in" style="padding-bottom: 30px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <button class="secondary" onclick="switchTab('dashboard')" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Zurück</button>
+            <span style="color:var(--text-muted); font-size:0.8rem;"><span id="list-count">0</span> Einträge</span>
+        </div>
+        
+        <input type="text" id="search-input" placeholder="🔍 Suchen..." onkeyup="renderList()">
+        
+        <div class="top-management-bar">
+            <select id="sort-select" onchange="renderList()">
+                <option value="newest">🕒 Neueste zuerst</option>
+                <option value="oldest">old Älteste zuerst</option>
+                <option value="box-asc">🔥 Box 0 ➔ 5</option>
+                <option value="box-desc">🏆 Box 5 ➔ 0</option>
+                <option value="fav">⭐ Favoriten oben</option>
+            </select>
+            
+            <select id="type-select" onchange="renderList()">
+                <option value="all">Alle Typen</option>
+                <option value="single">Nur Karten</option>
+                <option value="seq">Nur Sequenz</option>
+            </select>
+
+            <label class="file-upload">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv, text/csv, text/plain, application/vnd.ms-excel" onchange="importCSV(this)"></label>
+        </div>
+        
+        <button class="select-mode-btn" id="btn-select-mode" onclick="toggleSelectMode()" style="margin-bottom:15px;">Auswahl-Modus starten</button>
+
+        <div id="vocab-list-container"></div>
+        
+        <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+            <button class="outline" onclick="exportData()">⬇️ Backup</button>
+            <button class="danger" onclick="clearCurrentProjectData()">Leeren</button>
+        </div>
+    </div>
+
+    <div id="edit-modal" class="modal-overlay hidden">
+        <div class="modal-content fade-in">
+            <h3>Bearbeiten</h3>
+            <div id="seq-title-edit-container" class="hidden" style="margin-bottom:15px;">
+                <label style="font-size:0.7rem; color:var(--accent-seq); text-transform:uppercase;">Sequenz Titel (Optional)</label>
+                <input type="text" id="edit-seq-title" placeholder="z.B. Urlaub Dialog">
             </div>
-            <div class="input-group">
-                <label>Antwort</label>
-                <input type="text" id="edit-a">
+            
+            <div id="edit-content-area"></div> 
+            
+            <button id="btn-split-seq" class="split-btn hidden" onclick="dissolveSequence()">♻️ In Einzelkarten zerlegen</button>
+            
+            <hr style="border-color:#333; margin:15px 0;">
+            
+            <button onclick="saveEdit()">Speichern</button>
+            <button class="secondary" onclick="closeEditModal()">Abbrechen</button>
+        </div>
+    </div>
+
+    <div id="view-test" class="container hidden fade-in">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <button class="secondary" onclick="switchTab('dashboard')" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Zurück</button>
+            <span style="color:var(--text-muted); font-size:0.8rem;" id="test-project-name">Training</span>
+        </div>
+
+        <div id="question-area">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <p style="text-align:left; color:var(--text-muted); font-size: 0.85rem; margin:0;">Übersetze:</p>
+                <span id="level-indicator" style="font-size:0.7rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:var(--text-muted);">Box 0</span>
             </div>
-            <div class="btn-row">
-                <button class="btn-primary" style="background: var(--success-color);" onclick="saveCardEdit()">Speichern</button>
-                <button class="btn-secondary" onclick="closeOverlays()">Abbrechen</button>
-            </div>
+            
+            <div id="priority-indicator" style="text-align:center; margin-bottom:10px; font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
+            
+            <div id="question-display">...</div>
+            <div id="seq-progress" style="text-align:center; font-size:0.75rem; color:var(--accent-seq); margin-bottom:5px; display:none;">Teil 1/3</div>
+            
+            <input type="text" id="test-input" placeholder="Antwort..." autocomplete="off">
+            <button onclick="checkAnswer()">Prüfen</button>
+            <button class="secondary" onclick="solve()">Lösung</button>
+        </div>
+        <div id="result-area" class="hidden">
+            <div id="feedback-message"></div>
+            <div id="override-container"></div> 
+            <div id="notes-display" class="hint-box hidden"></div>
+            <br>
+            <button onclick="nextQuestion()">Weiter</button>
         </div>
     </div>
 
     <script>
-        // --- SPEICHER & DATEN ---
-        let decks = []; // Alle Sets
-        let activeDeckIndex = -1; // Welches Set lernen wir gerade?
-        let currentCardIndex = -1; // Welche Karte ist dran?
+        // --- DATA STRUCTURE ---
+        let appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] };
+        let cooldownQueue = []; let currentQuestionIndex = null; 
+        let currentSequenceStep = 0; let isSequenceActive = false;
+        let isSelectMode = false; let selectedIndices = new Set();
+        let direction = 0; // 0=DE->Lang, 1=Lang->DE
 
-        // Beim Starten: Daten laden
-        window.onload = function() {
-            loadDecks();
-            renderDashboard();
-        };
+        document.addEventListener('DOMContentLoaded', () => { loadData(); });
 
-        function loadDecks() {
-            const saved = localStorage.getItem('leitner_decks_v5');
-            if (saved) {
-                decks = JSON.parse(saved);
-            } else {
-                // Demo Daten beim allerersten Start
-                decks = [{
-                    name: "Demo: Englisch",
-                    cards: [
-                        { id: 1, q: "Hund", a: "Dog", box: 0 },
-                        { id: 2, q: "Katze", a: "Cat", box: 0 },
-                        { id: 3, q: "Haus", a: "House", box: 0 }
-                    ]
-                }];
-                saveToStorage();
+        function loadData() {
+            try {
+                const v2Data = localStorage.getItem('core_l_data_v2');
+                if (v2Data) { appData = JSON.parse(v2Data); } 
+                else { appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] }; }
+                
+                if (!appData.projects) appData.projects = [];
+                if (appData.projects.length === 0) appData.projects.push({ name: "Start Projekt", words: [] });
+                
+                repairAllData(); checkStreakLogic(); showProjects(); 
+            } catch(e) { 
+                appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [{ name: "Start Projekt", words: [] }] }; 
+                save(); showProjects(); 
             }
         }
 
-        function saveToStorage() {
-            localStorage.setItem('leitner_decks_v5', JSON.stringify(decks));
+        function repairAllData() {
+            if(!appData.projects) appData.projects = [];
+            appData.projects = appData.projects.filter(p => p !== null && p !== undefined);
+            
+            appData.projects.forEach(proj => {
+                if(!proj.words) proj.words = [];
+                proj.words = proj.words.filter(w => w !== null && w !== undefined);
+
+                proj.words.forEach(word => {
+                    if(!word.type) word.type = 'word';
+                    if(word.box === undefined) word.box = 0;
+                    if(word.active === undefined) word.active = true;
+                    
+                    if(word.type === 'word') { 
+                        word.de = cleanDisplay(word.de || ""); 
+                        word.lang = cleanDisplay(word.lang || ""); 
+                    }
+                    if(word.type === 'sequence') {
+                        if(!word.title) word.title = "";
+                        if(!Array.isArray(word.steps)) word.steps = [];
+                    }
+                });
+                
+                proj.words = proj.words.filter(w => {
+                    if(w.type === 'word') return (w.de && w.lang);
+                    if(w.type === 'sequence') return (w.steps && w.steps.length > 0 && w.steps[0].de);
+                    return false;
+                });
+            });
+            save();
         }
+
+        function save() { localStorage.setItem('core_l_data_v2', JSON.stringify(appData)); }
+        
+        function checkStreakLogic() {
+            const today = new Date().toDateString();
+            if (appData.lastPracticeDate !== today) {
+                const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+                if (appData.lastPracticeDate !== yesterday.toDateString()) appData.streak = 0;
+            }
+        }
+        function updateStreak() {
+            const today = new Date().toDateString();
+            if (appData.lastPracticeDate !== today) {
+                appData.streak = (appData.streak || 0) + 1;
+                appData.lastPracticeDate = today;
+                save();
+            }
+        }
+        
+        function cleanString(str) { 
+            return str ? str.trim().toLowerCase()
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ä/g, 'ae')
+                .replace(/ö/g, 'o')
+                .replace(/ß/g, 'ss')
+                .replace(/ı/g, 'i')
+                .replace(/İ/g, 'i') : ""; 
+        }
+        function cleanDisplay(str) { return str ? str.trim() : ""; }
 
         // --- NAVIGATION ---
-        function switchView(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
-            document.getElementById(viewId).style.display = 'flex';
+        function switchTab(tab) {
+            document.getElementById('view-projects').classList.add('hidden'); 
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-list-manager').classList.add('hidden'); 
+            document.getElementById('view-test').classList.add('hidden');
+            document.getElementById('view-guide').classList.add('hidden');
+            
+            if (tab === 'dashboard') {
+                document.getElementById('view-dashboard').classList.remove('hidden'); updateDashboardStats();
+            } else if (tab === 'listManager') {
+                document.getElementById('view-list-manager').classList.remove('hidden'); 
+                isSelectMode = false; toggleSelectMode(false); renderList();
+            } else if (tab === 'test') {
+                document.getElementById('view-test').classList.remove('hidden'); startTest();
+            } else if (tab === 'guide') {
+                document.getElementById('view-guide').classList.remove('hidden');
+            }
+        }
+        function showProjects() {
+            switchTab('none'); document.getElementById('view-projects').classList.remove('hidden'); renderProjectList();
+        }
+        function openProject(index) { appData.activeProjectId = index; cooldownQueue = []; switchTab('dashboard'); }
+        function updateDashboardStats() {
+            const list = getCurrentList(); document.getElementById('streak-count').innerText = appData.streak || 0;
+            if(!list || list.length === 0) { document.getElementById('mastery-percent').innerText = "0"; return; }
+            const mastered = list.filter(w => (w.box || 0) >= 4).length;
+            document.getElementById('mastery-percent').innerText = Math.round((mastered / list.length) * 100);
         }
 
-        function showDashboard() {
-            renderDashboard();
-            switchView('view-dashboard');
+        // --- PROJECT ---
+        function renderProjectList() {
+            const container = document.getElementById('project-list-container'); container.innerHTML = '';
+            if(!appData.projects || appData.projects.length === 0) { container.innerHTML = '<p style="color:#888;text-align:center;">Keine Projekte.</p>'; return; }
+            appData.projects.forEach((proj, index) => {
+                const div = document.createElement('div'); div.className = 'project-card'; div.onclick = () => openProject(index);
+                div.innerHTML = `<span class="project-name">📂 ${proj.name}</span><span class="project-count">${proj.words.length}</span>`;
+                const delBtn = document.createElement('button'); delBtn.innerText = "✕"; delBtn.className = "btn-icon btn-delete-small"; delBtn.style.width = "30px";
+                delBtn.onclick = (e) => { e.stopPropagation(); deleteProject(index); }; div.appendChild(delBtn);
+                container.appendChild(div);
+            });
+        }
+        function createNewProject() {
+            const name = document.getElementById('new-project-name').value.trim(); if (!name) return;
+            appData.projects.push({ name: name, words: [] }); document.getElementById('new-project-name').value = ''; save(); renderProjectList();
+        }
+        function deleteProject(index) { if(confirm("Löschen?")) { appData.projects.splice(index, 1); save(); renderProjectList(); } }
+
+        // --- LIST & SELECTION ---
+        function getCurrentList() { 
+            if(!appData.projects[appData.activeProjectId]) {
+                appData.activeProjectId = 0; 
+                if(!appData.projects[0]) appData.projects.push({name: "Rescue", words:[]});
+            }
+            return appData.projects[appData.activeProjectId].words; 
+        }
+        
+        function addVocab() {
+            const de = cleanDisplay(document.getElementById('input-de').value);
+            const lang = cleanDisplay(document.getElementById('input-lang').value);
+            const note = cleanDisplay(document.getElementById('input-note').value);
+            if (!de || !lang) { alert("Bitte ausfüllen."); return; }
+            
+            getCurrentList().push({ 
+                type: 'word', de: de, lang: lang, note: note, active: true, priority: false, box: 0, lastWrong: false 
+            });
+            
+            save(); document.getElementById('input-de').value = ''; document.getElementById('input-lang').value = ''; document.getElementById('input-note').value = ''; 
+            alert("Gespeichert!"); updateDashboardStats();
         }
 
-        function showEditor() {
-            document.getElementById('set-name').value = '';
-            document.getElementById('set-data').value = '';
-            switchView('view-editor');
+        function toggleSelectMode(forceState) {
+            if (forceState !== undefined) isSelectMode = forceState; else isSelectMode = !isSelectMode;
+            const btn = document.getElementById('btn-select-mode');
+            if (isSelectMode) {
+                btn.classList.add('select-mode-active'); selectedIndices.clear();
+            } else {
+                btn.classList.remove('select-mode-active');
+            }
+            renderList();
         }
 
-        // --- DASHBOARD LOGIK ---
-        function renderDashboard() {
-            const list = document.getElementById('deck-list');
-            list.innerHTML = '';
+        function selectItem(index) {
+            if (selectedIndices.has(index)) selectedIndices.delete(index); else selectedIndices.add(index);
+            renderList(); 
+        }
 
-            // Bestehende Decks anzeigen
-            decks.forEach((deck, index) => {
-                const total = deck.cards.length;
-                const mastered = deck.cards.filter(c => c.box === 5).length;
+        function combineSelected() {
+            if (selectedIndices.size < 2) { alert("Wähle mindestens 2 Karten."); return; }
+            const list = getCurrentList();
+            const indices = Array.from(selectedIndices).sort((a,b) => a-b);
+            let newSteps = [];
+            
+            indices.forEach(idx => {
+                const item = list[idx];
+                if (item.type === 'sequence') newSteps = newSteps.concat(item.steps);
+                else newSteps.push({ de: item.de, lang: item.lang, note: item.note });
+            });
+
+            const newSeq = { type: 'sequence', box: 0, active: true, priority: false, steps: newSteps, title: "" };
+            for (let i = indices.length - 1; i >= 0; i--) list.splice(indices[i], 1);
+            
+            list.push(newSeq); 
+            
+            save(); toggleSelectMode(false); alert("Sequenz erstellt!");
+        }
+
+        function deleteSelected() {
+            if (selectedIndices.size < 1) return;
+            if (!confirm(`${selectedIndices.size} Einträge löschen?`)) return;
+            
+            const list = getCurrentList();
+            const indices = Array.from(selectedIndices).sort((a,b) => a-b);
+            
+            for (let i = indices.length - 1; i >= 0; i--) list.splice(indices[i], 1);
+            
+            save(); toggleSelectMode(false); alert("Gelöscht!");
+        }
+
+        function renderList() {
+            const list = getCurrentList();
+            const container = document.getElementById('vocab-list-container');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const sortMode = document.getElementById('sort-select').value;
+            const typeMode = document.getElementById('type-select').value;
+
+            let displayList = list.map((item, index) => ({...item, originalIndex: index}));
+            
+            if(typeMode === 'single') displayList = displayList.filter(item => item.type !== 'sequence');
+            if(typeMode === 'seq') displayList = displayList.filter(item => item.type === 'sequence');
+
+            displayList = displayList.filter(item => {
+                if (item.type === 'sequence') return (item.title && item.title.toLowerCase().includes(searchTerm)) || item.steps.some(s => s.de.toLowerCase().includes(searchTerm) || s.lang.toLowerCase().includes(searchTerm));
+                return item.de.toLowerCase().includes(searchTerm) || item.lang.toLowerCase().includes(searchTerm);
+            });
+
+            if (sortMode === 'newest') displayList.reverse();
+            else if (sortMode === 'oldest') { /* nix */ }
+            else if (sortMode === 'box-asc') displayList.sort((a, b) => (a.box || 0) - (b.box || 0));
+            else if (sortMode === 'box-desc') displayList.sort((a, b) => (b.box || 0) - (a.box || 0));
+            else if (sortMode === 'fav') displayList.sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0));
+
+            document.getElementById('list-count').innerText = list.length; container.innerHTML = '';
+            
+            displayList.forEach(v => {
+                const realIndex = v.originalIndex;
                 const div = document.createElement('div');
-                div.className = 'deck-card';
-                div.innerHTML = `
-                    <button class="btn-delete-deck" onclick="deleteDeck(event, ${index})">🗑</button>
-                    <div>
-                        <div class="deck-title">${deck.name}</div>
-                        <div class="deck-info">${total} Karten • ${mastered} Meister</div>
-                    </div>
-                    <div style="font-size:0.8em; color:#bbb; margin-top:10px;">Klicken zum Starten</div>
-                `;
-                div.onclick = (e) => { if(e.target.className !== 'btn-delete-deck') startLearning(index); };
-                list.appendChild(div);
+                div.className = `vocab-item fade-in ${!v.active ? 'paused' : ''} ${v.type === 'sequence' ? 'sequence' : ''}`;
+                
+                const boxClass = `box-${v.box || 0}`;
+                const statusHtml = `<div class="status-bar ${boxClass} ${v.type==='sequence'?'seq-tag':''}"><div style="flex:1">${v.type==='sequence'?'SEQUENZ':''}</div><div style="flex:1; text-align:center;">${v.box || 0}</div><div style="flex:1; text-align:right;">${v.lastWrong ? '⚠️' : ''}</div></div>`;
+
+                let selectHtml = '';
+                let footerContent = '';
+                
+                if (isSelectMode) {
+                    const isSel = selectedIndices.has(realIndex);
+                    div.classList.add(isSel ? 'selected' : 'unselected');
+                    selectHtml = `<div class="select-overlay" onclick="selectItem(${realIndex})"><div class="select-checkbox">${isSel ? '✓' : ''}</div></div>`;
+                    
+                    if (isSel) {
+                        const showConnect = selectedIndices.size >= 2;
+                        footerContent = `
+                            <div class="vocab-footer">
+                                <div>${showConnect ? '<button class="btn-inline btn-connect" onclick="event.stopPropagation(); combineSelected()">🔗 Verbinden</button>' : ''}</div>
+                                <div><button class="btn-inline btn-delete-multi" onclick="event.stopPropagation(); deleteSelected()">🗑️ Löschen</button></div>
+                            </div>`;
+                    } else {
+                        footerContent = `<div style="height:15px"></div>`;
+                    }
+
+                } else {
+                    const actionsHtml = `
+                        <div class="vocab-actions-wrapper">
+                            <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})">✎</button>
+                            <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})">★</button>
+                            <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${realIndex})">${v.active ? '⏸' : '▶'}</button>
+                            <button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})">✕</button>
+                        </div>
+                    `;
+                    footerContent = `<div class="vocab-footer"><div></div>${actionsHtml}</div>`;
+                }
+
+                let contentHtml = '';
+                if (v.type === 'sequence') {
+                    let displayTitle = v.title || (v.steps[0] ? (v.steps[0].de.substring(0, 25) + "...") : "Leere Sequenz");
+                    contentHtml = `
+                        <div class="vocab-content-pad ${v.expanded ? 'expanded' : ''}">
+                            <div class="seq-header" onclick="this.parentElement.classList.toggle('expanded')">
+                                <span class="seq-title">💬 ${displayTitle} (${v.steps.length})</span>
+                                <span>▼</span>
+                            </div>
+                            <div class="seq-steps-container">
+                                ${v.steps.map(step => `
+                                    <div class="seq-step-row">
+                                        <div class="vocab-columns-wrapper" style="opacity:0.8; font-size:0.9em;">
+                                            <div class="vocab-col left">${step.de}</div>
+                                            <div class="vocab-col center">➜</div>
+                                            <div class="vocab-col right">${step.lang}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    contentHtml = `
+                        <div class="vocab-content-pad">
+                            <div class="vocab-columns-wrapper">
+                                <div class="vocab-col left">${v.de}</div>
+                                <div class="vocab-col center">➜</div>
+                                <div class="vocab-col right">${v.lang}</div>
+                            </div>
+                            ${v.note ? `<div class="vocab-note-area">💡 ${v.note}</div>` : ''}
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = selectHtml + statusHtml + contentHtml + footerContent;
+                container.appendChild(div);
             });
-
-            // "Neues Set" Button
-            const addDiv = document.createElement('div');
-            addDiv.className = 'deck-card add-deck-card';
-            addDiv.innerHTML = '+ Neues Set erstellen';
-            addDiv.onclick = showEditor;
-            list.appendChild(addDiv);
         }
 
-        function deleteDeck(e, index) {
-            e.stopPropagation();
-            if(confirm("Lernset wirklich löschen?")) {
-                decks.splice(index, 1);
-                saveToStorage();
-                renderDashboard();
-            }
-        }
-
-        // --- EDITOR LOGIK ---
-        function saveSet() {
-            const name = document.getElementById('set-name').value.trim();
-            const raw = document.getElementById('set-data').value;
+        // --- EDITING ---
+        let editIndex = null;
+        function openEditModal(index) {
+            editIndex = index;
+            const item = getCurrentList()[index];
+            const area = document.getElementById('edit-content-area');
+            const seqTitleContainer = document.getElementById('seq-title-edit-container');
+            const splitBtn = document.getElementById('btn-split-seq');
             
-            if(!name) return alert("Bitte einen Namen eingeben!");
-            if(!raw) return alert("Bitte Vokabeln eingeben!");
+            area.innerHTML = ''; 
 
-            const newCards = [];
-            const pairs = raw.split('|');
-            pairs.forEach((p, idx) => {
-                const parts = p.split(';');
-                if(parts.length >= 2) {
-                    newCards.push({
-                        id: Date.now() + idx,
-                        q: parts[0].trim(),
-                        a: parts[1].trim(),
-                        box: 0
-                    });
-                }
+            if (item.type === 'sequence') {
+                seqTitleContainer.classList.remove('hidden');
+                splitBtn.classList.remove('hidden'); 
+                document.getElementById('edit-seq-title').value = item.title || "";
+                item.steps.forEach((step, i) => { area.innerHTML += createStepEditHTML(i, step.de, step.lang, step.note, item.steps.length); });
+                area.innerHTML += `<button class="secondary" style="margin-top:10px" onclick="addEditStep()">+ Schritt hinzufügen</button>`;
+            } else {
+                seqTitleContainer.classList.add('hidden');
+                splitBtn.classList.add('hidden');
+                area.innerHTML = `<textarea id="edit-de" rows="1" placeholder="Deutsch">${item.de}</textarea><textarea id="edit-lang" rows="1" placeholder="Fremd">${item.lang}</textarea><textarea id="edit-note" rows="2" placeholder="Notiz">${item.note||''}</textarea>`;
+            }
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+
+        function createStepEditHTML(i, de, lang, note, total) {
+            return `<div class="edit-seq-item" id="seq-edit-${i}"><div class="edit-seq-tools"><button class="tiny-btn" onclick="moveStep(${i}, -1)" ${i===0?'disabled':''}>▲</button><button class="tiny-btn" onclick="moveStep(${i}, 1)" ${i===total-1?'disabled':''}>▼</button><button class="tiny-btn" style="background:#722" onclick="removeStep(${i})">x</button></div><div class="edit-seq-inputs"><input type="text" class="step-de" value="${de}" placeholder="DE"><input type="text" class="step-lang" value="${lang}" placeholder="Lang"><input type="text" class="step-note" value="${note}" placeholder="Note" style="font-size:10px; height:25px;"></div></div>`;
+        }
+
+        function dissolveSequence() {
+            if(!confirm("Sequenz wirklich auflösen?")) return;
+            const list = getCurrentList();
+            const item = list[editIndex];
+            
+            // Einzelne Karten erstellen
+            item.steps.forEach(step => {
+                list.push({ type: 'word', de: step.de, lang: step.lang, note: step.note, active: true, priority: false, box: item.box, lastWrong: false });
             });
-
-            if(newCards.length === 0) return alert("Keine gültigen Karten gefunden.");
-
-            decks.push({ name: name, cards: newCards });
-            saveToStorage();
-            showDashboard();
-        }
-
-        // --- GAME LOGIK ---
-        function startLearning(deckIndex) {
-            activeDeckIndex = deckIndex;
-            document.getElementById('active-set-name').innerText = decks[activeDeckIndex].name;
-            switchView('view-learning');
-            updateStats();
-            nextCard();
-        }
-
-        function updateStats() {
-            const container = document.getElementById('stats-display');
-            container.innerHTML = '';
-            const currentDeck = decks[activeDeckIndex];
             
-            for(let i=0; i<=5; i++) {
-                const count = currentDeck.cards.filter(c => c.box === i).length;
-                const badge = document.createElement('div');
-                badge.className = 'stat-badge';
-                badge.innerHTML = `Box ${i}: <span style="color:var(--accent-color)">${count}</span>`;
-                container.appendChild(badge);
-            }
+            list.splice(editIndex, 1);
+            save(); closeEditModal(); renderList();
         }
 
-        function nextCard() {
-            // Logik: Suche niedrigste Box, die nicht leer ist
-            const currentDeck = decks[activeDeckIndex];
-            let pool = [];
+        function addEditStep() {
+            const list = getCurrentList();
+            list[editIndex].steps.push({de:"", lang:"", note:""});
+            save(); openEditModal(editIndex); // Refresh UI
+        }
 
-            for(let i=0; i<5; i++) {
-                const cardsInBox = currentDeck.cards.filter(c => c.box === i);
-                if(cardsInBox.length > 0) {
-                    pool = cardsInBox;
-                    break;
+        function removeStep(stepIndex) {
+            const list = getCurrentList();
+            if(list[editIndex].steps.length <= 1) return alert("Eine Sequenz braucht mindestens 1 Schritt.");
+            list[editIndex].steps.splice(stepIndex, 1);
+            save(); openEditModal(editIndex);
+        }
+
+        function moveStep(stepIndex, direction) {
+            const list = getCurrentList();
+            const steps = list[editIndex].steps;
+            const temp = steps[stepIndex];
+            steps[stepIndex] = steps[stepIndex + direction];
+            steps[stepIndex + direction] = temp;
+            save(); openEditModal(editIndex);
+        }
+
+        function saveEdit() {
+            const list = getCurrentList();
+            const item = list[editIndex];
+
+            if (item.type === 'sequence') {
+                item.title = document.getElementById('edit-seq-title').value;
+                const rows = document.querySelectorAll('.edit-seq-item');
+                rows.forEach((row, i) => {
+                    item.steps[i].de = cleanDisplay(row.querySelector('.step-de').value);
+                    item.steps[i].lang = cleanDisplay(row.querySelector('.step-lang').value);
+                    item.steps[i].note = cleanDisplay(row.querySelector('.step-note').value);
+                });
+            } else {
+                item.de = cleanDisplay(document.getElementById('edit-de').value);
+                item.lang = cleanDisplay(document.getElementById('edit-lang').value);
+                item.note = cleanDisplay(document.getElementById('edit-note').value);
+            }
+            save(); closeEditModal(); renderList();
+        }
+        
+        function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
+        function togglePriority(index) { const list=getCurrentList(); list[index].priority=!list[index].priority; save(); renderList(); }
+        function toggleActive(index) { const list=getCurrentList(); list[index].active=!list[index].active; save(); renderList(); }
+        function deleteVocab(index) { if(confirm("Löschen?")) { getCurrentList().splice(index, 1); save(); renderList(); } }
+
+        // --- TEST (TRAINING) ---
+        function startTest() {
+            const projName = appData.projects[appData.activeProjectId].name;
+            document.getElementById('test-project-name').innerText = "Training: " + projName;
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            document.getElementById('question-area').classList.remove('hidden');
+            document.getElementById('result-area').classList.add('hidden');
+            document.getElementById('test-input').value = '';
+            document.getElementById('test-input').focus();
+            
+            const list = getCurrentList();
+            
+            // Wenn Sequenz aktiv ist, mach einfach den nächsten Schritt
+            if (isSequenceActive && currentQuestionIndex !== null) {
+                const seqItem = list[currentQuestionIndex];
+                currentSequenceStep++;
+                
+                if (currentSequenceStep < seqItem.steps.length) {
+                    displayQuestion(seqItem, true);
+                    return;
+                } else {
+                    // Sequenz beendet
+                    isSequenceActive = false;
+                    currentSequenceStep = 0;
+                    // Normale Logik folgt unten...
+                }
+            }
+            
+            // Normale Auswahl
+            const activeWords = list.map((w, i) => ({...w, idx: i})).filter(w => w.active);
+            if(activeWords.length === 0) {
+                alert("Keine aktiven Karten."); switchTab('dashboard'); return;
+            }
+
+            // Cooldown Check
+            if (cooldownQueue.length > 0) {
+                const cooledIndex = cooldownQueue.shift();
+                // Prüfen ob noch im aktiven Set
+                const exists = activeWords.find(w => w.idx === cooledIndex);
+                if (exists) {
+                    currentQuestionIndex = cooledIndex;
+                    direction = Math.random() < 0.5 ? 0 : 1;
+                    displayQuestion(list[currentQuestionIndex], false);
+                    return;
                 }
             }
 
-            // Wenn alles leer (oder alle in Box 5)
-            if(pool.length === 0) {
-                const box5 = currentDeck.cards.filter(c => c.box === 5);
-                if(box5.length > 0) {
-                     document.getElementById('question-text').innerText = "🎉 Alles gelernt! Alle Karten in Box 5.";
-                     document.getElementById('user-answer').style.display = 'none';
-                     return;
-                }
+            // Algorithmus: Priority > Box 0 > Random
+            let candidates = activeWords.filter(w => w.priority);
+            if (candidates.length === 0) candidates = activeWords.filter(w => w.box === 0);
+            if (candidates.length === 0) candidates = activeWords.filter(w => w.box < 5);
+            if (candidates.length === 0) candidates = activeWords; // Alles gelernt? Zufall.
+
+            const picked = candidates[Math.floor(Math.random() * candidates.length)];
+            currentQuestionIndex = picked.idx;
+            
+            // Sequenz Start?
+            if (picked.type === 'sequence') {
+                isSequenceActive = true;
+                currentSequenceStep = 0;
+                direction = 0; // Sequenzen immer DE->Lang (meistens sinnvoller)
+                displayQuestion(picked, true);
+            } else {
+                direction = Math.random() < 0.5 ? 0 : 1;
+                displayQuestion(picked, false);
             }
-
-            // Zufallskarte wählen
-            const card = pool[Math.floor(Math.random() * pool.length)];
-            currentCardIndex = currentDeck.cards.findIndex(c => c.id === card.id);
-
-            // UI Reset
-            document.getElementById('question-text').innerText = card.q;
-            document.getElementById('user-answer').value = '';
-            document.getElementById('user-answer').style.display = 'block';
-            document.getElementById('user-answer').focus();
-            document.getElementById('feedback-container').innerHTML = '';
         }
 
-        function normalize(text) {
-            return text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"").trim();
+        function displayQuestion(item, isSeq) {
+            let qText = "";
+            let levelInfo = `Box ${item.box || 0}`;
+            
+            if (isSeq) {
+                const step = item.steps[currentSequenceStep];
+                qText = step.de;
+                document.getElementById('seq-progress').style.display = 'block';
+                document.getElementById('seq-progress').innerText = `Schritt ${currentSequenceStep + 1} von ${item.steps.length}`;
+            } else {
+                qText = direction === 0 ? item.de : item.lang;
+                document.getElementById('seq-progress').style.display = 'none';
+            }
+
+            document.getElementById('question-display').innerText = qText;
+            document.getElementById('level-indicator').innerText = levelInfo;
+            document.getElementById('priority-indicator').style.visibility = item.priority ? 'visible' : 'hidden';
         }
 
         function checkAnswer() {
-            const currentDeck = decks[activeDeckIndex];
-            const card = currentDeck.cards[currentCardIndex];
-            const userInp = document.getElementById('user-answer').value;
-
-            if(normalize(userInp) === normalize(card.a)) {
-                processResult(true);
-            } else {
-                showCorrectionOverlay(userInp, card);
-            }
-        }
-
-        function processResult(isCorrect) {
-            const currentDeck = decks[activeDeckIndex];
-            const card = currentDeck.cards[currentCardIndex];
-            const oldBox = card.box;
-            let newBox = isCorrect ? (oldBox < 5 ? oldBox + 1 : 5) : 0;
-
-            // UI Feedback
-            const fb = document.getElementById('feedback-container');
-            const goldTxt = `<span class="gold-info">Box ${oldBox} ➔ Box ${newBox}</span>`;
-
-            if(isCorrect) {
-                fb.innerHTML = `<span class="msg-correct">Richtig!</span>${goldTxt}`;
-                card.box = newBox; // Update Card
-                saveToStorage();   // Save DB
-                updateStats();
-                setTimeout(nextCard, 1500);
-            } else {
-                return { oldBox, newBox }; // Für Overlay
-            }
-        }
-
-        // --- OVERLAYS ---
-        function showCorrectionOverlay(userTxt, card) {
-            const res = processResult(false); // Berechnet nur, führt nicht aus
+            const list = getCurrentList();
+            const item = list[currentQuestionIndex];
+            const input = cleanString(document.getElementById('test-input').value);
             
-            document.getElementById('correction-details').innerHTML = `
-                Frage: <b>${card.q}</b><br><br>
-                Deine Antwort: <s>${userTxt}</s><br>
-                Lösung: <b style="color:var(--success-color)">${card.a}</b>
-            `;
-            document.getElementById('correction-gold').innerText = `Box ${res.oldBox} ➔ Box 0`;
-            document.getElementById('overlay-correction').style.display = 'flex';
-        }
-
-        function overrideCorrect() {
-            document.getElementById('overlay-correction').style.display = 'none';
-            // Manuell als richtig werten
-            processResult(true);
-        }
-
-        function nextCardAfterWrong() {
-            // Bestrafung durchführen
-            const currentDeck = decks[activeDeckIndex];
-            const card = currentDeck.cards[currentCardIndex];
-            card.box = 0;
-            saveToStorage();
-            updateStats();
-
-            document.getElementById('overlay-correction').style.display = 'none';
-            nextCard();
-        }
-        // Button Mapping im HTML korrigieren, da ich oben nextCard() direkt im HTML hab, aber hier Logic brauche:
-        // Ich habe nextCard() im HTML Button "Weiter" beim Overlay. Das muss angepasst werden:
-        // Ich ersetze die onclick function im HTML string oben gedanklich oder per JS:
-        // HTML Zeile 163 ändern zu onclick="nextCardAfterWrong()"
-
-        function openEditOverlay() {
-            const card = decks[activeDeckIndex].cards[currentCardIndex];
-            document.getElementById('edit-q').value = card.q;
-            document.getElementById('edit-a').value = card.a;
-            document.getElementById('overlay-edit').style.display = 'flex';
-        }
-
-        function saveCardEdit() {
-            const nQ = document.getElementById('edit-q').value;
-            const nA = document.getElementById('edit-a').value;
-            if(nQ && nA) {
-                decks[activeDeckIndex].cards[currentCardIndex].q = nQ;
-                decks[activeDeckIndex].cards[currentCardIndex].a = nA;
-                saveToStorage();
-                document.getElementById('question-text').innerText = nQ;
-                closeOverlays();
+            let correctStr = "";
+            let noteStr = "";
+            
+            if (item.type === 'sequence') {
+                correctStr = item.steps[currentSequenceStep].lang;
+                noteStr = item.steps[currentSequenceStep].note;
+            } else {
+                correctStr = direction === 0 ? item.lang : item.de;
+                noteStr = item.note;
             }
+
+            const isCorrect = input === cleanString(correctStr);
+            showResult(isCorrect, correctStr, noteStr, item);
         }
 
-        function closeOverlays() {
-            document.querySelectorAll('.overlay').forEach(el => el.style.display = 'none');
+        function solve() {
+            const list = getCurrentList();
+            const item = list[currentQuestionIndex];
+            let correctStr = "";
+            let noteStr = "";
+            
+            if (item.type === 'sequence') {
+                correctStr = item.steps[currentSequenceStep].lang;
+                noteStr = item.steps[currentSequenceStep].note;
+            } else {
+                correctStr = direction === 0 ? item.lang : item.de;
+                noteStr = item.note;
+            }
+            showResult(false, correctStr, noteStr, item); // Als falsch werten
         }
 
-        // Helper für den "Weiter" Button im Error Overlay
-        document.querySelector('#overlay-correction .btn-primary:last-child').onclick = nextCardAfterWrong;
+        function showResult(success, correctAns, note, item) {
+            document.getElementById('question-area').classList.add('hidden');
+            document.getElementById('result-area').classList.remove('hidden');
+            
+            const fb = document.getElementById('feedback-message');
+            const ovr = document.getElementById('override-container');
+            const noteDiv = document.getElementById('notes-display');
 
-        function handleEnter(e) { if(e.key === 'Enter') checkAnswer(); }
+            if (success) {
+                fb.innerHTML = `<div class="feedback-box correct"><h3>Richtig! 🎉</h3></div>`;
+                fb.innerHTML += `<div style="margin-top:10px; color:#aaa;">Lösung: <b>${correctAns}</b></div>`;
+                ovr.innerHTML = '';
+                
+                // Box Logik
+                // Bei Sequenz: Nur am ENDE die Box erhöhen? Oder pro Schritt? 
+                // Core-Logic: Wenn ein Fehler in der Sequenz passiert, ganze Sequenz falsch.
+                // Wenn richtig, passiert noch nichts mit Box, erst am Ende der Sequenz.
+                
+                if (item.type !== 'sequence') {
+                    if (item.box < 5) item.box++;
+                    item.lastWrong = false;
+                    updateStreak();
+                } else {
+                    // Sequenz Step richtig
+                    if (currentSequenceStep === item.steps.length - 1) {
+                         // Letzter Schritt richtig -> Ganze Sequenz hoch
+                         if (item.box < 5) item.box++;
+                         item.lastWrong = false;
+                         updateStreak();
+                    }
+                }
 
+            } else {
+                fb.innerHTML = `<div class="feedback-box wrong"><h3>Leider falsch</h3></div>`;
+                fb.innerHTML += `<div style="margin-top:10px; font-size:1.1rem;">Lösung:<br><b style="color:var(--success-text)">${correctAns}</b></div>`;
+                
+                // Override Button
+                ovr.innerHTML = `<button class="override-btn" onclick="overrideResult()">War doch richtig (Tippfehler)</button>`;
+                
+                // Reset Box
+                item.box = 0;
+                item.lastWrong = true;
+                cooldownQueue.push(currentQuestionIndex); // Gleich nochmal abfragen
+                
+                // Wenn Sequenz falsch, brich ab oder lass weitermachen? 
+                // Wir lassen weitermachen, aber Box ist schon 0.
+            }
+
+            if(note) {
+                noteDiv.innerText = "💡 " + note;
+                noteDiv.classList.remove('hidden');
+            } else {
+                noteDiv.classList.add('hidden');
+            }
+            save();
+        }
+
+        function overrideResult() {
+            // Rückgängig machen von Falsch -> Richtig
+            const list = getCurrentList();
+            const item = list[currentQuestionIndex];
+            
+            // Queue entfernen
+            const qIdx = cooldownQueue.indexOf(currentQuestionIndex);
+            if(qIdx > -1) cooldownQueue.splice(qIdx, 1);
+            
+            // Box wiederherstellen (einfache Logik: einfach auf 1 setzen oder +1, wir machen +1 um Frust zu vermeiden, max 5)
+            if(item.box < 5) item.box++; 
+            item.lastWrong = false;
+            
+            updateStreak();
+            save();
+            nextQuestion();
+        }
+
+        // --- IMPORT / EXPORT ---
+        function clearCurrentProjectData() {
+            if(!confirm("Alle Karten in diesem Projekt unwiderruflich löschen?")) return;
+            const proj = appData.projects[appData.activeProjectId];
+            proj.words = [];
+            save(); renderList();
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "core_learning_backup_" + new Date().toISOString().slice(0,10) + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function importCSV(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n');
+                let count = 0;
+                
+                // Erkenne Trennzeichen (Semikolon oder Komma)
+                const firstLine = lines[0] || "";
+                const separator = firstLine.includes(';') ? ';' : ',';
+
+                lines.forEach(line => {
+                    if (!line.trim()) return;
+                    const parts = line.split(separator);
+                    if (parts.length >= 2) {
+                        const de = cleanDisplay(parts[0]);
+                        const lang = cleanDisplay(parts[1]);
+                        const note = parts[2] ? cleanDisplay(parts[2]) : "";
+                        
+                        if (de && lang) {
+                            getCurrentList().push({
+                                type: 'word', de: de, lang: lang, note: note,
+                                active: true, priority: false, box: 0
+                            });
+                            count++;
+                        }
+                    }
+                });
+                save(); renderList(); alert(`${count} Karten importiert!`);
+                input.value = ''; // Reset file input
+            };
+            reader.readAsText(file);
+        }
     </script>
 </body>
 </html>
