@@ -6,7 +6,6 @@
     <title>Version 5.0 Final Polish</title>
     <style>
         :root {
-            /* Das hochwertige Farbschema */
             --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --card-bg: #ffffff;
             --text-color: #2c3e50;
@@ -14,7 +13,7 @@
             --accent-hover: #2980b9;
             --success-color: #27ae60;
             --error-color: #e74c3c;
-            --gold-text: #b7950b; /* Dunkles Gold für gute Lesbarkeit */
+            --gold-text: #b7950b;
             --shadow: 0 10px 25px rgba(0,0,0,0.1);
             --radius: 15px;
         }
@@ -31,207 +30,136 @@
             align-items: center;
         }
 
-        h1 {
-            margin-bottom: 5px;
-            color: var(--text-color);
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
-        }
+        h1 { margin-bottom: 5px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
+        .subtitle { font-size: 0.9em; color: #7f8c8d; margin-bottom: 30px; }
 
-        .subtitle {
-            font-size: 0.9em;
-            color: #7f8c8d;
-            margin-bottom: 30px;
-        }
-
-        /* --- SETUP BEREICH --- */
-        #setup-container {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+        /* --- LAYOUT CONTAINER --- */
+        .view-section {
+            display: none; /* Alle erst mal ausblenden */
             width: 100%;
-            max-width: 600px;
-            text-align: center;
-            animation: fadeIn 0.5s ease;
-        }
-
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 15px;
-            border: 2px solid #ecf0f1;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-family: inherit;
-            font-size: 1em;
-            resize: vertical;
-            box-sizing: border-box; /* Wichtig für Layout */
-        }
-        
-        textarea:focus { outline: none; border-color: var(--accent-color); }
-
-        /* --- LERN BEREICH --- */
-        #learning-container {
-            display: none; /* Initial ausgeblendet */
+            max-width: 700px;
             flex-direction: column;
             align-items: center;
-            width: 100%;
-            max-width: 600px;
+            animation: fadeIn 0.4s ease;
         }
 
-        /* Statistik Leiste */
-        .stats-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 25px;
+        /* --- DASHBOARD (STARTSEITE) --- */
+        .deck-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
             width: 100%;
         }
 
-        .stat-badge {
+        .deck-card {
             background: var(--card-bg);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            color: var(--text-color);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 120px;
         }
 
-        .stat-badge span { color: var(--accent-color); font-weight: bold; }
+        .deck-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+        .deck-title { font-weight: bold; font-size: 1.2em; margin-bottom: 10px; color: var(--accent-color); }
+        .deck-info { font-size: 0.85em; color: #7f8c8d; }
+        
+        .btn-delete-deck {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: none; border: none; color: #e74c3c;
+            font-size: 1.2em; cursor: pointer; opacity: 0.5;
+        }
+        .btn-delete-deck:hover { opacity: 1; }
 
-        /* Die Lernkarte */
-        .card-container {
+        .add-deck-card {
+            border: 2px dashed #bdc3c7;
+            background: transparent;
+            box-shadow: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+        .add-deck-card:hover { border-color: var(--accent-color); color: var(--accent-color); }
+
+        /* --- EDITOR --- */
+        .editor-box {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+        }
+        
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        
+        input[type="text"], textarea {
+            width: 100%; padding: 12px;
+            border: 2px solid #ecf0f1; border-radius: 8px;
+            font-family: inherit; box-sizing: border-box;
+        }
+        input[type="text"]:focus, textarea:focus { border-color: var(--accent-color); outline: none; }
+        textarea { height: 150px; resize: vertical; }
+
+        /* --- GAME UI --- */
+        .stats-bar { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+        .stat-badge { background: var(--card-bg); padding: 5px 12px; border-radius: 15px; font-size: 0.8em; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        .flashcard {
             background: var(--card-bg);
             padding: 40px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             width: 100%;
             text-align: center;
-            position: relative;
-            animation: slideUp 0.4s ease-out;
         }
 
-        .question-text {
-            font-size: 1.5em;
-            font-weight: 700;
-            margin-bottom: 25px;
-            color: var(--text-color);
-            line-height: 1.4;
-        }
+        .question-text { font-size: 1.6em; font-weight: 700; margin-bottom: 30px; color: var(--text-color); }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.1em;
-            border: 2px solid #dfe6e9;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-            transition: border-color 0.3s;
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        /* Button Container */
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
+        .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
 
         button {
-            padding: 12px 25px;
-            font-size: 1em;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.1s, background-color 0.2s;
-            font-weight: 600;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer;
+            font-size: 1em; font-weight: 600; transition: background 0.2s;
+            color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
-        button:active { transform: scale(0.98); }
-
-        .btn-primary { background-color: var(--accent-color); color: white; }
+        .btn-primary { background-color: var(--accent-color); }
         .btn-primary:hover { background-color: var(--accent-hover); }
-
-        .btn-edit { background-color: #f39c12; color: white; display: flex; align-items: center; gap: 5px; }
+        .btn-secondary { background-color: #95a5a6; }
+        .btn-secondary:hover { background-color: #7f8c8d; }
+        .btn-edit { background-color: #f39c12; }
         .btn-edit:hover { background-color: #e67e22; }
-
-        /* Feedback Bereich */
-        #feedback-container {
-            min-height: 60px; /* Platzhalter damit nichts springt */
-            margin-top: 15px;
-        }
-
-        .msg-correct { color: var(--success-color); font-weight: bold; font-size: 1.2em; display: block; }
-        .msg-wrong { color: var(--error-color); font-weight: bold; font-size: 1.2em; display: block; }
         
-        .gold-info {
-            color: var(--gold-text);
-            font-size: 0.95em;
-            font-weight: bold;
-            font-style: italic;
-            margin-top: 5px;
-            display: block;
-        }
+        /* Feedback styles */
+        .feedback-area { margin-top: 15px; min-height: 50px; }
+        .msg-correct { color: var(--success-color); font-weight: bold; font-size: 1.2em; }
+        .msg-wrong { color: var(--error-color); font-weight: bold; font-size: 1.2em; }
+        .gold-info { color: var(--gold-text); font-weight: bold; font-style: italic; display: block; margin-top: 5px; }
 
-        /* --- OVERLAYS (Popups) --- */
+        /* --- OVERLAY --- */
         .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            display: none; /* Hidden by default */
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
         }
-
-        .overlay-box {
-            background: white;
-            padding: 30px;
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 450px;
-            text-align: center;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-            animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        .overlay-content {
+            background: white; padding: 30px; border-radius: var(--radius);
+            width: 90%; max-width: 450px; text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: popIn 0.3s;
         }
-
-        .overlay-box h3 { margin-top: 0; color: var(--error-color); }
-
-        .correction-details {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: left;
-            margin: 15px 0;
-            color: #555;
-            line-height: 1.6;
-        }
-
-        .btn-green { background-color: var(--success-color); color: white; margin-right: 5px; }
-        .btn-green:hover { background-color: #219150; }
+        .correction-box { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: left; margin: 15px 0; color: #555; }
         
-        .btn-grey { background-color: #95a5a6; color: white; }
-        .btn-grey:hover { background-color: #7f8c8d; }
-
-        /* Edit Overlay Inputs */
-        .edit-field { margin-bottom: 15px; text-align: left; }
-        .edit-field label { display: block; font-size: 0.85em; font-weight: bold; color: #7f8c8d; margin-bottom: 5px; }
-        .edit-field input { margin-bottom: 0; }
-
-        /* Animationen */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     </style>
 </head>
@@ -240,179 +168,275 @@
     <h1>Version 5.0 Final Polish</h1>
     <div class="subtitle">Das ultimative Leitner-Lernsystem</div>
 
-    <div id="setup-container">
-        <h2>Lernset erstellen</h2>
-        <p style="color: #666; font-size: 0.9em;">Format: Frage;Antwort | Frage;Antwort</p>
-        <textarea id="input-data" placeholder="Hund;Dog | Katze;Cat | Maus;Mouse"></textarea>
-        <br>
-        <button class="btn-primary" onclick="startLearning()">Lernen starten</button>
+    <div id="view-dashboard" class="view-section" style="display: flex;">
+        <h2 style="margin-top:0;">Meine Lernsets</h2>
+        <div id="deck-list" class="deck-grid">
+            </div>
     </div>
 
-    <div id="learning-container">
-        
+    <div id="view-editor" class="view-section">
+        <div class="editor-box">
+            <h2 id="editor-title" style="margin-top:0;">Neues Set erstellen</h2>
+            
+            <div class="input-group">
+                <label>Name des Sets</label>
+                <input type="text" id="set-name" placeholder="z.B. Englisch Vokabeln">
+            </div>
+
+            <div class="input-group">
+                <label>Karten (Format: Frage;Antwort)</label>
+                <textarea id="set-data" placeholder="Hund;Dog | Katze;Cat"></textarea>
+                <div style="font-size: 0.8em; color: #888; margin-top: 5px;">Tipp: Trenne Paare mit | und Frage/Antwort mit ;</div>
+            </div>
+
+            <div class="btn-row">
+                <button class="btn-primary" onclick="saveSet()">Speichern</button>
+                <button class="btn-secondary" onclick="showDashboard()">Abbrechen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-learning" class="view-section">
+        <div style="width: 100%; display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <button class="btn-secondary" onclick="showDashboard()" style="padding: 5px 15px; font-size: 0.9em;">&larr; Zurück</button>
+            <span id="active-set-name" style="font-weight:bold; color: var(--accent-color);"></span>
+        </div>
+
         <div id="stats-display" class="stats-bar"></div>
 
-        <div class="card-container">
+        <div class="flashcard">
             <div id="question-text" class="question-text"></div>
             
             <input type="text" id="user-answer" placeholder="Deine Antwort..." autocomplete="off" onkeypress="handleEnter(event)">
             
-            <div class="btn-group">
+            <div class="btn-row">
                 <button class="btn-primary" onclick="checkAnswer()">Überprüfen</button>
                 <button class="btn-edit" onclick="openEditOverlay()">✏️ Bearbeiten</button>
             </div>
 
-            <div id="feedback-container"></div>
+            <div id="feedback-container" class="feedback-area"></div>
         </div>
     </div>
 
-    <div id="correction-overlay" class="overlay">
-        <div class="overlay-box">
-            <h3>Nicht ganz...</h3>
-            <div style="font-weight: bold; margin-bottom: 10px; color:#333;" id="overlay-question-ref"></div>
+    <div id="overlay-correction" class="overlay">
+        <div class="overlay-content">
+            <h3 style="color: var(--error-color); margin-top:0;">Nicht ganz...</h3>
+            <div id="correction-details" class="correction-box"></div>
+            <div id="correction-gold" class="gold-info" style="margin-bottom: 20px;"></div>
             
-            <div class="correction-details" id="overlay-details"></div>
-            
-            <div id="overlay-gold-info" class="gold-info" style="margin-bottom: 20px;"></div>
-
-            <button class="btn-green" onclick="overrideCorrect()">Doch, das war richtig!</button>
-            <button class="btn-primary" onclick="nextCard()">Weiter</button>
+            <div class="btn-row">
+                <button class="btn-primary" style="background: var(--success-color);" onclick="overrideCorrect()">Doch, war richtig!</button>
+                <button class="btn-primary" onclick="nextCard()">Weiter</button>
+            </div>
         </div>
     </div>
 
-    <div id="edit-overlay" class="overlay">
-        <div class="overlay-box">
-            <h3 style="color: var(--text-color);">Karte bearbeiten</h3>
-            
-            <div class="edit-field">
-                <label>Frage:</label>
-                <input type="text" id="edit-q-input">
+    <div id="overlay-edit" class="overlay">
+        <div class="overlay-content">
+            <h3>Karte bearbeiten</h3>
+            <div class="input-group">
+                <label>Frage</label>
+                <input type="text" id="edit-q">
             </div>
-            
-            <div class="edit-field">
-                <label>Antwort:</label>
-                <input type="text" id="edit-a-input">
+            <div class="input-group">
+                <label>Antwort</label>
+                <input type="text" id="edit-a">
             </div>
-
-            <button class="btn-green" onclick="saveEdit()">Speichern</button>
-            <button class="btn-grey" onclick="closeEditOverlay()">Abbrechen</button>
+            <div class="btn-row">
+                <button class="btn-primary" style="background: var(--success-color);" onclick="saveCardEdit()">Speichern</button>
+                <button class="btn-secondary" onclick="closeOverlays()">Abbrechen</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- DATENSTRUKTUR ---
-        let cards = [];
-        let currentCardIndex = -1;
-        // Boxen 0, 1, 2, 3, 4, 5
-        let boxes = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [] };
+        // --- SPEICHER & DATEN ---
+        let decks = []; // Alle Sets
+        let activeDeckIndex = -1; // Welches Set lernen wir gerade?
+        let currentCardIndex = -1; // Welche Karte ist dran?
 
-        // --- SETUP LOGIK ---
-        function startLearning() {
-            const inputVal = document.getElementById('input-data').value;
-            
-            if (!inputVal.trim()) {
-                // Demo Daten falls leer
-                initGame("Hund;Dog | Katze;Cat | Apfel;Apple | Schule;School | Buch;Book");
-                return;
+        // Beim Starten: Daten laden
+        window.onload = function() {
+            loadDecks();
+            renderDashboard();
+        };
+
+        function loadDecks() {
+            const saved = localStorage.getItem('leitner_decks_v5');
+            if (saved) {
+                decks = JSON.parse(saved);
+            } else {
+                // Demo Daten beim allerersten Start
+                decks = [{
+                    name: "Demo: Englisch",
+                    cards: [
+                        { id: 1, q: "Hund", a: "Dog", box: 0 },
+                        { id: 2, q: "Katze", a: "Cat", box: 0 },
+                        { id: 3, q: "Haus", a: "House", box: 0 }
+                    ]
+                }];
+                saveToStorage();
             }
-            initGame(inputVal);
         }
 
-        function initGame(textData) {
-            cards = [];
-            // Reset Boxen
-            boxes = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [] };
+        function saveToStorage() {
+            localStorage.setItem('leitner_decks_v5', JSON.stringify(decks));
+        }
 
-            const pairs = textData.split('|');
-            pairs.forEach((pair, index) => {
-                const parts = pair.split(';');
-                if (parts.length >= 2) {
-                    let newCard = {
-                        id: index,
-                        question: parts[0].trim(),
-                        answer: parts[1].trim(),
-                        box: 0 // Start in Box 0
-                    };
-                    cards.push(newCard);
-                    boxes[0].push(newCard);
+        // --- NAVIGATION ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.style.display = 'none');
+            document.getElementById(viewId).style.display = 'flex';
+        }
+
+        function showDashboard() {
+            renderDashboard();
+            switchView('view-dashboard');
+        }
+
+        function showEditor() {
+            document.getElementById('set-name').value = '';
+            document.getElementById('set-data').value = '';
+            switchView('view-editor');
+        }
+
+        // --- DASHBOARD LOGIK ---
+        function renderDashboard() {
+            const list = document.getElementById('deck-list');
+            list.innerHTML = '';
+
+            // Bestehende Decks anzeigen
+            decks.forEach((deck, index) => {
+                const total = deck.cards.length;
+                const mastered = deck.cards.filter(c => c.box === 5).length;
+                const div = document.createElement('div');
+                div.className = 'deck-card';
+                div.innerHTML = `
+                    <button class="btn-delete-deck" onclick="deleteDeck(event, ${index})">🗑</button>
+                    <div>
+                        <div class="deck-title">${deck.name}</div>
+                        <div class="deck-info">${total} Karten • ${mastered} Meister</div>
+                    </div>
+                    <div style="font-size:0.8em; color:#bbb; margin-top:10px;">Klicken zum Starten</div>
+                `;
+                div.onclick = (e) => { if(e.target.className !== 'btn-delete-deck') startLearning(index); };
+                list.appendChild(div);
+            });
+
+            // "Neues Set" Button
+            const addDiv = document.createElement('div');
+            addDiv.className = 'deck-card add-deck-card';
+            addDiv.innerHTML = '+ Neues Set erstellen';
+            addDiv.onclick = showEditor;
+            list.appendChild(addDiv);
+        }
+
+        function deleteDeck(e, index) {
+            e.stopPropagation();
+            if(confirm("Lernset wirklich löschen?")) {
+                decks.splice(index, 1);
+                saveToStorage();
+                renderDashboard();
+            }
+        }
+
+        // --- EDITOR LOGIK ---
+        function saveSet() {
+            const name = document.getElementById('set-name').value.trim();
+            const raw = document.getElementById('set-data').value;
+            
+            if(!name) return alert("Bitte einen Namen eingeben!");
+            if(!raw) return alert("Bitte Vokabeln eingeben!");
+
+            const newCards = [];
+            const pairs = raw.split('|');
+            pairs.forEach((p, idx) => {
+                const parts = p.split(';');
+                if(parts.length >= 2) {
+                    newCards.push({
+                        id: Date.now() + idx,
+                        q: parts[0].trim(),
+                        a: parts[1].trim(),
+                        box: 0
+                    });
                 }
             });
 
-            if (cards.length === 0) return alert("Keine gültigen Karten gefunden.");
+            if(newCards.length === 0) return alert("Keine gültigen Karten gefunden.");
 
-            // UI Umschalten
-            document.getElementById('setup-container').style.display = 'none';
-            document.getElementById('learning-container').style.display = 'flex';
-            
-            updateStats();
-            loadNextCard();
+            decks.push({ name: name, cards: newCards });
+            saveToStorage();
+            showDashboard();
         }
 
-        // --- SPIEL LOGIK ---
+        // --- GAME LOGIK ---
+        function startLearning(deckIndex) {
+            activeDeckIndex = deckIndex;
+            document.getElementById('active-set-name').innerText = decks[activeDeckIndex].name;
+            switchView('view-learning');
+            updateStats();
+            nextCard();
+        }
+
         function updateStats() {
             const container = document.getElementById('stats-display');
             container.innerHTML = '';
+            const currentDeck = decks[activeDeckIndex];
             
-            // Schleife über alle 6 Boxen (0-5)
-            for (let i = 0; i <= 5; i++) {
-                let badge = document.createElement('div');
+            for(let i=0; i<=5; i++) {
+                const count = currentDeck.cards.filter(c => c.box === i).length;
+                const badge = document.createElement('div');
                 badge.className = 'stat-badge';
-                badge.innerHTML = `Box ${i}: <span>${boxes[i].length}</span>`;
+                badge.innerHTML = `Box ${i}: <span style="color:var(--accent-color)">${count}</span>`;
                 container.appendChild(badge);
             }
         }
 
-        function loadNextCard() {
-            // Algorithmus: Suche niedrigste Box, die Karten enthält (außer Box 5, wenn möglich)
-            let cardPool = [];
-            
-            for (let i = 0; i < 5; i++) {
-                if (boxes[i].length > 0) {
-                    cardPool = boxes[i];
+        function nextCard() {
+            // Logik: Suche niedrigste Box, die nicht leer ist
+            const currentDeck = decks[activeDeckIndex];
+            let pool = [];
+
+            for(let i=0; i<5; i++) {
+                const cardsInBox = currentDeck.cards.filter(c => c.box === i);
+                if(cardsInBox.length > 0) {
+                    pool = cardsInBox;
                     break;
                 }
             }
 
-            // Wenn alle Boxen 0-4 leer sind, checken wir Box 5
-            if (cardPool.length === 0 && boxes[5].length > 0) {
-                // Fertig-Meldung
-                document.getElementById('question-text').innerText = "Glückwunsch! Alle Karten sind in Box 5.";
-                document.getElementById('user-answer').style.display = 'none';
-                document.querySelector('.btn-group').style.display = 'none';
-                return;
+            // Wenn alles leer (oder alle in Box 5)
+            if(pool.length === 0) {
+                const box5 = currentDeck.cards.filter(c => c.box === 5);
+                if(box5.length > 0) {
+                     document.getElementById('question-text').innerText = "🎉 Alles gelernt! Alle Karten in Box 5.";
+                     document.getElementById('user-answer').style.display = 'none';
+                     return;
+                }
             }
 
-            if (cardPool.length > 0) {
-                // Zufällige Karte aus dem Pool
-                const randomIndex = Math.floor(Math.random() * cardPool.length);
-                const selectedCard = cardPool[randomIndex];
-                currentCardIndex = cards.findIndex(c => c.id === selectedCard.id);
+            // Zufallskarte wählen
+            const card = pool[Math.floor(Math.random() * pool.length)];
+            currentCardIndex = currentDeck.cards.findIndex(c => c.id === card.id);
 
-                // UI anzeigen
-                document.getElementById('question-text').innerText = cards[currentCardIndex].question;
-                document.getElementById('user-answer').value = '';
-                document.getElementById('user-answer').focus();
-                document.getElementById('feedback-container').innerHTML = '';
-            }
+            // UI Reset
+            document.getElementById('question-text').innerText = card.q;
+            document.getElementById('user-answer').value = '';
+            document.getElementById('user-answer').style.display = 'block';
+            document.getElementById('user-answer').focus();
+            document.getElementById('feedback-container').innerHTML = '';
         }
 
-        // Hilfsfunktion: Text normalisieren (Satzzeichen weg, kleinschreiben)
         function normalize(text) {
-            return text
-                .toLowerCase()
-                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "") // Satzzeichen entfernen
-                .replace(/\s{2,}/g, " ") // Doppelte Leerzeichen weg
-                .trim();
+            return text.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"").trim();
         }
 
         function checkAnswer() {
-            const card = cards[currentCardIndex];
+            const currentDeck = decks[activeDeckIndex];
+            const card = currentDeck.cards[currentCardIndex];
             const userInp = document.getElementById('user-answer').value;
-            
-            // Toleranter Vergleich
-            const isCorrect = normalize(userInp) === normalize(card.answer);
 
-            if (isCorrect) {
+            if(normalize(userInp) === normalize(card.a)) {
                 processResult(true);
             } else {
                 showCorrectionOverlay(userInp, card);
@@ -420,119 +444,88 @@
         }
 
         function processResult(isCorrect) {
-            const card = cards[currentCardIndex];
+            const currentDeck = decks[activeDeckIndex];
+            const card = currentDeck.cards[currentCardIndex];
             const oldBox = card.box;
-            let newBox = oldBox;
+            let newBox = isCorrect ? (oldBox < 5 ? oldBox + 1 : 5) : 0;
 
-            if (isCorrect) {
-                if (oldBox < 5) newBox++;
-            } else {
-                newBox = 0; // Strafe: Zurück auf Los
-            }
+            // UI Feedback
+            const fb = document.getElementById('feedback-container');
+            const goldTxt = `<span class="gold-info">Box ${oldBox} ➔ Box ${newBox}</span>`;
 
-            // Visuelles Feedback erstellen
-            const feedbackEl = document.getElementById('feedback-container');
-            const goldText = `<span class="gold-info">Box ${oldBox} ➔ Box ${newBox}</span>`;
-
-            if (isCorrect) {
-                feedbackEl.innerHTML = `<span class="msg-correct">Richtig!</span>${goldText}`;
-                
-                // Karte verschieben
-                moveCard(card, oldBox, newBox);
-                
-                // Kurz warten, dann weiter
+            if(isCorrect) {
+                fb.innerHTML = `<span class="msg-correct">Richtig!</span>${goldTxt}`;
+                card.box = newBox; // Update Card
+                saveToStorage();   // Save DB
+                updateStats();
                 setTimeout(nextCard, 1500);
             } else {
-                // Nur Rückgabe für Overlay, Bewegung passiert erst bei "Weiter"
-                return { oldBox, newBox, goldText };
+                return { oldBox, newBox }; // Für Overlay
             }
         }
 
-        function moveCard(card, oldBox, newBox) {
-            // Aus alter Box löschen
-            boxes[oldBox] = boxes[oldBox].filter(c => c.id !== card.id);
-            // Karte updaten
-            card.box = newBox;
-            // In neue Box
-            boxes[newBox].push(card);
-            
-            updateStats();
-        }
-
-        function nextCard() {
-            // Falls das Overlay offen war, müssen wir die Karte jetzt "bestrafen" (verschieben)
-            const overlay = document.getElementById('correction-overlay');
-            if(overlay.style.display === 'flex') {
-                const card = cards[currentCardIndex];
-                moveCard(card, card.box, 0); // Zurück zu 0
-                overlay.style.display = 'none';
-            }
-            
-            loadNextCard();
-        }
-
-        // --- OVERLAY LOGIK (Fehler) ---
+        // --- OVERLAYS ---
         function showCorrectionOverlay(userTxt, card) {
-            const oldBox = card.box;
-            const newBox = 0; // Fehler = Box 0
+            const res = processResult(false); // Berechnet nur, führt nicht aus
             
-            document.getElementById('overlay-question-ref').innerText = "Frage: " + card.question;
-            document.getElementById('overlay-details').innerHTML = `
-                Du hast geschrieben: <s>${userTxt}</s><br>
-                Lösung: <b>${card.answer}</b>
+            document.getElementById('correction-details').innerHTML = `
+                Frage: <b>${card.q}</b><br><br>
+                Deine Antwort: <s>${userTxt}</s><br>
+                Lösung: <b style="color:var(--success-color)">${card.a}</b>
             `;
-            document.getElementById('overlay-gold-info').innerText = `Box ${oldBox} ➔ Box ${newBox}`;
-            
-            document.getElementById('correction-overlay').style.display = 'flex';
+            document.getElementById('correction-gold').innerText = `Box ${res.oldBox} ➔ Box 0`;
+            document.getElementById('overlay-correction').style.display = 'flex';
         }
 
         function overrideCorrect() {
-            // User sagt: "Es war doch richtig!"
-            document.getElementById('correction-overlay').style.display = 'none';
-            
-            const card = cards[currentCardIndex];
-            const oldBox = card.box;
-            // Manuell hochstufen
-            const newBox = oldBox < 5 ? oldBox + 1 : 5;
-            
-            const feedbackEl = document.getElementById('feedback-container');
-            feedbackEl.innerHTML = `<span class="msg-correct">Als richtig markiert!</span><span class="gold-info">Box ${oldBox} ➔ Box ${newBox}</span>`;
-
-            moveCard(card, oldBox, newBox);
-            setTimeout(nextCard, 1500);
+            document.getElementById('overlay-correction').style.display = 'none';
+            // Manuell als richtig werten
+            processResult(true);
         }
 
-        // --- EDIT LOGIK ---
+        function nextCardAfterWrong() {
+            // Bestrafung durchführen
+            const currentDeck = decks[activeDeckIndex];
+            const card = currentDeck.cards[currentCardIndex];
+            card.box = 0;
+            saveToStorage();
+            updateStats();
+
+            document.getElementById('overlay-correction').style.display = 'none';
+            nextCard();
+        }
+        // Button Mapping im HTML korrigieren, da ich oben nextCard() direkt im HTML hab, aber hier Logic brauche:
+        // Ich habe nextCard() im HTML Button "Weiter" beim Overlay. Das muss angepasst werden:
+        // Ich ersetze die onclick function im HTML string oben gedanklich oder per JS:
+        // HTML Zeile 163 ändern zu onclick="nextCardAfterWrong()"
+
         function openEditOverlay() {
-            const card = cards[currentCardIndex];
-            document.getElementById('edit-q-input').value = card.question;
-            document.getElementById('edit-a-input').value = card.answer;
-            document.getElementById('edit-overlay').style.display = 'flex';
+            const card = decks[activeDeckIndex].cards[currentCardIndex];
+            document.getElementById('edit-q').value = card.q;
+            document.getElementById('edit-a').value = card.a;
+            document.getElementById('overlay-edit').style.display = 'flex';
         }
 
-        function closeEditOverlay() {
-            document.getElementById('edit-overlay').style.display = 'none';
-        }
-
-        function saveEdit() {
-            const newQ = document.getElementById('edit-q-input').value;
-            const newA = document.getElementById('edit-a-input').value;
-            
-            if (newQ && newA) {
-                // Daten im Array ändern
-                cards[currentCardIndex].question = newQ;
-                cards[currentCardIndex].answer = newA;
-                
-                // Anzeige sofort aktualisieren
-                document.getElementById('question-text').innerText = newQ;
-                
-                closeEditOverlay();
+        function saveCardEdit() {
+            const nQ = document.getElementById('edit-q').value;
+            const nA = document.getElementById('edit-a').value;
+            if(nQ && nA) {
+                decks[activeDeckIndex].cards[currentCardIndex].q = nQ;
+                decks[activeDeckIndex].cards[currentCardIndex].a = nA;
+                saveToStorage();
+                document.getElementById('question-text').innerText = nQ;
+                closeOverlays();
             }
         }
 
-        function handleEnter(e) {
-            if (e.key === 'Enter') checkAnswer();
+        function closeOverlays() {
+            document.querySelectorAll('.overlay').forEach(el => el.style.display = 'none');
         }
+
+        // Helper für den "Weiter" Button im Error Overlay
+        document.querySelector('#overlay-correction .btn-primary:last-child').onclick = nextCardAfterWrong;
+
+        function handleEnter(e) { if(e.key === 'Enter') checkAnswer(); }
 
     </script>
 </body>
