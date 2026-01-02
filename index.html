@@ -6,112 +6,139 @@
     <title>Version 5.0 Final Polish</title>
     <style>
         :root {
+            /* Das hochwertige Farbschema */
             --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --card-bg: #ffffff;
-            --text-main: #2c3e50;
-            --text-light: #7f8c8d;
-            --accent: #3498db;
+            --text-color: #2c3e50;
+            --accent-color: #3498db;
             --accent-hover: #2980b9;
-            --success: #27ae60;
-            --error: #e74c3c;
-            --gold-text: #d4ac0d; /* Dunkles Gold für gute Lesbarkeit */
-            --shadow: 0 10px 20px rgba(0,0,0,0.1);
-            --radius: 12px;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --gold-text: #b7950b; /* Dunkles Gold für gute Lesbarkeit */
+            --shadow: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 15px;
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-gradient);
-            color: var(--text-main);
-            min-height: 100vh;
+            color: var(--text-color);
             margin: 0;
+            padding: 20px;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
         }
 
         h1 {
             margin-bottom: 5px;
-            color: var(--text-main);
+            color: var(--text-color);
             text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
         }
 
         .subtitle {
             font-size: 0.9em;
-            color: var(--text-light);
+            color: #7f8c8d;
             margin-bottom: 30px;
         }
 
-        /* --- Statistik Boxen --- */
-        .stats-wrapper {
+        /* --- SETUP BEREICH --- */
+        #setup-container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: inherit;
+            font-size: 1em;
+            resize: vertical;
+            box-sizing: border-box; /* Wichtig für Layout */
+        }
+        
+        textarea:focus { outline: none; border-color: var(--accent-color); }
+
+        /* --- LERN BEREICH --- */
+        #learning-container {
+            display: none; /* Initial ausgeblendet */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* Statistik Leiste */
+        .stats-bar {
             display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
             flex-wrap: wrap;
+            gap: 10px;
             justify-content: center;
+            margin-bottom: 25px;
+            width: 100%;
         }
 
         .stat-badge {
             background: var(--card-bg);
-            padding: 8px 15px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.85em;
             font-weight: 600;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border: 1px solid rgba(0,0,0,0.05);
-            transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            color: var(--text-color);
         }
 
-        .stat-badge:hover {
-            transform: translateY(-2px);
-        }
+        .stat-badge span { color: var(--accent-color); font-weight: bold; }
 
-        /* --- Hauptkarte --- */
-        .flashcard {
+        /* Die Lernkarte */
+        .card-container {
             background: var(--card-bg);
-            width: 100%;
-            max-width: 550px;
             padding: 40px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
+            width: 100%;
             text-align: center;
             position: relative;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            animation: slideUp 0.4s ease-out;
         }
 
         .question-text {
-            font-size: 1.6em;
+            font-size: 1.5em;
             font-weight: 700;
-            color: var(--text-main);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            color: var(--text-color);
             line-height: 1.4;
         }
 
-        /* Input Styling */
         input[type="text"] {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             font-size: 1.1em;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #dfe6e9;
             border-radius: 8px;
             margin-bottom: 20px;
+            box-sizing: border-box;
             transition: border-color 0.3s;
-            box-sizing: border-box; /* Wichtig damit Padding nicht die Breite sprengt */
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: var(--accent);
+            border-color: var(--accent-color);
         }
 
-        /* Buttons */
-        .action-row {
+        /* Button Container */
+        .btn-group {
             display: flex;
             gap: 10px;
             justify-content: center;
@@ -119,110 +146,92 @@
         }
 
         button {
-            padding: 12px 24px;
+            padding: 12px 25px;
             font-size: 1em;
-            font-weight: 600;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: transform 0.1s, background-color 0.2s;
+            font-weight: 600;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .btn-primary {
-            background-color: var(--accent);
-            color: white;
-        }
-        .btn-primary:hover { background-color: var(--accent-hover); transform: translateY(-1px); }
+        button:active { transform: scale(0.98); }
 
-        .btn-edit {
-            background-color: #f39c12; /* Orange für Bearbeiten */
-            color: white;
-            font-size: 0.9em;
-            padding: 12px 15px;
-        }
+        .btn-primary { background-color: var(--accent-color); color: white; }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+
+        .btn-edit { background-color: #f39c12; color: white; display: flex; align-items: center; gap: 5px; }
         .btn-edit:hover { background-color: #e67e22; }
 
-        /* Setup Area */
-        #setup-area {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
+        /* Feedback Bereich */
+        #feedback-container {
+            min-height: 60px; /* Platzhalter damit nichts springt */
+            margin-top: 15px;
         }
 
-        textarea {
-            width: 100%;
-            height: 120px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            resize: vertical;
-            margin-bottom: 15px;
-            font-family: inherit;
-            box-sizing: border-box;
-        }
-
-        /* Feedback & Gold Text */
-        #feedback-area {
-            min-height: 50px;
-            margin-top: 10px;
-        }
-
-        .correct-msg { color: var(--success); font-weight: bold; font-size: 1.2em; display: block; margin-bottom: 5px; }
-        .wrong-msg { color: var(--error); font-weight: bold; font-size: 1.2em; display: block; margin-bottom: 5px; }
+        .msg-correct { color: var(--success-color); font-weight: bold; font-size: 1.2em; display: block; }
+        .msg-wrong { color: var(--error-color); font-weight: bold; font-size: 1.2em; display: block; }
         
-        .gold-transition {
+        .gold-info {
             color: var(--gold-text);
             font-size: 0.95em;
-            font-weight: 600;
+            font-weight: bold;
             font-style: italic;
             margin-top: 5px;
             display: block;
         }
 
-        /* Overlay Styles */
+        /* --- OVERLAYS (Popups) --- */
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(3px);
-            display: none;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            display: none; /* Hidden by default */
             justify-content: center;
             align-items: center;
-            z-index: 999;
+            z-index: 1000;
         }
 
-        .overlay-card {
+        .overlay-box {
             background: white;
             padding: 30px;
-            border-radius: 15px;
+            border-radius: var(--radius);
             width: 90%;
             max-width: 450px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
 
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        .overlay-box h3 { margin-top: 0; color: var(--error-color); }
+
+        .correction-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            margin: 15px 0;
+            color: #555;
+            line-height: 1.6;
         }
 
-        .overlay-card h3 { margin-top: 0; color: var(--error); }
-        .correction-details { margin: 20px 0; color: #555; line-height: 1.6; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 8px; }
-        
-        .btn-green { background-color: var(--success); color: white; margin-right: 10px; }
+        .btn-green { background-color: var(--success-color); color: white; margin-right: 5px; }
         .btn-green:hover { background-color: #219150; }
+        
+        .btn-grey { background-color: #95a5a6; color: white; }
+        .btn-grey:hover { background-color: #7f8c8d; }
 
-        /* Edit Overlay Specifics */
-        #edit-overlay h3 { color: var(--text-main); }
-        .edit-input-group { text-align: left; margin-bottom: 15px; }
-        .edit-input-group label { font-size: 0.9em; font-weight: bold; color: #666; display: block; margin-bottom: 5px; }
-        .edit-input-group input { margin-bottom: 0; }
+        /* Edit Overlay Inputs */
+        .edit-field { margin-bottom: 15px; text-align: left; }
+        .edit-field label { display: block; font-size: 0.85em; font-weight: bold; color: #7f8c8d; margin-bottom: 5px; }
+        .edit-field input { margin-bottom: 0; }
+
+        /* Animationen */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     </style>
 </head>
@@ -231,279 +240,300 @@
     <h1>Version 5.0 Final Polish</h1>
     <div class="subtitle">Das ultimative Leitner-Lernsystem</div>
 
-    <div id="setup-area">
-        <h3>Lernset erstellen</h3>
-        <p style="font-size: 0.9em; color: #666;">Format: Frage;Antwort | Frage;Antwort</p>
-        <textarea id="import-data" placeholder="Beispiel: Hund;Dog | Haus;House | ..."></textarea>
+    <div id="setup-container">
+        <h2>Lernset erstellen</h2>
+        <p style="color: #666; font-size: 0.9em;">Format: Frage;Antwort | Frage;Antwort</p>
+        <textarea id="input-data" placeholder="Hund;Dog | Katze;Cat | Maus;Mouse"></textarea>
         <br>
-        <button class="btn-primary" onclick="initLearning()">Lernen starten</button>
+        <button class="btn-primary" onclick="startLearning()">Lernen starten</button>
     </div>
 
-    <div id="learning-area" style="display:none; width: 100%; flex-direction: column; align-items: center;">
+    <div id="learning-container">
         
-        <div class="stats-wrapper" id="stats-bar">
-            </div>
+        <div id="stats-display" class="stats-bar"></div>
 
-        <div class="flashcard">
-            <div id="question-display" class="question-text"></div>
-
-            <div class="action-row">
-                </div>
+        <div class="card-container">
+            <div id="question-text" class="question-text"></div>
             
-            <input type="text" id="user-input" placeholder="Deine Antwort eingeben..." autocomplete="off" onkeypress="handleEnter(event)">
+            <input type="text" id="user-answer" placeholder="Deine Antwort..." autocomplete="off" onkeypress="handleEnter(event)">
             
-            <div class="action-row">
+            <div class="btn-group">
                 <button class="btn-primary" onclick="checkAnswer()">Überprüfen</button>
-                <button class="btn-edit" onclick="openEditModal()">✏️ Karte bearbeiten</button>
+                <button class="btn-edit" onclick="openEditOverlay()">✏️ Bearbeiten</button>
             </div>
 
-            <div id="feedback-area"></div>
+            <div id="feedback-container"></div>
         </div>
     </div>
 
     <div id="correction-overlay" class="overlay">
-        <div class="overlay-card">
-            <h3>Leider falsch</h3>
-            <div style="font-weight: bold; margin-bottom: 10px; color:#333;" id="overlay-q-ref"></div>
+        <div class="overlay-box">
+            <h3>Nicht ganz...</h3>
+            <div style="font-weight: bold; margin-bottom: 10px; color:#333;" id="overlay-question-ref"></div>
             
-            <div class="correction-details" id="correction-text"></div>
+            <div class="correction-details" id="overlay-details"></div>
             
-            <div id="overlay-gold-info" class="gold-transition" style="margin-bottom: 20px;"></div>
+            <div id="overlay-gold-info" class="gold-info" style="margin-bottom: 20px;"></div>
 
-            <button class="btn-green" onclick="markAsCorrectManually()">Doch, war richtig!</button>
+            <button class="btn-green" onclick="overrideCorrect()">Doch, das war richtig!</button>
             <button class="btn-primary" onclick="nextCard()">Weiter</button>
         </div>
     </div>
 
     <div id="edit-overlay" class="overlay">
-        <div class="overlay-card">
-            <h3>Karte bearbeiten</h3>
-            <div class="edit-input-group">
+        <div class="overlay-box">
+            <h3 style="color: var(--text-color);">Karte bearbeiten</h3>
+            
+            <div class="edit-field">
                 <label>Frage:</label>
-                <input type="text" id="edit-question-input">
+                <input type="text" id="edit-q-input">
             </div>
-            <div class="edit-input-group">
+            
+            <div class="edit-field">
                 <label>Antwort:</label>
-                <input type="text" id="edit-answer-input">
+                <input type="text" id="edit-a-input">
             </div>
-            <button class="btn-green" onclick="saveEditedCard()">Speichern</button>
-            <button class="btn-edit" style="background:#95a5a6;" onclick="closeEditModal()">Abbrechen</button>
+
+            <button class="btn-green" onclick="saveEdit()">Speichern</button>
+            <button class="btn-grey" onclick="closeEditOverlay()">Abbrechen</button>
         </div>
     </div>
 
     <script>
+        // --- DATENSTRUKTUR ---
         let cards = [];
         let currentCardIndex = -1;
-        // Boxen 0 bis 5
-        let boxes = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[] };
+        // Boxen 0, 1, 2, 3, 4, 5
+        let boxes = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [] };
 
-        function initLearning() {
-            const raw = document.getElementById('import-data').value;
-            if(!raw.trim()) {
-                // Fallback Demo Daten
-                startWithData("Hund;Dog | Katze;Cat | Maus;Mouse | Schule;School | Buch;Book");
+        // --- SETUP LOGIK ---
+        function startLearning() {
+            const inputVal = document.getElementById('input-data').value;
+            
+            if (!inputVal.trim()) {
+                // Demo Daten falls leer
+                initGame("Hund;Dog | Katze;Cat | Apfel;Apple | Schule;School | Buch;Book");
                 return;
             }
-            startWithData(raw);
+            initGame(inputVal);
         }
 
-        function startWithData(text) {
+        function initGame(textData) {
             cards = [];
-            boxes = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[] };
-            
-            const pairs = text.split('|');
-            pairs.forEach((p, idx) => {
-                const [q, a] = p.split(';');
-                if(q && a) {
-                    let card = {
-                        id: idx,
-                        q: q.trim(),
-                        a: a.trim(),
-                        box: 0
+            // Reset Boxen
+            boxes = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [] };
+
+            const pairs = textData.split('|');
+            pairs.forEach((pair, index) => {
+                const parts = pair.split(';');
+                if (parts.length >= 2) {
+                    let newCard = {
+                        id: index,
+                        question: parts[0].trim(),
+                        answer: parts[1].trim(),
+                        box: 0 // Start in Box 0
                     };
-                    cards.push(card);
-                    boxes[0].push(card);
+                    cards.push(newCard);
+                    boxes[0].push(newCard);
                 }
             });
 
-            document.getElementById('setup-area').style.display = 'none';
-            document.getElementById('learning-area').style.display = 'flex';
+            if (cards.length === 0) return alert("Keine gültigen Karten gefunden.");
+
+            // UI Umschalten
+            document.getElementById('setup-container').style.display = 'none';
+            document.getElementById('learning-container').style.display = 'flex';
+            
             updateStats();
-            pickNextCard();
+            loadNextCard();
         }
 
+        // --- SPIEL LOGIK ---
         function updateStats() {
-            const bar = document.getElementById('stats-bar');
-            bar.innerHTML = '';
-            for(let i=0; i<=5; i++) {
+            const container = document.getElementById('stats-display');
+            container.innerHTML = '';
+            
+            // Schleife über alle 6 Boxen (0-5)
+            for (let i = 0; i <= 5; i++) {
                 let badge = document.createElement('div');
                 badge.className = 'stat-badge';
-                badge.innerHTML = `Box ${i}: <span style="color:var(--accent)">${boxes[i].length}</span>`;
-                bar.appendChild(badge);
+                badge.innerHTML = `Box ${i}: <span>${boxes[i].length}</span>`;
+                container.appendChild(badge);
             }
         }
 
-        function pickNextCard() {
-            // Algorithmus: Zufall aus niedrigster Box, die nicht leer ist
-            let pool = [];
-            for(let i=0; i<5; i++) {
-                if(boxes[i].length > 0) {
-                    pool = boxes[i];
+        function loadNextCard() {
+            // Algorithmus: Suche niedrigste Box, die Karten enthält (außer Box 5, wenn möglich)
+            let cardPool = [];
+            
+            for (let i = 0; i < 5; i++) {
+                if (boxes[i].length > 0) {
+                    cardPool = boxes[i];
                     break;
                 }
             }
-            
-            // Wenn alle in Box 5 sind
-            if(pool.length === 0 && boxes[5].length > 0) {
-                document.getElementById('question-display').innerText = "Herzlichen Glückwunsch! Alles gelernt.";
-                document.getElementById('user-input').style.display = 'none';
-                document.querySelector('.action-row').style.display = 'none';
+
+            // Wenn alle Boxen 0-4 leer sind, checken wir Box 5
+            if (cardPool.length === 0 && boxes[5].length > 0) {
+                // Fertig-Meldung
+                document.getElementById('question-text').innerText = "Glückwunsch! Alle Karten sind in Box 5.";
+                document.getElementById('user-answer').style.display = 'none';
+                document.querySelector('.btn-group').style.display = 'none';
                 return;
             }
 
-            if(pool.length > 0) {
-                const rand = Math.floor(Math.random() * pool.length);
-                const card = pool[rand];
-                currentCardIndex = cards.findIndex(c => c.id === card.id);
-                
-                showCardUI(cards[currentCardIndex]);
+            if (cardPool.length > 0) {
+                // Zufällige Karte aus dem Pool
+                const randomIndex = Math.floor(Math.random() * cardPool.length);
+                const selectedCard = cardPool[randomIndex];
+                currentCardIndex = cards.findIndex(c => c.id === selectedCard.id);
+
+                // UI anzeigen
+                document.getElementById('question-text').innerText = cards[currentCardIndex].question;
+                document.getElementById('user-answer').value = '';
+                document.getElementById('user-answer').focus();
+                document.getElementById('feedback-container').innerHTML = '';
             }
         }
 
-        function showCardUI(card) {
-            document.getElementById('question-display').innerText = card.q;
-            document.getElementById('user-input').value = '';
-            document.getElementById('user-input').focus();
-            document.getElementById('feedback-area').innerHTML = '';
-        }
-
-        // Hilfsfunktion: Satzzeichen ignorieren
-        function cleanText(txt) {
-            return txt.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"").trim();
+        // Hilfsfunktion: Text normalisieren (Satzzeichen weg, kleinschreiben)
+        function normalize(text) {
+            return text
+                .toLowerCase()
+                .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, "") // Satzzeichen entfernen
+                .replace(/\s{2,}/g, " ") // Doppelte Leerzeichen weg
+                .trim();
         }
 
         function checkAnswer() {
             const card = cards[currentCardIndex];
-            const userTxt = document.getElementById('user-input').value;
+            const userInp = document.getElementById('user-answer').value;
             
-            const isCorrect = cleanText(userTxt) === cleanText(card.a);
+            // Toleranter Vergleich
+            const isCorrect = normalize(userInp) === normalize(card.answer);
 
-            if(isCorrect) {
-                handleResult(true);
+            if (isCorrect) {
+                processResult(true);
             } else {
-                showCorrectionOverlay(userTxt, card);
+                showCorrectionOverlay(userInp, card);
             }
         }
 
-        function handleResult(success) {
+        function processResult(isCorrect) {
             const card = cards[currentCardIndex];
             const oldBox = card.box;
             let newBox = oldBox;
 
-            if(success) {
-                if(oldBox < 5) newBox++;
+            if (isCorrect) {
+                if (oldBox < 5) newBox++;
             } else {
-                newBox = 0;
+                newBox = 0; // Strafe: Zurück auf Los
             }
 
-            // UI Feedback (Gold)
-            const fb = document.getElementById('feedback-area');
-            const goldTxt = `<span class="gold-transition">Box ${oldBox} ➔ Box ${newBox}</span>`;
-            
-            if(success) {
-                fb.innerHTML = `<span class="correct-msg">Richtig!</span>${goldTxt}`;
+            // Visuelles Feedback erstellen
+            const feedbackEl = document.getElementById('feedback-container');
+            const goldText = `<span class="gold-info">Box ${oldBox} ➔ Box ${newBox}</span>`;
+
+            if (isCorrect) {
+                feedbackEl.innerHTML = `<span class="msg-correct">Richtig!</span>${goldText}`;
+                
+                // Karte verschieben
                 moveCard(card, oldBox, newBox);
+                
+                // Kurz warten, dann weiter
                 setTimeout(nextCard, 1500);
             } else {
-                // Rückgabe für Overlay
-                return { oldBox, newBox, goldTxt };
+                // Nur Rückgabe für Overlay, Bewegung passiert erst bei "Weiter"
+                return { oldBox, newBox, goldText };
             }
         }
 
         function moveCard(card, oldBox, newBox) {
-            // Aus alter Liste entfernen
+            // Aus alter Box löschen
             boxes[oldBox] = boxes[oldBox].filter(c => c.id !== card.id);
-            // Update
+            // Karte updaten
             card.box = newBox;
-            // In neue Liste
+            // In neue Box
             boxes[newBox].push(card);
+            
             updateStats();
         }
 
-        function showCorrectionOverlay(userTxt, card) {
-            // Simulation des Ergebnisses für die Anzeige
-            const oldBox = card.box;
-            const newBox = 0; // Falsch = Box 0
+        function nextCard() {
+            // Falls das Overlay offen war, müssen wir die Karte jetzt "bestrafen" (verschieben)
+            const overlay = document.getElementById('correction-overlay');
+            if(overlay.style.display === 'flex') {
+                const card = cards[currentCardIndex];
+                moveCard(card, card.box, 0); // Zurück zu 0
+                overlay.style.display = 'none';
+            }
             
-            document.getElementById('overlay-q-ref').innerText = "Frage: " + card.q;
-            document.getElementById('correction-text').innerHTML = `
-                Deine Antwort: <s>${userTxt}</s><br>
-                Lösung: <b>${card.a}</b>
+            loadNextCard();
+        }
+
+        // --- OVERLAY LOGIK (Fehler) ---
+        function showCorrectionOverlay(userTxt, card) {
+            const oldBox = card.box;
+            const newBox = 0; // Fehler = Box 0
+            
+            document.getElementById('overlay-question-ref').innerText = "Frage: " + card.question;
+            document.getElementById('overlay-details').innerHTML = `
+                Du hast geschrieben: <s>${userTxt}</s><br>
+                Lösung: <b>${card.answer}</b>
             `;
             document.getElementById('overlay-gold-info').innerText = `Box ${oldBox} ➔ Box ${newBox}`;
             
             document.getElementById('correction-overlay').style.display = 'flex';
         }
 
-        function markAsCorrectManually() {
+        function overrideCorrect() {
+            // User sagt: "Es war doch richtig!"
             document.getElementById('correction-overlay').style.display = 'none';
-            // Manuell als Richtig werten -> Box hoch
+            
             const card = cards[currentCardIndex];
             const oldBox = card.box;
-            const newBox = (oldBox < 5) ? oldBox + 1 : 5;
-
-            // Feedback anzeigen
-            const fb = document.getElementById('feedback-area');
-            fb.innerHTML = `<span class="correct-msg">Korrigiert: Richtig!</span><span class="gold-transition">Box ${oldBox} ➔ Box ${newBox}</span>`;
+            // Manuell hochstufen
+            const newBox = oldBox < 5 ? oldBox + 1 : 5;
             
+            const feedbackEl = document.getElementById('feedback-container');
+            feedbackEl.innerHTML = `<span class="msg-correct">Als richtig markiert!</span><span class="gold-info">Box ${oldBox} ➔ Box ${newBox}</span>`;
+
             moveCard(card, oldBox, newBox);
             setTimeout(nextCard, 1500);
         }
 
-        function nextCard() {
-            // Wenn Overlay offen war (also Fehler), dann jetzt Bestrafung ausführen
-            const overlay = document.getElementById('correction-overlay');
-            if(overlay.style.display === 'flex') {
-                const card = cards[currentCardIndex];
-                moveCard(card, card.box, 0); // Zurück auf 0
-                overlay.style.display = 'none';
-            }
-            pickNextCard();
-        }
-
-        // --- BEARBEITEN FUNKTIONEN ---
-        function openEditModal() {
+        // --- EDIT LOGIK ---
+        function openEditOverlay() {
             const card = cards[currentCardIndex];
-            document.getElementById('edit-question-input').value = card.q;
-            document.getElementById('edit-answer-input').value = card.a;
+            document.getElementById('edit-q-input').value = card.question;
+            document.getElementById('edit-a-input').value = card.answer;
             document.getElementById('edit-overlay').style.display = 'flex';
         }
 
-        function closeEditModal() {
+        function closeEditOverlay() {
             document.getElementById('edit-overlay').style.display = 'none';
         }
 
-        function saveEditedCard() {
-            const newQ = document.getElementById('edit-question-input').value;
-            const newA = document.getElementById('edit-answer-input').value;
+        function saveEdit() {
+            const newQ = document.getElementById('edit-q-input').value;
+            const newA = document.getElementById('edit-a-input').value;
             
-            if(newQ && newA) {
-                // Daten aktualisieren
-                cards[currentCardIndex].q = newQ;
-                cards[currentCardIndex].a = newA;
+            if (newQ && newA) {
+                // Daten im Array ändern
+                cards[currentCardIndex].question = newQ;
+                cards[currentCardIndex].answer = newA;
                 
-                // UI sofort aktualisieren
-                document.getElementById('question-display').innerText = newQ;
+                // Anzeige sofort aktualisieren
+                document.getElementById('question-text').innerText = newQ;
                 
-                closeEditModal();
-            } else {
-                alert("Beides muss ausgefüllt sein!");
+                closeEditOverlay();
             }
         }
 
         function handleEnter(e) {
-            if(e.key === 'Enter') checkAnswer();
+            if (e.key === 'Enter') checkAnswer();
         }
+
     </script>
 </body>
 </html>
