@@ -82,14 +82,6 @@
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
-        /* Training Edit Button */
-        .train-edit-btn {
-            background: transparent; border: 1px solid #333; color: #666;
-            width: 30px; height: 30px; padding: 0; border-radius: 50%;
-            font-size: 14px; margin-left: 10px; display: inline-flex; align-items: center; justify-content: center;
-        }
-        .train-edit-btn:hover { background: #222; color: white; }
-
         /* DASHBOARD STATS */
         .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
         .stat-card {
@@ -223,13 +215,15 @@
         /* Persistent Training Header */
         .persistent-header { margin: 40px 0 20px 0; text-align: center; }
 
+        /* Top Right Info */
+        .top-right-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
+        .box-info-tag { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 4px; }
+        .gold-trans { color: var(--gold-text); font-style: italic; }
+
         #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
         .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #113311; }
         .wrong { background-color: var(--error-bg); color: var(--error-text); border: 1px solid #331111; }
         .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--text-muted); font-size: 14px; color: var(--text-muted); text-align: left; white-space: pre-wrap; line-height: 1.5; border-radius: 4px;}
-
-        /* Gold Box Info */
-        .gold-transition { color: var(--gold-text); font-weight: bold; margin-top: 5px; font-size: 0.9rem; display: block; font-style: italic; }
 
         hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
         .file-upload { display: block; border: 1px dashed var(--border); text-align: center; border-radius: 6px; cursor: pointer; color: var(--text-muted); }
@@ -410,20 +404,22 @@
     </div>
 
     <div id="view-test" class="container hidden fade-in">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
             <button class="secondary" onclick="switchTab('dashboard')" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Zurück</button>
-            <span style="color:var(--text-muted); font-size:0.8rem;" id="test-project-name">Training</span>
+            
+            <div class="top-right-info">
+                <span id="test-project-name" style="color:var(--text-muted); font-size:0.8rem;">Training</span>
+                <span id="box-display" class="box-info-tag">Box 0</span>
+            </div>
         </div>
 
         <div class="persistent-header">
             <div style="display:flex; justify-content:center; align-items:center; gap: 10px; margin-bottom: 5px;">
-                <span id="level-indicator" style="font-size:0.7rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:var(--text-muted);">Box 0</span>
                 <div id="priority-indicator" style="font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
             </div>
             
             <div style="display:flex; justify-content:center; align-items:center;">
                 <div id="question-display">...</div>
-                <button class="train-edit-btn" onclick="editCurrentCard()">✏️</button>
             </div>
             <div id="seq-progress" style="text-align:center; font-size:0.75rem; color:var(--accent-seq); margin-bottom:5px; display:none;">Teil 1/3</div>
         </div>
@@ -432,7 +428,7 @@
             <div style="text-align:left; color:var(--text-muted); font-size: 0.85rem; margin-bottom:5px;">Übersetze:</div>
             <input type="text" id="test-input" placeholder="Antwort..." autocomplete="off">
             <button onclick="checkAnswer()">Prüfen</button>
-            <button class="secondary" onclick="solve()">Lösung</button>
+            <button class="secondary" onclick="editCurrentCard()">Karte bearbeiten</button>
         </div>
 
         <div id="result-area" class="hidden">
@@ -520,11 +516,10 @@
             }
         }
         
-        // TOLERANZ-UPDATE: Ignoriert Punkte, Kommas, etc.
         function cleanString(str) { 
             return str ? str.trim().toLowerCase()
-                .replace(/[.,?!]/g, '') // Entfernt Satzzeichen
-                .replace(/\s+/g, ' ') // Entfernt doppelte Leerzeichen
+                .replace(/[.,?!]/g, '') 
+                .replace(/\s+/g, ' ') 
                 .replace(/ğ/g, 'g')
                 .replace(/ü/g, 'u')
                 .replace(/ä/g, 'ae')
@@ -946,7 +941,12 @@
             }
 
             document.getElementById('question-display').innerText = qText;
-            document.getElementById('level-indicator').innerText = levelInfo;
+            
+            // BOX INFO OBEN RECHTS UPDATE
+            const boxDisplay = document.getElementById('box-display');
+            boxDisplay.innerText = levelInfo;
+            boxDisplay.innerHTML = levelInfo; // Reset falls Gold war
+            
             document.getElementById('priority-indicator').style.visibility = item.priority ? 'visible' : 'hidden';
         }
 
@@ -971,20 +971,10 @@
             showResult(isCorrect, correctStr, noteStr, item);
         }
 
+        // DIESE FUNKTION IST JETZT EIGENTLICH NICHT MEHR NÖTIG ÜBER BUTTON,
+        // KANN ABER VON DER LOGIK HER NOCH GENUTZT WERDEN (z.B. bei LEEREM INPUT)
         function solve() {
-            const list = getCurrentList();
-            const item = list[currentQuestionIndex];
-            let correctStr = "";
-            let noteStr = "";
-            
-            if (item.type === 'sequence') {
-                correctStr = item.steps[currentSequenceStep].lang;
-                noteStr = item.steps[currentSequenceStep].note;
-            } else {
-                correctStr = direction === 0 ? item.lang : item.de;
-                noteStr = item.note;
-            }
-            showResult(false, correctStr, noteStr, item); 
+           // Wird aktuell nicht per Button aufgerufen, da Button ersetzt wurde.
         }
 
         function showResult(success, correctAns, note, item) {
@@ -1030,8 +1020,9 @@
                 cooldownQueue.push(currentQuestionIndex); 
             }
 
-            // GOLD INFO
-            fb.innerHTML += `<span class="gold-transition">Box ${oldBox} ➔ Box ${newBox}</span>`;
+            // GOLD INFO: WIRD JETZT OBEN RECHTS ANGEZEIGT
+            const boxDisplay = document.getElementById('box-display');
+            boxDisplay.innerHTML = `<span class="gold-trans">Box ${oldBox} ➔ Box ${newBox}</span>`;
 
             if(note) {
                 noteDiv.innerText = "💡 " + note;
@@ -1050,7 +1041,13 @@
             const qIdx = cooldownQueue.indexOf(currentQuestionIndex);
             if(qIdx > -1) cooldownQueue.splice(qIdx, 1);
             
-            // Manuelle Korrektur erhöht Box + 1
+            // Manuelle Korrektur erhöht Box + 1 (Wiederherstellung/Aufstieg)
+            // Wir nehmen an es war richtig, also Aufstieg vom URSPRUNGSZUSTAND.
+            // Da wir oben schon auf 0 gesetzt haben, müssen wir rekonstruieren.
+            // Einfache Logik: Wir setzen es auf Box 1 (oder +1 wenn wir history hätten).
+            // Fairness: Setze auf 1 wenn 0 war, sonst +1. 
+            // Hier machen wir es einfach: +1.
+            
             if(item.box < 5) item.box++; 
             item.lastWrong = false;
             
