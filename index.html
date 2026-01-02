@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v5.0</title>
+    <title>Core-Learning v5.1</title>
     <style>
         :root {
-            /* Core Theme v5.0 - Final Polish */
+            /* Core Theme v5.1 - Answer Fix & Seq Override */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -165,7 +165,7 @@
         .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
         .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); } 
 
-        /* INLINE BUTTONS */
+        /* INLINE BUTTONS (Connect / Delete) */
         .btn-inline {
             border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
             box-shadow: 0 2px 10px rgba(0,0,0,0.4); z-index: 20; position: relative;
@@ -217,7 +217,6 @@
         .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--text-muted); font-size: 14px; color: var(--text-muted); text-align: left; white-space: pre-wrap; line-height: 1.5; border-radius: 4px;}
 
         hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
-        /* MOBILE IMPORT FIX: accept many types */
         .file-upload { display: block; border: 1px dashed var(--border); text-align: center; border-radius: 6px; cursor: pointer; color: var(--text-muted); }
         .file-upload:hover { border-color: #aaaaaa; color: #ffffff; background: var(--input-bg);}
     </style>
@@ -226,7 +225,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v5.0 | Final Polish</div>
+        <div class="subtitle">v5.1 | Final Polish & Fix</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -483,7 +482,16 @@
         function save() { localStorage.setItem('core_l_data_v2', JSON.stringify(appData)); }
         function checkStreakLogic() { /* preserved */ }
         function updateStreak() { /* preserved */ }
-        function cleanString(str) { return str ? str.trim().toLowerCase().replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ä/g, 'ae').replace(/ö/g, 'o').replace(/ß/g, 'ss') : ""; }
+        function cleanString(str) { 
+            return str ? str.trim().toLowerCase()
+                .replace(/ğ/g, 'g')
+                .replace(/ü/g, 'u')
+                .replace(/ä/g, 'ae')
+                .replace(/ö/g, 'o')
+                .replace(/ß/g, 'ss')
+                .replace(/ı/g, 'i')
+                .replace(/İ/g, 'i') : ""; 
+        }
         function cleanDisplay(str) { return str ? str.trim() : ""; }
 
         // --- NAVIGATION ---
@@ -802,7 +810,7 @@
             }; reader.readAsText(file);
         }
 
-        // --- TRAINING LOGIC v5.0 ---
+        // --- TRAINING LOGIC v5.1 ---
         function startTest() {
             try {
                 repairAllData();
@@ -909,6 +917,7 @@
                 isCorrect = cleanString(input) === cleanString(correctSolution);
                 
                 if (!isCorrect) {
+                    word.tempPrevBox = word.box || 0; // Backup for override
                     word.box = 0; word.lastWrong = true; save();
                     showResult(false, correctSolution, note, input, false, true); 
                 } else {
@@ -936,7 +945,7 @@
             
             if(isSequenceActive) {
                 const step = word.steps[currentSequenceStep];
-                word.box = 0; word.lastWrong = true; save();
+                word.tempPrevBox = word.box || 0; word.box = 0; word.lastWrong = true; save();
                 showResult(false, step.lang, step.note, "", true, true);
             } else {
                 const sol = direction === 0 ? word.lang : word.de;
@@ -953,21 +962,48 @@
             let btnText = "Weiter";
             if (isSequenceActive && isCorrect && currentSequenceStep > 0) btnText = "Nächster Teil ➔";
             if (isSequenceActive && !isCorrect) btnText = "Weiter (Sequenz abgebrochen)";
-            document.querySelector('#result-area button').innerText = btnText;
+            
+            const nextBtn = document.querySelector('#result-area button');
+            nextBtn.innerText = btnText;
+            nextBtn.onclick = nextQuestion; // Default logic
 
             if (isCorrect) {
                 feedback.className = 'correct'; feedback.innerHTML = `<h3 style="margin:0">Richtig!</h3>`;
             } else {
                 feedback.className = 'wrong';
                 feedback.innerHTML = `<div class="comparison-container"><div class="comp-block"><div class="comp-label">Deine Antwort</div><div class="comp-text comp-wrong">${userInput || "---"}</div></div><div class="comp-block"><div class="comp-label">Lösung</div><div class="comp-text comp-correct">${solution}</div></div></div>`;
-                if(!wasSkipped && !isSeqFlow) overrideContainer.innerHTML = `<button class="override-btn" onclick="overrideCorrect()">War doch richtig</button>`;
+                if(!wasSkipped) {
+                    overrideContainer.innerHTML = `<button class="override-btn" onclick="overrideCorrect()">War doch richtig</button>`;
+                }
             }
             const noteBox = document.getElementById('notes-display'); if (note) { noteBox.innerHTML = `💡 ${note}`; noteBox.classList.remove('hidden'); } else { noteBox.classList.add('hidden'); }
         }
 
         function overrideCorrect() { 
-            const word = getCurrentList()[currentQuestionIndex]; word.box = (word.tempPrevBox||0)+1; word.lastWrong=false; save();
-            document.getElementById('feedback-message').innerHTML = "<h3>Korrigiert!</h3>"; document.getElementById('override-container').innerHTML = "";
+            const word = getCurrentList()[currentQuestionIndex]; 
+            word.box = (word.tempPrevBox||0)+1; 
+            word.lastWrong=false; 
+            save();
+            
+            document.getElementById('feedback-message').innerHTML = "<h3>Korrigiert!</h3>"; 
+            document.getElementById('override-container').innerHTML = "";
+
+            // Handle Sequence Continuation if needed
+            if(isSequenceActive) {
+                const nextBtn = document.querySelector('#result-area button');
+                if(currentSequenceStep < word.steps.length - 1) {
+                    nextBtn.innerText = "Nächster Teil ➔";
+                    nextBtn.onclick = function() {
+                        currentSequenceStep++;
+                        document.getElementById('test-input').value = '';
+                        document.getElementById('question-area').classList.remove('hidden'); 
+                        document.getElementById('result-area').classList.add('hidden');
+                        showSequenceStep(word);
+                    };
+                } else {
+                    nextBtn.innerText = "Weiter"; // Finished sequence
+                }
+            }
         }
     </script>
 </body>
