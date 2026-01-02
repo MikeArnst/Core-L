@@ -82,6 +82,14 @@
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
+        /* Training Edit Button */
+        .train-edit-btn {
+            background: transparent; border: 1px solid #333; color: #666;
+            width: 30px; height: 30px; padding: 0; border-radius: 50%;
+            font-size: 14px; margin-left: 10px; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .train-edit-btn:hover { background: #222; color: white; }
+
         /* DASHBOARD STATS */
         .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
         .stat-card {
@@ -208,7 +216,9 @@
         .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
         
         #question-display { 
-            font-size: 1.4rem; text-align: center; font-weight: 500; color: white; 
+            font-size: 1.4rem; text-align: center; 
+            font-weight: 400; /* GEÄNDERT: Nicht mehr fett (war 500) */
+            color: white; 
             white-space: pre-wrap; line-height: 1.4; margin: 10px 0;
         }
         
@@ -218,7 +228,11 @@
         /* Top Right Info */
         .top-right-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
         .box-info-tag { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 4px; }
-        .gold-trans { color: var(--gold-text); font-style: italic; }
+        .gold-trans { 
+            color: var(--gold-text); 
+            font-style: italic;
+            font-weight: 400; /* GEÄNDERT: Nicht mehr fett */
+        }
 
         #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
         .correct { background-color: var(--success-bg); color: var(--success-text); border: 1px solid #113311; }
@@ -971,12 +985,6 @@
             showResult(isCorrect, correctStr, noteStr, item);
         }
 
-        // DIESE FUNKTION IST JETZT EIGENTLICH NICHT MEHR NÖTIG ÜBER BUTTON,
-        // KANN ABER VON DER LOGIK HER NOCH GENUTZT WERDEN (z.B. bei LEEREM INPUT)
-        function solve() {
-           // Wird aktuell nicht per Button aufgerufen, da Button ersetzt wurde.
-        }
-
         function showResult(success, correctAns, note, item) {
             document.getElementById('input-area').classList.add('hidden'); // Versteckt Input
             document.getElementById('result-area').classList.remove('hidden'); // Zeigt Ergebnis
@@ -990,7 +998,8 @@
 
             if (success) {
                 fb.innerHTML = `<div class="feedback-box correct"><h3>Richtig! 🎉</h3></div>`;
-                fb.innerHTML += `<div style="margin-top:10px; color:#aaa;">Lösung: <b>${correctAns}</b></div>`;
+                // FETTE SCHRIFT ENTFERNT
+                fb.innerHTML += `<div style="margin-top:10px; color:#aaa;">Lösung: ${correctAns}</div>`;
                 ovr.innerHTML = '';
                 
                 // Box Logik
@@ -1011,7 +1020,8 @@
             } else {
                 newBox = 0;
                 fb.innerHTML = `<div class="feedback-box wrong"><h3>Leider falsch</h3></div>`;
-                fb.innerHTML += `<div style="margin-top:10px; font-size:1.1rem;">Lösung:<br><b style="color:var(--success-text)">${correctAns}</b></div>`;
+                // FETTE SCHRIFT ENTFERNT, Farbe bleibt
+                fb.innerHTML += `<div style="margin-top:10px; font-size:1.1rem;">Lösung:<br><span style="color:var(--success-text)">${correctAns}</span></div>`;
                 ovr.innerHTML = `<button class="override-btn" onclick="overrideResult()">War doch richtig (Tippfehler)</button>`;
                 
                 // Bei Fehler: Box 0
@@ -1042,12 +1052,6 @@
             if(qIdx > -1) cooldownQueue.splice(qIdx, 1);
             
             // Manuelle Korrektur erhöht Box + 1 (Wiederherstellung/Aufstieg)
-            // Wir nehmen an es war richtig, also Aufstieg vom URSPRUNGSZUSTAND.
-            // Da wir oben schon auf 0 gesetzt haben, müssen wir rekonstruieren.
-            // Einfache Logik: Wir setzen es auf Box 1 (oder +1 wenn wir history hätten).
-            // Fairness: Setze auf 1 wenn 0 war, sonst +1. 
-            // Hier machen wir es einfach: +1.
-            
             if(item.box < 5) item.box++; 
             item.lastWrong = false;
             
