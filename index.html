@@ -165,7 +165,7 @@
         .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
         .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); } 
 
-        /* INLINE BUTTONS (Connect / Delete) */
+        /* INLINE BUTTONS */
         .btn-inline {
             border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
             box-shadow: 0 2px 10px rgba(0,0,0,0.4); z-index: 20; position: relative;
@@ -217,6 +217,7 @@
         .hint-box { margin-top: 15px; padding: 12px; background-color: var(--input-bg); border-left: 3px solid var(--text-muted); font-size: 14px; color: var(--text-muted); text-align: left; white-space: pre-wrap; line-height: 1.5; border-radius: 4px;}
 
         hr { border: 0; border-top: 1px solid var(--border); margin: 20px 0; }
+        /* MOBILE IMPORT FIX: accept many types */
         .file-upload { display: block; border: 1px dashed var(--border); text-align: center; border-radius: 6px; cursor: pointer; color: var(--text-muted); }
         .file-upload:hover { border-color: #aaaaaa; color: #ffffff; background: var(--input-bg);}
     </style>
@@ -242,6 +243,7 @@
 
     <div id="view-guide" class="container hidden fade-in">
         <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px;">← Zurück</button>
+        
         <div class="guide-section">
             <div class="guide-title">🧠 Das Brain-System</div>
             <div class="guide-text">
@@ -249,6 +251,7 @@
                 <br><b>Regel:</b> Ein Fehler? Zurück auf Box 0.
             </div>
         </div>
+
         <div class="guide-section">
             <div class="guide-title">🎨 Die Farben</div>
             <div class="guide-legend">
@@ -258,13 +261,52 @@
                 <div class="legend-item"><span class="color-dot" style="background:var(--box-5); box-shadow:0 0 5px orange;"></span> Box 5: Master</div>
             </div>
         </div>
+
+        <div class="guide-section">
+            <div class="guide-title">📂 Import & Export Guide</div>
+            <div class="guide-text">
+                <p>So bekommst du deine Vokabellisten aus <b>Excel</b> oder <b>Google Sheets</b> in die App:</p>
+                
+                <div style="margin-bottom:10px;">
+                    <b>1. Das Tabellen-Format</b><br>
+                    Erstelle eine Tabelle <u>ohne Überschriften</u>.
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Spalte A:</b> Dein Wort / Frage (z.B. Deutsch)</li>
+                        <li><b>Spalte B:</b> Die Lösung / Sprache (z.B. Englisch)</li>
+                        <li><b>Spalte C:</b> (Optional) Notiz oder Eselsbrücke</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <b>2. Als CSV speichern</b><br>
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Google Sheets:</b> <i>Datei</i> → <i>Herunterladen</i> → <i>Kommagetrennte Werte (.csv)</i></li>
+                        <li><b>Excel:</b> <i>Datei</i> → <i>Speichern unter</i> → Dateityp: <i>CSV (Trennzeichen-getrennt) (*.csv)</i></li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <b>3. Importieren</b><br>
+                    Gehe in die <i>Datenbank</i> (📜), klicke auf <b>"📂 Import"</b> und wähle die Datei aus.
+                    <br><span style="font-size:0.8em; color:#666;">(Die App erkennt automatisch, ob Trennzeichen Kommas oder Semikolons sind.)</span>
+                </div>
+
+                <hr style="border-color:#333; margin:15px 0;">
+
+                <div>
+                    <b>💾 Backup (Export)</b><br>
+                    Der Button <b>"⬇️ Backup"</b> speichert deinen kompletten Fortschritt (alle Projekte, Boxen, Streaks) als <code>.json</code> Datei.
+                    Nutze dies, um deine Daten zu sichern oder auf ein anderes Gerät zu übertragen.
+                </div>
+            </div>
+        </div>
+
         <div class="guide-section">
             <div class="guide-title">💬 Sequenzen & Power-Features</div>
             <div class="guide-text">
                 <ul>
                     <li style="margin-bottom:8px;"><b>Auswahl-Modus:</b> Markiere Karten. Links erscheint <b>Verbinden</b> (erstellt Sequenz), Rechts erscheint <b>Löschen</b> (entfernt alle Markierten).</li>
                     <li style="margin-bottom:8px;"><b>Sequenzen:</b> Unterhaltungen werden am Stück abgefragt. Im Bearbeiten-Menü kannst du sie mit <b>"♻️ Zerlegen"</b> wieder in Einzelkarten auflösen.</li>
-                    <li><b>Import:</b> Lade CSV-Dateien. Die App erkennt automatisch Kommas oder Semikolons.</li>
                 </ul>
             </div>
         </div>
@@ -319,7 +361,7 @@
                 <option value="seq">Nur Sequenz</option>
             </select>
 
-            <label class="file-upload">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv" onchange="importCSV(this)"></label>
+            <label class="file-upload">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv, text/csv, text/plain, application/vnd.ms-excel" onchange="importCSV(this)"></label>
         </div>
         
         <button class="select-mode-btn" id="btn-select-mode" onclick="toggleSelectMode()" style="margin-bottom:15px;">Auswahl-Modus starten</button>
@@ -604,7 +646,6 @@
                     div.classList.add(isSel ? 'selected' : 'unselected');
                     selectHtml = `<div class="select-overlay" onclick="selectItem(${realIndex})"><div class="select-checkbox">${isSel ? '✓' : ''}</div></div>`;
                     
-                    // SELECT MODE FOOTER (Connect left, Delete right)
                     if (isSel) {
                         const showConnect = selectedIndices.size >= 2;
                         footerContent = `
@@ -613,12 +654,10 @@
                                 <div><button class="btn-inline btn-delete-multi" onclick="event.stopPropagation(); deleteSelected()">🗑️ Löschen</button></div>
                             </div>`;
                     } else {
-                        // Empty placeholder for height consistency
                         footerContent = `<div style="height:15px"></div>`;
                     }
 
                 } else {
-                    // STANDARD FOOTER (Edit, Star, etc.)
                     const actionsHtml = `
                         <div class="vocab-actions-wrapper">
                             <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})">✎</button>
@@ -763,7 +802,7 @@
             }; reader.readAsText(file);
         }
 
-        // --- TRAINING LOGIC v8.1 ---
+        // --- TRAINING LOGIC v5.0 ---
         function startTest() {
             try {
                 repairAllData();
