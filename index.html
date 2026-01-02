@@ -460,7 +460,8 @@
     <script>
         // --- DATA STRUCTURE ---
         let appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] };
-        let cooldownQueue = []; let currentQuestionIndex = null; 
+        let cooldownQueue = []; // Structure: { idx: number, wait: number }
+        let currentQuestionIndex = null; 
         let currentSequenceStep = 0; let isSequenceActive = false;
         let isSelectMode = false; let selectedIndices = new Set();
         let direction = 0; // 0=DE->Lang, 1=Lang->DE
@@ -912,7 +913,7 @@
             
             const list = getCurrentList();
             
-            // Wenn Sequenz aktiv ist
+            // 1. Sequenz Logik
             if (isSequenceActive && currentQuestionIndex !== null) {
                 const seqItem = list[currentQuestionIndex];
                 currentSequenceStep++;
@@ -921,31 +922,47 @@
                     displayQuestion(seqItem, true);
                     return;
                 } else {
-                    // Sequenz beendet
                     isSequenceActive = false;
                     currentSequenceStep = 0;
                 }
             }
             
-            // Normale Auswahl
-            const activeWords = list.map((w, i) => ({...w, idx: i})).filter(w => w.active);
-            if(activeWords.length === 0) {
-                alert("Keine aktiven Karten."); switchTab('dashboard'); return;
-            }
-
-            // Cooldown Check
-            if (cooldownQueue.length > 0) {
-                const cooledIndex = cooldownQueue.shift();
-                const exists = activeWords.find(w => w.idx === cooledIndex);
-                if (exists) {
-                    currentQuestionIndex = cooledIndex;
-                    direction = Math.random() < 0.5 ? 0 : 1;
+            // 2. Cooldown Logic
+            cooldownQueue.forEach(item => item.wait--);
+            // Remove ready items
+            const readyItemIndex = cooldownQueue.findIndex(item => item.wait <= 0);
+            if (readyItemIndex !== -1) {
+                const readyItem = cooldownQueue[readyItemIndex];
+                cooldownQueue.splice(readyItemIndex, 1);
+                
+                if (list[readyItem.idx] && list[readyItem.idx].active) {
+                    currentQuestionIndex = readyItem.idx;
+                    direction = Math.random() < 0.5 ? 0 : 1; 
                     displayQuestion(list[currentQuestionIndex], false);
                     return;
                 }
             }
 
-            // Algorithmus: Priority > Box 0 > Box < 5 > Random
+            // 3. Normal Selection
+            const waitingIndices = cooldownQueue.map(c => c.idx);
+            
+            let activeWords = list.map((w, i) => ({...w, idx: i}))
+                                  .filter(w => w.active && !waitingIndices.includes(i));
+
+            if(activeWords.length === 0) {
+                if(cooldownQueue.length > 0) {
+                    cooldownQueue.sort((a,b) => a.wait - b.wait);
+                    const forcedItem = cooldownQueue.shift();
+                    currentQuestionIndex = forcedItem.idx;
+                    direction = Math.random() < 0.5 ? 0 : 1; 
+                    displayQuestion(list[currentQuestionIndex], false);
+                    return;
+                } else {
+                    alert("Keine aktiven Karten."); switchTab('dashboard'); return;
+                }
+            }
+
+            // Priority > Box 0 > Box < 5 > Random
             let candidates = activeWords.filter(w => w.priority);
             if (candidates.length === 0) candidates = activeWords.filter(w => w.box === 0);
             if (candidates.length === 0) candidates = activeWords.filter(w => w.box < 5);
@@ -954,11 +971,10 @@
             const picked = candidates[Math.floor(Math.random() * candidates.length)];
             currentQuestionIndex = picked.idx;
             
-            // Sequenz Start?
             if (picked.type === 'sequence') {
                 isSequenceActive = true;
                 currentSequenceStep = 0;
-                direction = 0; // Sequenzen immer DE->Lang
+                direction = 0; 
                 displayQuestion(picked, true);
             } else {
                 direction = Math.random() < 0.5 ? 0 : 1;
@@ -993,8 +1009,8 @@
         function checkAnswer() {
             const list = getCurrentList();
             const item = list[currentQuestionIndex];
-            const rawInput = document.getElementById('test-input').value; // Original Input für Anzeige
-            const input = cleanString(rawInput); // Clean Input für Logik
+            const rawInput = document.getElementById('test-input').value; // Original Input
+            const input = cleanString(rawInput); // Clean Input
             
             let correctStr = "";
             let noteStr = "";
@@ -1023,8 +1039,7 @@
             const oldBox = item.box || 0;
             let newBox = oldBox;
 
-            // ANZEIGE DEINER ANTWORT (NEU)
-            // Falls leer, zeigen wir "(Keine Antwort)"
+            // ANZEIGE DEINER ANTWORT
             const userDisplay = userRawAnswer ? userRawAnswer : "(Keine Antwort)";
             let userHtml = `<div style="color:#aaa; font-size:0.9rem; margin-bottom:5px;">Deine Antwort: <span style="color:#fff">${userDisplay}</span></div>`;
 
@@ -1048,6 +1063,8 @@
                          updateStreak();
                     }
                 }
+                // NEU: Auch bei Erfolg kurz auf die Wartebank (10 Runden), damit nicht sofort die Rückseite kommt
+                cooldownQueue.push({ idx: currentQuestionIndex, wait: 10 });
 
             } else {
                 newBox = 0;
@@ -1056,10 +1073,10 @@
                 fb.innerHTML += `<div style="margin-top:5px; font-size:1.1rem;">Lösung:<br><span style="color:var(--success-text)">${correctAns}</span></div>`;
                 ovr.innerHTML = `<button class="override-btn" onclick="overrideResult()">War doch richtig (Tippfehler)</button>`;
                 
-                // Bei Fehler: Box 0
+                // Bei Fehler: Box 0 und ab in die Queue (Wartezeit 3 Runden)
                 item.box = 0;
                 item.lastWrong = true;
-                cooldownQueue.push(currentQuestionIndex); 
+                cooldownQueue.push({ idx: currentQuestionIndex, wait: 3 });
             }
 
             // GOLD INFO: WIRD JETZT OBEN RECHTS ANGEZEIGT
@@ -1080,12 +1097,16 @@
             const list = getCurrentList();
             const item = list[currentQuestionIndex];
             
-            const qIdx = cooldownQueue.indexOf(currentQuestionIndex);
+            // Remove from cooldown queue since we force it correct
+            const qIdx = cooldownQueue.findIndex(c => c.idx === currentQuestionIndex);
             if(qIdx > -1) cooldownQueue.splice(qIdx, 1);
             
-            // Manuelle Korrektur erhöht Box + 1 (Wiederherstellung/Aufstieg)
+            // Manuelle Korrektur erhöht Box + 1
             if(item.box < 5) item.box++; 
             item.lastWrong = false;
+            
+            // Wieder auf die Wartebank (10 Runden), wie bei einem normalen Erfolg
+            cooldownQueue.push({ idx: currentQuestionIndex, wait: 10 });
             
             updateStreak();
             save();
