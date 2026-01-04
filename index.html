@@ -318,9 +318,11 @@
                 <hr style="border-color:#333; margin:15px 0;">
 
                 <div>
-                    <b>💾 Backup (Export)</b><br>
-                    Der Button <b>"⬇️ Backup"</b> speichert deinen kompletten Fortschritt (alle Projekte, Boxen, Streaks) als <code>.json</code> Datei.
-                    Nutze dies, um deine Daten zu sichern oder auf ein anderes Gerät zu übertragen.
+                    <b>💾 Backup (JSON)</b><br>
+                    Nutze dies, um deine Daten zu sichern oder auf ein anderes Gerät zu übertragen. (Enthält Lernfortschritt).
+                    <br><br>
+                    <b>📊 Export (Excel)</b><br>
+                    Erstellt eine CSV-Datei, die du direkt in Excel oder Google Sheets öffnen und lesen kannst.
                 </div>
             </div>
         </div>
@@ -393,8 +395,9 @@
         <div id="vocab-list-container"></div>
         
         <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
-            <button class="outline" onclick="exportData()">⬇️ Backup</button>
-            <button class="danger" onclick="clearCurrentProjectData()">Leeren</button>
+            <button class="outline" onclick="exportData()">⬇️ Backup (JSON)</button>
+            <button class="outline" onclick="exportCSV()">📊 Export (Excel)</button>
+            <button class="danger" style="margin-top:10px" onclick="clearCurrentProjectData()">Leeren</button>
         </div>
     </div>
 
@@ -934,16 +937,13 @@
             // 2. Cooldown Logic
             cooldownQueue.forEach(item => item.wait--);
             // Remove ready items
-            // Wir filtern erst die, die fertig sind
             const readyIndices = [];
             for (let i = cooldownQueue.length - 1; i >= 0; i--) {
                 if (cooldownQueue[i].wait <= 0) {
                     // Wenn Karte existiert und aktiv ist, ist sie Kandidat
                     if(list[cooldownQueue[i].idx] && list[cooldownQueue[i].idx].active) {
-                        // Wir entfernen sie aus der Queue, damit sie "frei" ist
                         cooldownQueue.splice(i, 1);
                     } else {
-                        // Karte gelöscht oder inaktiv -> nur aus Queue entfernen
                         cooldownQueue.splice(i, 1);
                     }
                 }
@@ -971,7 +971,7 @@
                         displayQuestion(list[currentQuestionIndex], false);
                         return;
                     } else {
-                        // Rekursiv nochmal versuchen, falls wir eine "Geisterkarte" erwischt haben
+                        // Rekursiv nochmal versuchen
                         nextQuestion();
                         return;
                     }
@@ -1063,13 +1063,11 @@
 
             // INTELLIGENTE WARTEZEIT BERECHNUNG
             // Wir wollen nicht mehr warten als Karten da sind, sonst blockiert alles.
-            // Formel: min(gewünschteZeit, anzahlAktiverKarten - 1)
-            // -1 weil die aktuelle Karte ja gerade "weg" ist.
             const totalActive = getCurrentList().filter(w => w.active).length;
             
             // WARTEZEITEN KONFIGURATION
-            const waitTimeWrong = 3;  // Wie gewünscht: 3 Runden Strafe
-            const waitTimeCorrect = 10; // Wie gewünscht: 10 Runden Pause bei Erfolg
+            const waitTimeWrong = 3;  
+            const waitTimeCorrect = 10; 
 
             // Sichere Berechnung (mindestens 0)
             const safeWaitWrong = Math.max(0, Math.min(waitTimeWrong, totalActive - 1));
@@ -1096,7 +1094,7 @@
                     }
                 }
                 
-                // AUCH BEI RICHTIG AUF DIE WARTEBANK (10 Runden), damit Rückseite nicht sofort kommt
+                // AUCH BEI RICHTIG AUF DIE WARTEBANK
                 cooldownQueue.push({ idx: currentQuestionIndex, wait: safeWaitCorrect });
 
             } else {
@@ -1106,7 +1104,7 @@
                 fb.innerHTML += `<div style="margin-top:5px; font-size:1.1rem;">Lösung:<br><span style="color:var(--success-text)">${correctAns}</span></div>`;
                 ovr.innerHTML = `<button class="override-btn" onclick="overrideResult()">War doch richtig (Tippfehler)</button>`;
                 
-                // Bei Fehler: Box 0 und ab in die Queue (Wartezeit 3 Runden)
+                // Bei Fehler: Box 0
                 item.box = 0;
                 item.lastWrong = true;
                 cooldownQueue.push({ idx: currentQuestionIndex, wait: safeWaitWrong });
@@ -1137,7 +1135,7 @@
             if(item.box < 5) item.box++; 
             item.lastWrong = false;
             
-            // Wieder auf die Wartebank (10 Runden), wie bei einem normalen Erfolg
+            // Wieder auf die Wartebank
             const totalActive = list.filter(w => w.active).length;
             const safeWaitCorrect = Math.max(0, Math.min(10, totalActive - 1));
             
@@ -1164,6 +1162,33 @@
             document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
+        }
+
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // UTF-8 BOM
+            csvContent += "Projekt;Typ;Frage;Antwort;Notiz;Box;Priorität\n";
+
+            appData.projects.forEach(p => {
+                p.words.forEach(w => {
+                    const clean = (text) => '"' + (text ? text.replace(/"/g, '""') : "") + '"';
+                    
+                    if(w.type === 'sequence') {
+                        w.steps.forEach(step => {
+                            csvContent += `${clean(p.name)};Sequenz: ${clean(w.title)};${clean(step.de)};${clean(step.lang)};${clean(step.note)};${w.box};${w.priority?"Ja":"Nein"}\n`;
+                        });
+                    } else {
+                        csvContent += `${clean(p.name)};Karte;${clean(w.de)};${clean(w.lang)};${clean(w.note)};${w.box};${w.priority?"Ja":"Nein"}\n`;
+                    }
+                });
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "core_learning_export.csv");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
         }
 
         function importCSV(input) {
