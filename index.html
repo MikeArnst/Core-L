@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v5.0 Final</title>
+    <title>Core-Learning v6.0 Units</title>
     <style>
         :root {
-            /* Core Theme v5.0 */
+            /* Core Theme v6.0 */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -90,27 +90,16 @@
         }
         .train-edit-btn:hover { background: #222; color: white; }
 
-        /* DASHBOARD STATS */
-        .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
-        .stat-card {
-            flex: 1; background: var(--input-bg); padding: 15px; border-radius: 12px;
-            border: 1px solid var(--border); text-align: center; display: flex;
-            flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        /* Unit List Items */
+        .unit-card {
+            background: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
-        .stat-val { font-size: 1.8rem; font-weight: 700; display: block; line-height: 1.2; margin-bottom: 5px; }
-        .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
-
-        .dashboard-actions { display: flex; justify-content: center; gap: 30px; margin-top: 25px; margin-bottom: 10px; }
-        .action-item { text-align: center; cursor: pointer; width: 80px; }
-        .list-btn-circle {
-            width: 60px; height: 60px; border-radius: 50%;
-            background: var(--input-bg); color: var(--text-main); font-size: 24px; border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center; margin: 0 auto 8px auto; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s;
-        }
-        .action-item:active .list-btn-circle { transform: scale(0.9); }
-        .action-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        .unit-info { flex: 1; }
+        .unit-name { font-weight: 500; font-size: 0.95rem; }
+        .unit-count { font-size: 0.75rem; color: var(--text-muted); }
+        .unit-actions { display: flex; gap: 5px; }
+        .btn-small-icon { width: 35px; height: 35px; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
 
         /* CARDS */
         .vocab-item {
@@ -217,21 +206,19 @@
         
         #question-display { 
             font-size: 1.4rem; text-align: center; 
-            font-weight: 400; /* NICHT FETT */
+            font-weight: 400; 
             color: white; 
             white-space: pre-wrap; line-height: 1.4; margin: 10px 0;
         }
         
-        /* Persistent Training Header */
         .persistent-header { margin: 40px 0 20px 0; text-align: center; }
 
-        /* Top Right Info */
         .top-right-info { text-align: right; display: flex; flex-direction: column; align-items: flex-end; }
         .box-info-tag { font-size: 0.8rem; color: var(--text-muted); font-weight: normal; margin-top: 4px; }
         .gold-trans { 
             color: var(--gold-text); 
             font-style: italic;
-            font-weight: 400; /* NICHT FETT */
+            font-weight: 400; 
         }
 
         #feedback-area { margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
@@ -248,7 +235,7 @@
 
     <div id="app-header" onclick="showProjects()">
         <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v5.0 | Final Polish</div>
+        <div class="subtitle">v6.0 | Units</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -259,108 +246,26 @@
             <button class="outline" onclick="createNewProject()">+ Projekt erstellen</button>
         </div>
         <div style="text-align:center; margin-top:20px;">
-            <button class="secondary" style="width:auto; font-size:0.8rem; padding:8px 15px;" onclick="switchTab('guide')">ℹ️ Wie es funktioniert</button>
-        </div>
-    </div>
-
-    <div id="view-guide" class="container hidden fade-in">
-        <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px;">← Zurück</button>
-        
-        <div class="guide-section">
-            <div class="guide-title">🧠 Das Brain-System</div>
-            <div class="guide-text">
-                Core-L nutzt das <b>Leitner-Prinzip</b>. Neue Wörter (Box 0) kommen oft dran. Wenn du sie kannst, steigen sie auf. In Box 5 hast du sie gemeistert.
-                <br><b>Regel:</b> Ein Fehler? Zurück auf Box 0.
-            </div>
-        </div>
-
-        <div class="guide-section">
-            <div class="guide-title">🎨 Die Farben</div>
-            <div class="guide-legend">
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-0)"></span> Box 0: Neu / Falsch</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-1)"></span> Box 1: Anfänger</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-2)"></span> Box 2: Geht so</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-3)"></span> Box 3: Fortgeschritten</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-4)"></span> Box 4: Profi</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-5); box-shadow:0 0 5px orange;"></span> Box 5: Master</div>
-            </div>
-        </div>
-
-        <div class="guide-section">
-            <div class="guide-title">📂 Import & Export Guide</div>
-            <div class="guide-text">
-                <p>So bekommst du deine Vokabellisten aus <b>Excel</b> oder <b>Google Sheets</b> in die App:</p>
-                
-                <div style="margin-bottom:10px;">
-                    <b>1. Das Tabellen-Format</b><br>
-                    Erstelle eine Tabelle <u>ohne Überschriften</u>.
-                    <ul style="margin-top:5px; padding-left:20px;">
-                        <li><b>Spalte A:</b> Dein Wort / Frage (z.B. Deutsch)</li>
-                        <li><b>Spalte B:</b> Die Lösung / Sprache (z.B. Englisch)</li>
-                        <li><b>Spalte C:</b> (Optional) Notiz oder Eselsbrücke</li>
-                    </ul>
-                </div>
-
-                <div style="margin-bottom:10px;">
-                    <b>2. Als CSV speichern</b><br>
-                    <ul style="margin-top:5px; padding-left:20px;">
-                        <li><b>Google Sheets:</b> <i>Datei</i> → <i>Herunterladen</i> → <i>Kommagetrennte Werte (.csv)</i></li>
-                        <li><b>Excel:</b> <i>Datei</i> → <i>Speichern unter</i> → Dateityp: <i>CSV (Trennzeichen-getrennt) (*.csv)</i></li>
-                    </ul>
-                </div>
-
-                <div style="margin-bottom:10px;">
-                    <b>3. Importieren</b><br>
-                    Gehe in die <i>Datenbank</i> (📜), klicke auf <b>"📂 Import"</b> und wähle die Datei aus.
-                    <br><span style="font-size:0.8em; color:#666;">(Die App erkennt automatisch, ob Trennzeichen Kommas oder Semikolons sind.)</span>
-                </div>
-
-                <hr style="border-color:#333; margin:15px 0;">
-
-                <div>
-                    <b>💾 Backup (JSON)</b><br>
-                    Nutze dies, um deine Daten zu sichern oder auf ein anderes Gerät zu übertragen. (Enthält Lernfortschritt).
-                    <br><br>
-                    <b>📊 Export (Excel)</b><br>
-                    Erstellt eine CSV-Datei, die du direkt in Excel oder Google Sheets öffnen und lesen kannst.
-                </div>
-            </div>
-        </div>
-
-        <div class="guide-section">
-            <div class="guide-title">💬 Sequenzen & Power-Features</div>
-            <div class="guide-text">
-                <ul>
-                    <li style="margin-bottom:8px;"><b>Auswahl-Modus:</b> Markiere Karten. Links erscheint <b>Verbinden</b> (erstellt Sequenz), Rechts erscheint <b>Löschen</b> (entfernt alle Markierten).</li>
-                    <li style="margin-bottom:8px;"><b>Sequenzen:</b> Unterhaltungen werden am Stück abgefragt. Im Bearbeiten-Menü kannst du sie mit <b>"♻️ Zerlegen"</b> wieder in Einzelkarten auflösen.</li>
-                </ul>
-            </div>
+            <button class="secondary" style="width:auto; font-size:0.8rem; padding:8px 15px;" onclick="switchTab('guide')">ℹ️ Anleitung</button>
         </div>
     </div>
 
     <div id="view-dashboard" class="container hidden fade-in">
         <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 15px; padding: 8px 15px; font-size: 12px;">← Projekte</button>
-        
-        <div class="stats-row">
-            <div class="stat-card">
-                <span class="stat-val" style="color:var(--fire-color)"><span id="streak-count">0</span> 🔥</span>
-                <span class="stat-label">Streak</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-val" style="color:var(--success-text)"><span id="mastery-percent">0</span>%</span>
-                <span class="stat-label">Gelernt</span>
-            </div>
+        <h3 id="dashboard-title" style="margin-bottom:20px;">Projekt</h3>
+
+        <button onclick="startTest(null)" style="background: var(--accent-seq); margin-bottom: 25px;">Gesamt-Training starten</button>
+
+        <h3 style="color:#888; font-size:0.8rem; margin-bottom:10px;">UNITS (LEKTIONEN)</h3>
+        <div id="unit-list-container"></div>
+
+        <div style="margin-top:15px; border-top:1px solid #333; padding-top:15px;">
+            <input type="text" id="new-unit-name" placeholder="Neue Unit (z.B. Tiere)">
+            <button class="outline" onclick="createNewUnit()">+ Unit erstellen</button>
         </div>
-        
-        <h3>Neues Wort</h3>
-        <textarea id="input-de" rows="1" placeholder="🇩🇪 Deutsch"></textarea>
-        <textarea id="input-lang" rows="1" placeholder="🌍 Fremdsprache"></textarea>
-        <textarea id="input-note" rows="2" placeholder="💡 Notiz (Optional)"></textarea>
-        <button onclick="addVocab()">Speichern</button>
-        
-        <div class="dashboard-actions">
+
+        <div class="dashboard-actions" style="margin-top:30px;">
             <div class="action-item" onclick="switchTab('listManager')"><div class="list-btn-circle">📜</div><div class="action-label">Datenbank</div></div>
-            <div class="action-item" onclick="switchTab('test')"><div class="list-btn-circle">🎓</div><div class="action-label">Training</div></div>
         </div>
     </div>
 
@@ -370,26 +275,33 @@
             <span style="color:var(--text-muted); font-size:0.8rem;"><span id="list-count">0</span> Einträge</span>
         </div>
         
+        <select id="db-unit-filter" onchange="renderList()" style="width:100%; margin-bottom:10px; background:#2a2a2a; border-color:#444;">
+            <option value="all">Alle Units anzeigen</option>
+        </select>
+
         <input type="text" id="search-input" placeholder="🔍 Suchen..." onkeyup="renderList()">
         
         <div class="top-management-bar">
             <select id="sort-select" onchange="renderList()">
-                <option value="newest">🕒 Neueste zuerst</option>
-                <option value="oldest">old Älteste zuerst</option>
-                <option value="box-asc">🔥 Box 0 ➔ 5</option>
-                <option value="box-desc">🏆 Box 5 ➔ 0</option>
-                <option value="fav">⭐ Favoriten oben</option>
+                <option value="newest">🕒 Neueste</option>
+                <option value="box-asc">🔥 Box 0-5</option>
+                <option value="box-desc">🏆 Box 5-0</option>
             </select>
             
-            <select id="type-select" onchange="renderList()">
-                <option value="all">Alle Typen</option>
-                <option value="single">Nur Karten</option>
-                <option value="seq">Nur Sequenz</option>
-            </select>
-
-            <label class="file-upload">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv, text/csv, text/plain, application/vnd.ms-excel" onchange="importCSV(this)"></label>
+            <label class="file-upload" style="font-size:10px;">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv, text/csv, text/plain" onchange="importCSV(this)"></label>
         </div>
         
+        <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px; border:1px solid #333;">
+            <div style="font-size:0.7rem; color:#888; margin-bottom:5px;">NEUES WORT HINZUFÜGEN</div>
+            <select id="add-word-unit-select" style="margin-bottom:5px; padding:8px; font-size:12px;"></select>
+            <div style="display:flex; gap:5px;">
+                <input id="input-de" placeholder="Deutsch" style="margin:0;">
+                <input id="input-lang" placeholder="Fremd" style="margin:0;">
+            </div>
+            <input id="input-note" placeholder="Notiz" style="margin:5px 0 5px 0;">
+            <button onclick="addVocab()" style="margin:0; padding:8px;">Hinzufügen</button>
+        </div>
+
         <button class="select-mode-btn" id="btn-select-mode" onclick="toggleSelectMode()" style="margin-bottom:15px;">Auswahl-Modus starten</button>
 
         <div id="vocab-list-container"></div>
@@ -401,12 +313,32 @@
         </div>
     </div>
 
+    <div id="view-guide" class="container hidden fade-in">
+        <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px;">← Zurück</button>
+        <div class="guide-section">
+            <div class="guide-title">🚀 Version 6.0: Units</div>
+            <div class="guide-text">
+                Deine Vokabeln sind jetzt in <b>Units (Lektionen)</b> organisiert.
+                <br><br>
+                <b>Training:</b> Du kannst entweder das gesamte Projekt trainieren ("Gesamt-Training") oder gezielt einzelne Units üben (Play-Button neben der Unit).
+                <br><br>
+                <b>Verschieben:</b> Wenn du eine Karte bearbeitest, kannst du sie nun in eine andere Unit verschieben.
+            </div>
+        </div>
+    </div>
+
     <div id="edit-modal" class="modal-overlay hidden">
         <div class="modal-content fade-in">
             <h3>Bearbeiten</h3>
+            
+            <div style="margin-bottom:15px;">
+                <label style="font-size:0.75rem; color:#888;">Unit:</label>
+                <select id="edit-unit-select" style="margin-bottom:0;"></select>
+            </div>
+
             <div id="seq-title-edit-container" class="hidden" style="margin-bottom:15px;">
-                <label style="font-size:0.7rem; color:var(--accent-seq); text-transform:uppercase;">Sequenz Titel (Optional)</label>
-                <input type="text" id="edit-seq-title" placeholder="z.B. Urlaub Dialog">
+                <label style="font-size:0.7rem; color:var(--accent-seq);">Sequenz Titel</label>
+                <input type="text" id="edit-seq-title">
             </div>
             
             <div id="edit-content-area"></div> 
@@ -417,17 +349,16 @@
             
             <button onclick="saveEdit()">Speichern</button>
             <button class="secondary" onclick="closeEditModal()">Abbrechen</button>
-            
             <button class="danger" style="margin-top:10px;" onclick="deleteCurrentCardFromEdit()">🗑️ Karte löschen</button>
         </div>
     </div>
 
     <div id="view-test" class="container hidden fade-in">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
-            <button class="secondary" onclick="switchTab('dashboard')" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Zurück</button>
+            <button class="secondary" onclick="switchTab('dashboard')" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Beenden</button>
             
             <div class="top-right-info">
-                <span id="test-project-name" style="color:var(--text-muted); font-size:0.8rem;">Training</span>
+                <span id="test-unit-name" style="color:var(--text-muted); font-size:0.8rem; font-style:italic;">Unit: Allgemein</span>
                 <span id="box-display" class="box-info-tag">Box 0</span>
             </div>
         </div>
@@ -461,62 +392,59 @@
     </div>
 
     <script>
-        // --- DATA STRUCTURE ---
+        // --- DATA STRUCTURE V6 (Units) ---
+        // projects: [ { name: "Türkisch", units: [ { name: "Tiere", words: [] } ] } ]
         let appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] };
-        let cooldownQueue = []; // Structure: { idx: number, wait: number }
-        let currentQuestionIndex = null; 
-        let currentSequenceStep = 0; let isSequenceActive = false;
-        let isSelectMode = false; let selectedIndices = new Set();
-        let direction = 0; // 0=DE->Lang, 1=Lang->DE
+        
+        let trainingQueue = []; // Flattened list for training
+        let currentCardInfo = null; // { card: obj, unitIdx: int, wordIdx: int }
+        let currentSequenceStep = 0; 
+        let isSequenceActive = false;
+        
+        let cooldownQueue = []; 
+        let isSelectMode = false; let selectedIndices = new Set(); // Stores composite IDs "unitIdx-wordIdx"
+        let direction = 0; 
 
         document.addEventListener('DOMContentLoaded', () => { loadData(); });
 
         function loadData() {
             try {
-                const v2Data = localStorage.getItem('core_l_data_v2');
-                if (v2Data) { appData = JSON.parse(v2Data); } 
-                else { appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] }; }
+                const data = localStorage.getItem('core_l_data_v2'); // Keep v2 key to migrate
+                if (data) { appData = JSON.parse(data); } 
                 
                 if (!appData.projects) appData.projects = [];
-                if (appData.projects.length === 0) appData.projects.push({ name: "Start Projekt", words: [] });
+                if (appData.projects.length === 0) appData.projects.push({ name: "Demo Projekt", units: [{name:"Allgemein", words:[]}] });
                 
-                repairAllData(); checkStreakLogic(); showProjects(); 
+                migrateToV6(); 
+                checkStreakLogic(); 
+                showProjects(); 
             } catch(e) { 
-                appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [{ name: "Start Projekt", words: [] }] }; 
-                save(); showProjects(); 
+                console.error(e);
+                alert("Datenfehler. Reset.");
+                localStorage.removeItem('core_l_data_v2');
+                location.reload();
             }
         }
 
-        function repairAllData() {
-            if(!appData.projects) appData.projects = [];
-            appData.projects = appData.projects.filter(p => p !== null && p !== undefined);
-            
-            appData.projects.forEach(proj => {
-                if(!proj.words) proj.words = [];
-                proj.words = proj.words.filter(w => w !== null && w !== undefined);
-
-                proj.words.forEach(word => {
-                    if(!word.type) word.type = 'word';
-                    if(word.box === undefined) word.box = 0;
-                    if(word.active === undefined) word.active = true;
-                    
-                    if(word.type === 'word') { 
-                        word.de = cleanDisplay(word.de || ""); 
-                        word.lang = cleanDisplay(word.lang || ""); 
+        // MIGRATION: Convert old flat projects to Unit structure
+        function migrateToV6() {
+            let migrated = false;
+            appData.projects.forEach(p => {
+                // If project has words but no units (Old format)
+                if (p.words && !p.units) {
+                    p.units = [];
+                    if (p.words.length > 0) {
+                        p.units.push({ name: "Allgemein", words: p.words });
+                    } else {
+                        p.units.push({ name: "Allgemein", words: [] });
                     }
-                    if(word.type === 'sequence') {
-                        if(!word.title) word.title = "";
-                        if(!Array.isArray(word.steps)) word.steps = [];
-                    }
-                });
-                
-                proj.words = proj.words.filter(w => {
-                    if(w.type === 'word') return (w.de && w.lang);
-                    if(w.type === 'sequence') return (w.steps && w.steps.length > 0 && w.steps[0].de);
-                    return false;
-                });
+                    delete p.words; // Remove old flat list
+                    migrated = true;
+                }
+                // Safety check
+                if (!p.units) p.units = [{ name: "Allgemein", words: [] }];
             });
-            save();
+            if (migrated) save();
         }
 
         function save() { localStorage.setItem('core_l_data_v2', JSON.stringify(appData)); }
@@ -536,379 +464,307 @@
                 save();
             }
         }
-        
-        function cleanString(str) { 
-            return str ? str.trim().toLowerCase()
-                .replace(/[.,?!]/g, '') 
-                .replace(/\s+/g, ' ') 
-                .replace(/ğ/g, 'g')
-                .replace(/ü/g, 'u')
-                .replace(/ä/g, 'ae')
-                .replace(/ö/g, 'o')
-                .replace(/ß/g, 'ss')
-                .replace(/ı/g, 'i')
-                .replace(/İ/g, 'i') : ""; 
-        }
+        function cleanString(str) { return str ? str.trim().toLowerCase().replace(/[.,?!]/g, '').replace(/\s+/g, ' ') : ""; }
         function cleanDisplay(str) { return str ? str.trim() : ""; }
 
         // --- NAVIGATION ---
         function switchTab(tab) {
-            document.getElementById('view-projects').classList.add('hidden'); 
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-list-manager').classList.add('hidden'); 
-            document.getElementById('view-test').classList.add('hidden');
-            document.getElementById('view-guide').classList.add('hidden');
-            
-            if (tab === 'dashboard') {
-                document.getElementById('view-dashboard').classList.remove('hidden'); updateDashboardStats();
-            } else if (tab === 'listManager') {
-                document.getElementById('view-list-manager').classList.remove('hidden'); 
-                isSelectMode = false; toggleSelectMode(false); renderList();
-            } else if (tab === 'test') {
-                document.getElementById('view-test').classList.remove('hidden'); startTest();
-            } else if (tab === 'guide') {
-                document.getElementById('view-guide').classList.remove('hidden');
+            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+            if(tab === 'projects') document.getElementById('view-projects').classList.remove('hidden');
+            if(tab === 'dashboard') {
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                renderUnitDashboard();
             }
-        }
-        function showProjects() {
-            switchTab('none'); document.getElementById('view-projects').classList.remove('hidden'); renderProjectList();
-        }
-        function openProject(index) { appData.activeProjectId = index; cooldownQueue = []; switchTab('dashboard'); }
-        function updateDashboardStats() {
-            const list = getCurrentList(); document.getElementById('streak-count').innerText = appData.streak || 0;
-            if(!list || list.length === 0) { document.getElementById('mastery-percent').innerText = "0"; return; }
-            const mastered = list.filter(w => (w.box || 0) >= 4).length;
-            document.getElementById('mastery-percent').innerText = Math.round((mastered / list.length) * 100);
+            if(tab === 'listManager') {
+                document.getElementById('view-list-manager').classList.remove('hidden');
+                initDBFilters();
+                renderList();
+            }
+            if(tab === 'test') document.getElementById('view-test').classList.remove('hidden');
+            if(tab === 'guide') document.getElementById('view-guide').classList.remove('hidden');
         }
 
-        // --- PROJECT ---
-        function renderProjectList() {
-            const container = document.getElementById('project-list-container'); container.innerHTML = '';
-            if(!appData.projects || appData.projects.length === 0) { container.innerHTML = '<p style="color:#888;text-align:center;">Keine Projekte.</p>'; return; }
-            appData.projects.forEach((proj, index) => {
-                const div = document.createElement('div'); div.className = 'project-card'; div.onclick = () => openProject(index);
-                div.innerHTML = `<span class="project-name">📂 ${proj.name}</span><span class="project-count">${proj.words.length}</span>`;
-                const delBtn = document.createElement('button'); delBtn.innerText = "✕"; delBtn.className = "btn-icon btn-delete-small"; delBtn.style.width = "30px";
-                delBtn.onclick = (e) => { e.stopPropagation(); deleteProject(index); }; div.appendChild(delBtn);
-                container.appendChild(div);
+        function showProjects() {
+            switchTab('projects');
+            const c = document.getElementById('project-list-container'); c.innerHTML = '';
+            appData.projects.forEach((p, i) => {
+                // Count total words
+                let total = 0; if(p.units) p.units.forEach(u => total += u.words.length);
+                const div = document.createElement('div'); div.className = 'project-card';
+                div.innerHTML = `<span class="project-name">📂 ${p.name}</span><span class="project-count">${total} Karten</span>`;
+                div.onclick = () => openProject(i);
+                
+                const del = document.createElement('button'); del.innerText = "✕"; del.className = "btn-icon";
+                del.style.width="30px"; del.onclick=(e)=>{e.stopPropagation(); deleteProject(i)};
+                div.appendChild(del); c.appendChild(div);
             });
         }
-        function createNewProject() {
-            const name = document.getElementById('new-project-name').value.trim(); if (!name) return;
-            appData.projects.push({ name: name, words: [] }); document.getElementById('new-project-name').value = ''; save(); renderProjectList();
-        }
-        function deleteProject(index) { if(confirm("Löschen?")) { appData.projects.splice(index, 1); save(); renderProjectList(); } }
 
-        // --- LIST & SELECTION ---
-        function getCurrentList() { 
-            if(!appData.projects[appData.activeProjectId]) {
-                appData.activeProjectId = 0; 
-                if(!appData.projects[0]) appData.projects.push({name: "Rescue", words:[]});
-            }
-            return appData.projects[appData.activeProjectId].words; 
+        function createNewProject() {
+            const name = document.getElementById('new-project-name').value.trim();
+            if(!name) return;
+            appData.projects.push({ name: name, units: [{name:"Allgemein", words:[]}] });
+            save(); document.getElementById('new-project-name').value=''; showProjects();
         }
-        
+        function deleteProject(i) {
+            if(confirm("Projekt löschen?")) { appData.projects.splice(i,1); save(); showProjects(); }
+        }
+
+        function openProject(i) {
+            appData.activeProjectId = i;
+            switchTab('dashboard');
+        }
+
+        // --- UNIT DASHBOARD ---
+        function renderUnitDashboard() {
+            const p = appData.projects[appData.activeProjectId];
+            document.getElementById('dashboard-title').innerText = p.name;
+            
+            const c = document.getElementById('unit-list-container'); c.innerHTML = '';
+            
+            p.units.forEach((u, idx) => {
+                const div = document.createElement('div'); div.className = 'unit-card';
+                div.innerHTML = `
+                    <div class="unit-info">
+                        <div class="unit-name">${u.name}</div>
+                        <div class="unit-count">${u.words.length} Wörter</div>
+                    </div>
+                    <div class="unit-actions">
+                        <button class="btn-small-icon" style="background:var(--accent-seq); color:white;" onclick="startTest(${idx})">▶</button>
+                        <button class="btn-small-icon" style="background:#333;" onclick="deleteUnit(${idx})">✕</button>
+                    </div>
+                `;
+                c.appendChild(div);
+            });
+        }
+
+        function createNewUnit() {
+            const name = document.getElementById('new-unit-name').value.trim();
+            if(!name) return;
+            appData.projects[appData.activeProjectId].units.push({ name: name, words: [] });
+            save(); document.getElementById('new-unit-name').value=''; renderUnitDashboard();
+        }
+
+        function deleteUnit(idx) {
+            if(confirm("Unit löschen? Alle Karten darin gehen verloren!")) {
+                appData.projects[appData.activeProjectId].units.splice(idx, 1);
+                save(); renderUnitDashboard();
+            }
+        }
+
+        // --- DATABASE & LISTS ---
+        function initDBFilters() {
+            const p = appData.projects[appData.activeProjectId];
+            const filter = document.getElementById('db-unit-filter');
+            const add = document.getElementById('add-word-unit-select');
+            
+            filter.innerHTML = '<option value="all">Alle Units anzeigen</option>';
+            add.innerHTML = '';
+            
+            p.units.forEach((u, i) => {
+                filter.innerHTML += `<option value="${i}">${u.name}</option>`;
+                add.innerHTML += `<option value="${i}">${u.name}</option>`;
+            });
+        }
+
         function addVocab() {
+            const unitIdx = document.getElementById('add-word-unit-select').value;
             const de = cleanDisplay(document.getElementById('input-de').value);
             const lang = cleanDisplay(document.getElementById('input-lang').value);
             const note = cleanDisplay(document.getElementById('input-note').value);
-            if (!de || !lang) { alert("Bitte ausfüllen."); return; }
             
-            getCurrentList().push({ 
-                type: 'word', de: de, lang: lang, note: note, active: true, priority: false, box: 0, lastWrong: false 
+            if(!de || !lang) return alert("Bitte ausfüllen");
+            
+            appData.projects[appData.activeProjectId].units[unitIdx].words.push({
+                type: 'word', de: de, lang: lang, note: note, active: true, priority: false, box: 0, lastWrong: false
             });
-            
-            save(); document.getElementById('input-de').value = ''; document.getElementById('input-lang').value = ''; document.getElementById('input-note').value = ''; 
-            alert("Gespeichert!"); updateDashboardStats();
-        }
-
-        function toggleSelectMode(forceState) {
-            if (forceState !== undefined) isSelectMode = forceState; else isSelectMode = !isSelectMode;
-            const btn = document.getElementById('btn-select-mode');
-            if (isSelectMode) {
-                btn.classList.add('select-mode-active'); selectedIndices.clear();
-            } else {
-                btn.classList.remove('select-mode-active');
-            }
+            save();
+            document.getElementById('input-de').value=''; document.getElementById('input-lang').value=''; document.getElementById('input-note').value='';
             renderList();
         }
 
-        function selectItem(index) {
-            if (selectedIndices.has(index)) selectedIndices.delete(index); else selectedIndices.add(index);
-            renderList(); 
-        }
-
-        function combineSelected() {
-            if (selectedIndices.size < 2) { alert("Wähle mindestens 2 Karten."); return; }
-            const list = getCurrentList();
-            const indices = Array.from(selectedIndices).sort((a,b) => a-b);
-            let newSteps = [];
+        // Collects all cards based on filter for DB view
+        function getDisplayList() {
+            const p = appData.projects[appData.activeProjectId];
+            const mode = document.getElementById('db-unit-filter').value;
+            let list = [];
             
-            indices.forEach(idx => {
-                const item = list[idx];
-                if (item.type === 'sequence') newSteps = newSteps.concat(item.steps);
-                else newSteps.push({ de: item.de, lang: item.lang, note: item.note });
+            p.units.forEach((u, uIdx) => {
+                if(mode === 'all' || mode == uIdx) {
+                    u.words.forEach((w, wIdx) => {
+                        // Attach composite ID for handling
+                        list.push({ ...w, unitIdx: uIdx, wordIdx: wIdx, unitName: u.name });
+                    });
+                }
             });
-
-            const newSeq = { type: 'sequence', box: 0, active: true, priority: false, steps: newSteps, title: "" };
-            for (let i = indices.length - 1; i >= 0; i--) list.splice(indices[i], 1);
-            
-            list.push(newSeq); 
-            
-            save(); toggleSelectMode(false); alert("Sequenz erstellt!");
-        }
-
-        function deleteSelected() {
-            if (selectedIndices.size < 1) return;
-            if (!confirm(`${selectedIndices.size} Einträge löschen?`)) return;
-            
-            const list = getCurrentList();
-            const indices = Array.from(selectedIndices).sort((a,b) => a-b);
-            
-            for (let i = indices.length - 1; i >= 0; i--) list.splice(indices[i], 1);
-            
-            save(); toggleSelectMode(false); alert("Gelöscht!");
+            return list;
         }
 
         function renderList() {
-            const list = getCurrentList();
+            const list = getDisplayList();
             const container = document.getElementById('vocab-list-container');
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
-            const sortMode = document.getElementById('sort-select').value;
-            const typeMode = document.getElementById('type-select').value;
-
-            let displayList = list.map((item, index) => ({...item, originalIndex: index}));
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const sort = document.getElementById('sort-select').value;
             
-            if(typeMode === 'single') displayList = displayList.filter(item => item.type !== 'sequence');
-            if(typeMode === 'seq') displayList = displayList.filter(item => item.type === 'sequence');
-
-            displayList = displayList.filter(item => {
-                if (item.type === 'sequence') return (item.title && item.title.toLowerCase().includes(searchTerm)) || item.steps.some(s => s.de.toLowerCase().includes(searchTerm) || s.lang.toLowerCase().includes(searchTerm));
-                return item.de.toLowerCase().includes(searchTerm) || item.lang.toLowerCase().includes(searchTerm);
+            // Filter Search
+            let filtered = list.filter(item => {
+                return (item.de.toLowerCase().includes(search) || item.lang.toLowerCase().includes(search));
             });
 
-            if (sortMode === 'newest') displayList.reverse();
-            else if (sortMode === 'oldest') { /* nix */ }
-            else if (sortMode === 'box-asc') displayList.sort((a, b) => (a.box || 0) - (b.box || 0));
-            else if (sortMode === 'box-desc') displayList.sort((a, b) => (b.box || 0) - (a.box || 0));
-            else if (sortMode === 'fav') displayList.sort((a, b) => (b.priority ? 1 : 0) - (a.priority ? 1 : 0));
+            // Sort
+            if (sort === 'newest') filtered.reverse();
+            else if (sort === 'box-asc') filtered.sort((a,b) => a.box - b.box);
+            else if (sort === 'box-desc') filtered.sort((a,b) => b.box - a.box);
 
-            document.getElementById('list-count').innerText = list.length; container.innerHTML = '';
-            
-            displayList.forEach(v => {
-                const realIndex = v.originalIndex;
+            document.getElementById('list-count').innerText = filtered.length;
+            container.innerHTML = '';
+
+            filtered.forEach(item => {
                 const div = document.createElement('div');
-                div.className = `vocab-item fade-in ${!v.active ? 'paused' : ''} ${v.type === 'sequence' ? 'sequence' : ''}`;
+                div.className = `vocab-item fade-in ${!item.active ? 'paused' : ''}`;
                 
-                const boxClass = `box-${v.box || 0}`;
-                const statusHtml = `<div class="status-bar ${boxClass} ${v.type==='sequence'?'seq-tag':''}"><div style="flex:1">${v.type==='sequence'?'SEQUENZ':''}</div><div style="flex:1; text-align:center;">${v.box || 0}</div><div style="flex:1; text-align:right;">${v.lastWrong ? '⚠️' : ''}</div></div>`;
-
-                let selectHtml = '';
-                let footerContent = '';
+                // Composite ID for functions
+                const cid = `${item.unitIdx}-${item.wordIdx}`;
                 
-                if (isSelectMode) {
-                    const isSel = selectedIndices.has(realIndex);
-                    div.classList.add(isSel ? 'selected' : 'unselected');
-                    selectHtml = `<div class="select-overlay" onclick="selectItem(${realIndex})"><div class="select-checkbox">${isSel ? '✓' : ''}</div></div>`;
-                    
-                    if (isSel) {
-                        const showConnect = selectedIndices.size >= 2;
-                        footerContent = `
-                            <div class="vocab-footer">
-                                <div>${showConnect ? '<button class="btn-inline btn-connect" onclick="event.stopPropagation(); combineSelected()">🔗 Verbinden</button>' : ''}</div>
-                                <div><button class="btn-inline btn-delete-multi" onclick="event.stopPropagation(); deleteSelected()">🗑️ Löschen</button></div>
-                            </div>`;
-                    } else {
-                        footerContent = `<div style="height:15px"></div>`;
-                    }
-
-                } else {
-                    const actionsHtml = `
+                div.innerHTML = `
+                    <div class="status-bar box-${item.box}">
+                        <div style="flex:1">${item.unitName}</div>
+                        <div style="flex:1; text-align:center;">Box ${item.box}</div>
+                        <div style="flex:1; text-align:right;">${item.lastWrong?'⚠️':''}</div>
+                    </div>
+                    <div class="vocab-content-pad">
+                        <div class="vocab-columns-wrapper">
+                            <div class="vocab-col left">${item.de}</div>
+                            <div class="vocab-col center">➜</div>
+                            <div class="vocab-col right">${item.lang}</div>
+                        </div>
+                        ${item.note ? `<div class="vocab-note-area">💡 ${item.note}</div>` : ''}
+                    </div>
+                    <div class="vocab-footer">
+                        <div></div>
                         <div class="vocab-actions-wrapper">
-                            <button class="btn-icon btn-edit" onclick="openEditModal(${realIndex})">✎</button>
-                            <button class="btn-icon ${v.priority ? 'active-star' : ''}" onclick="togglePriority(${realIndex})">★</button>
-                            <button class="btn-icon ${!v.active ? 'is-paused' : ''}" onclick="toggleActive(${realIndex})">${v.active ? '⏸' : '▶'}</button>
-                            <button class="btn-icon btn-delete-small" onclick="deleteVocab(${realIndex})">✕</button>
+                            <button class="btn-icon btn-edit" onclick="openEditModal(${item.unitIdx}, ${item.wordIdx})">✎</button>
+                            <button class="btn-icon btn-delete-small" onclick="deleteCard(${item.unitIdx}, ${item.wordIdx})">✕</button>
                         </div>
-                    `;
-                    footerContent = `<div class="vocab-footer"><div></div>${actionsHtml}</div>`;
-                }
-
-                let contentHtml = '';
-                if (v.type === 'sequence') {
-                    let displayTitle = v.title || (v.steps[0] ? (v.steps[0].de.substring(0, 25) + "...") : "Leere Sequenz");
-                    contentHtml = `
-                        <div class="vocab-content-pad ${v.expanded ? 'expanded' : ''}">
-                            <div class="seq-header" onclick="this.parentElement.classList.toggle('expanded')">
-                                <span class="seq-title">💬 ${displayTitle} (${v.steps.length})</span>
-                                <span>▼</span>
-                            </div>
-                            <div class="seq-steps-container">
-                                ${v.steps.map(step => `
-                                    <div class="seq-step-row">
-                                        <div class="vocab-columns-wrapper" style="opacity:0.8; font-size:0.9em;">
-                                            <div class="vocab-col left">${step.de}</div>
-                                            <div class="vocab-col center">➜</div>
-                                            <div class="vocab-col right">${step.lang}</div>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    contentHtml = `
-                        <div class="vocab-content-pad">
-                            <div class="vocab-columns-wrapper">
-                                <div class="vocab-col left">${v.de}</div>
-                                <div class="vocab-col center">➜</div>
-                                <div class="vocab-col right">${v.lang}</div>
-                            </div>
-                            ${v.note ? `<div class="vocab-note-area">💡 ${v.note}</div>` : ''}
-                        </div>
-                    `;
-                }
-
-                div.innerHTML = selectHtml + statusHtml + contentHtml + footerContent;
+                    </div>
+                `;
                 container.appendChild(div);
             });
         }
 
-        // --- EDITING ---
-        let editIndex = null;
-        function openEditModal(index) {
-            editIndex = index;
-            const item = getCurrentList()[index];
-            const area = document.getElementById('edit-content-area');
-            const seqTitleContainer = document.getElementById('seq-title-edit-container');
-            const splitBtn = document.getElementById('btn-split-seq');
-            
-            area.innerHTML = ''; 
-
-            if (item.type === 'sequence') {
-                seqTitleContainer.classList.remove('hidden');
-                splitBtn.classList.remove('hidden'); 
-                document.getElementById('edit-seq-title').value = item.title || "";
-                item.steps.forEach((step, i) => { area.innerHTML += createStepEditHTML(i, step.de, step.lang, step.note, item.steps.length); });
-                area.innerHTML += `<button class="secondary" style="margin-top:10px" onclick="addEditStep()">+ Schritt hinzufügen</button>`;
-            } else {
-                seqTitleContainer.classList.add('hidden');
-                splitBtn.classList.add('hidden');
-                area.innerHTML = `<textarea id="edit-de" rows="1" placeholder="Deutsch">${item.de}</textarea><textarea id="edit-lang" rows="1" placeholder="Fremd">${item.lang}</textarea><textarea id="edit-note" rows="2" placeholder="Notiz">${item.note||''}</textarea>`;
+        function deleteCard(uIdx, wIdx) {
+            if(confirm("Löschen?")) {
+                appData.projects[appData.activeProjectId].units[uIdx].words.splice(wIdx, 1);
+                save(); renderList();
             }
+        }
+
+        // --- EDITING ---
+        let editTarget = null; // { uIdx, wIdx }
+
+        function openEditModal(uIdx, wIdx) {
+            editTarget = { uIdx, wIdx };
+            const p = appData.projects[appData.activeProjectId];
+            const item = p.units[uIdx].words[wIdx];
+            
+            // Setup Unit Selector
+            const unitSel = document.getElementById('edit-unit-select');
+            unitSel.innerHTML = '';
+            p.units.forEach((u, i) => {
+                unitSel.innerHTML += `<option value="${i}" ${i==uIdx?'selected':''}>${u.name}</option>`;
+            });
+
+            document.getElementById('edit-content-area').innerHTML = `
+                <textarea id="edit-de" rows="1">${item.de}</textarea>
+                <textarea id="edit-lang" rows="1">${item.lang}</textarea>
+                <textarea id="edit-note" rows="2">${item.note||''}</textarea>
+            `;
+            
             document.getElementById('edit-modal').classList.remove('hidden');
         }
 
-        // Direktes Bearbeiten im Training
-        function editCurrentCard() {
-            if(currentQuestionIndex !== null) {
-                openEditModal(currentQuestionIndex);
-            }
-        }
-
-        // NEU: Löschen direkt aus dem Bearbeiten-Fenster
-        function deleteCurrentCardFromEdit() {
-            if(!confirm("Karte wirklich unwiderruflich löschen?")) return;
+        function saveEdit() {
+            const newUIdx = parseInt(document.getElementById('edit-unit-select').value);
+            const de = cleanDisplay(document.getElementById('edit-de').value);
+            const lang = cleanDisplay(document.getElementById('edit-lang').value);
+            const note = cleanDisplay(document.getElementById('edit-note').value);
             
-            const list = getCurrentList();
-            list.splice(editIndex, 1);
+            const p = appData.projects[appData.activeProjectId];
+            const oldUIdx = editTarget.uIdx;
+            const wIdx = editTarget.wIdx;
+            
+            // Update Data
+            const card = p.units[oldUIdx].words[wIdx];
+            card.de = de; card.lang = lang; card.note = note;
+
+            // Move if unit changed
+            if (newUIdx !== oldUIdx) {
+                p.units[oldUIdx].words.splice(wIdx, 1); // Remove from old
+                p.units[newUIdx].words.push(card); // Add to new
+            }
+
             save();
             closeEditModal();
-            renderList(); // Update DB view if open
-            
-            // Wenn wir gerade im Training sind und diese Karte aktiv war
-            if(!document.getElementById('view-test').classList.contains('hidden') && currentQuestionIndex === editIndex) {
-               // Wenn es noch Karten gibt, weiter zur nächsten
-               const activeWords = list.filter(w => w.active);
-               if (activeWords.length > 0) {
-                   nextQuestion();
-               } else {
-                   alert("Keine Karten mehr im Set.");
-                   switchTab('dashboard');
-               }
+            // If in DB view
+            if(!document.getElementById('view-list-manager').classList.contains('hidden')) renderList();
+            // If in Test view and we edited the current card, refresh display
+            if(!document.getElementById('view-test').classList.contains('hidden') && currentCardInfo) {
+                // Update display only if we didn't move it. If moved, it's messy, so just continue
+                if(newUIdx === oldUIdx) {
+                    document.getElementById('question-display').innerText = (direction===0 ? de : lang);
+                    document.getElementById('test-unit-name').innerText = "Unit: " + p.units[newUIdx].name;
+                }
             }
         }
 
-        function createStepEditHTML(i, de, lang, note, total) {
-            return `<div class="edit-seq-item" id="seq-edit-${i}"><div class="edit-seq-tools"><button class="tiny-btn" onclick="moveStep(${i}, -1)" ${i===0?'disabled':''}>▲</button><button class="tiny-btn" onclick="moveStep(${i}, 1)" ${i===total-1?'disabled':''}>▼</button><button class="tiny-btn" style="background:#722" onclick="removeStep(${i})">x</button></div><div class="edit-seq-inputs"><input type="text" class="step-de" value="${de}" placeholder="DE"><input type="text" class="step-lang" value="${lang}" placeholder="Lang"><input type="text" class="step-note" value="${note}" placeholder="Note" style="font-size:10px; height:25px;"></div></div>`;
-        }
-
-        function dissolveSequence() {
-            if(!confirm("Sequenz wirklich auflösen?")) return;
-            const list = getCurrentList();
-            const item = list[editIndex];
+        function deleteCurrentCardFromEdit() {
+            if(!confirm("Wirklich löschen?")) return;
+            const p = appData.projects[appData.activeProjectId];
+            p.units[editTarget.uIdx].words.splice(editTarget.wIdx, 1);
+            save();
+            closeEditModal();
+            if(!document.getElementById('view-list-manager').classList.contains('hidden')) renderList();
             
-            // Einzelne Karten erstellen
-            item.steps.forEach(step => {
-                list.push({ type: 'word', de: step.de, lang: step.lang, note: step.note, active: true, priority: false, box: item.box, lastWrong: false });
-            });
-            
-            list.splice(editIndex, 1);
-            save(); closeEditModal(); renderList();
-        }
-
-        function addEditStep() {
-            const list = getCurrentList();
-            list[editIndex].steps.push({de:"", lang:"", note:""});
-            save(); openEditModal(editIndex); // Refresh UI
-        }
-
-        function removeStep(stepIndex) {
-            const list = getCurrentList();
-            if(list[editIndex].steps.length <= 1) return alert("Eine Sequenz braucht mindestens 1 Schritt.");
-            list[editIndex].steps.splice(stepIndex, 1);
-            save(); openEditModal(editIndex);
-        }
-
-        function moveStep(stepIndex, direction) {
-            const list = getCurrentList();
-            const steps = list[editIndex].steps;
-            const temp = steps[stepIndex];
-            steps[stepIndex] = steps[stepIndex + direction];
-            steps[stepIndex + direction] = temp;
-            save(); openEditModal(editIndex);
-        }
-
-        function saveEdit() {
-            const list = getCurrentList();
-            const item = list[editIndex];
-
-            if (item.type === 'sequence') {
-                item.title = document.getElementById('edit-seq-title').value;
-                const rows = document.querySelectorAll('.edit-seq-item');
-                rows.forEach((row, i) => {
-                    item.steps[i].de = cleanDisplay(row.querySelector('.step-de').value);
-                    item.steps[i].lang = cleanDisplay(row.querySelector('.step-lang').value);
-                    item.steps[i].note = cleanDisplay(row.querySelector('.step-note').value);
-                });
-            } else {
-                item.de = cleanDisplay(document.getElementById('edit-de').value);
-                item.lang = cleanDisplay(document.getElementById('edit-lang').value);
-                item.note = cleanDisplay(document.getElementById('edit-note').value);
-            }
-            save(); 
-            closeEditModal(); 
-            renderList();
-            
-            // Falls wir gerade im Training sind und genau diese Karte bearbeiten, Anzeige aktualisieren
-            if(!document.getElementById('view-test').classList.contains('hidden') && editIndex === currentQuestionIndex) {
-                displayQuestion(item, item.type === 'sequence');
+            // Handle Training delete
+            if(!document.getElementById('view-test').classList.contains('hidden')) {
+                // Remove from Queue if it's there
+                // This is complex because queue has flattened objects.
+                // Easiest: Just skip to next and hope for best or restart logic
+                nextQuestion();
             }
         }
-        
+
         function closeEditModal() { document.getElementById('edit-modal').classList.add('hidden'); }
-        function togglePriority(index) { const list=getCurrentList(); list[index].priority=!list[index].priority; save(); renderList(); }
-        function toggleActive(index) { const list=getCurrentList(); list[index].active=!list[index].active; save(); renderList(); }
-        function deleteVocab(index) { if(confirm("Löschen?")) { getCurrentList().splice(index, 1); save(); renderList(); } }
 
-        // --- TEST (TRAINING) ---
-        function startTest() {
-            const projName = appData.projects[appData.activeProjectId].name;
-            document.getElementById('test-project-name').innerText = "Training: " + projName;
+        // --- TRAINING LOGIC ---
+        
+        // Starts training. If unitIdx is null, trains all.
+        function startTest(unitIdx) {
+            const p = appData.projects[appData.activeProjectId];
             
-            // WICHTIG: Queue leeren bei Neustart, um alte Indizes zu vermeiden
-            cooldownQueue = []; 
+            // Build Training Queue (Flattened references)
+            trainingQueue = [];
             
+            p.units.forEach((u, uI) => {
+                if (unitIdx === null || unitIdx === uI) {
+                    u.words.forEach((w, wI) => {
+                        if (w.active) {
+                            trainingQueue.push({ 
+                                card: w, 
+                                uIdx: uI, 
+                                wIdx: wI, 
+                                uName: u.name,
+                                id: `${uI}-${wI}` // Unique ID for cooldown mapping
+                            });
+                        }
+                    });
+                }
+            });
+
+            if (trainingQueue.length === 0) return alert("Keine aktiven Karten in dieser Auswahl.");
+            
+            cooldownQueue = []; // Reset cooldown
+            switchTab('test');
             nextQuestion();
         }
 
@@ -917,205 +773,113 @@
             document.getElementById('result-area').classList.add('hidden');
             document.getElementById('test-input').value = '';
             document.getElementById('test-input').focus();
-            
-            const list = getCurrentList();
-            
-            // 1. Sequenz Logik
-            if (isSequenceActive && currentQuestionIndex !== null) {
-                const seqItem = list[currentQuestionIndex];
-                currentSequenceStep++;
-                
-                if (currentSequenceStep < seqItem.steps.length) {
-                    displayQuestion(seqItem, true);
-                    return;
-                } else {
-                    isSequenceActive = false;
-                    currentSequenceStep = 0;
-                }
-            }
-            
-            // 2. Cooldown Logic
-            cooldownQueue.forEach(item => item.wait--);
-            // Remove ready items
-            const readyIndices = [];
-            for (let i = cooldownQueue.length - 1; i >= 0; i--) {
-                if (cooldownQueue[i].wait <= 0) {
-                    // Wenn Karte existiert und aktiv ist, ist sie Kandidat
-                    if(list[cooldownQueue[i].idx] && list[cooldownQueue[i].idx].active) {
-                        cooldownQueue.splice(i, 1);
-                    } else {
-                        cooldownQueue.splice(i, 1);
-                    }
-                }
-            }
 
-            // 3. Normal Selection
-            // Alle aktiven Karten, die NICHT in der Queue sind
-            const waitingIndices = cooldownQueue.map(c => c.idx);
+            // COOLDOWN LOGIC
+            // Decrease wait time
+            cooldownQueue.forEach(i => i.wait--);
+            // Remove finished
+            cooldownQueue = cooldownQueue.filter(i => i.wait > 0);
             
-            let activeWords = list.map((w, i) => ({...w, idx: i}))
-                                  .filter(w => w.active && !waitingIndices.includes(w.idx));
+            // Get available candidates (not in cooldown)
+            const blockedIds = cooldownQueue.map(c => c.id);
+            let candidates = trainingQueue.filter(item => !blockedIds.includes(item.id));
 
-            // FALLBACK: Wenn alle Karten in der Queue sind
-            if(activeWords.length === 0) {
-                if(cooldownQueue.length > 0) {
-                    // Sortiere nach Wartezeit aufsteigend
+            // EMERGENCY FALLBACK: If all blocked, pick the one with lowest wait
+            if (candidates.length === 0) {
+                if (cooldownQueue.length > 0) {
                     cooldownQueue.sort((a,b) => a.wait - b.wait);
-                    // Nimm das Element mit der geringsten Wartezeit
-                    const forcedItem = cooldownQueue.shift(); 
-                    
-                    // Sicherstellen, dass Karte noch existiert (könnte gelöscht sein)
-                    if (list[forcedItem.idx]) {
-                        currentQuestionIndex = forcedItem.idx;
-                        direction = Math.random() < 0.5 ? 0 : 1; 
-                        displayQuestion(list[currentQuestionIndex], false);
-                        return;
-                    } else {
-                        // Rekursiv nochmal versuchen
-                        nextQuestion();
-                        return;
-                    }
+                    const forcedId = cooldownQueue[0].id;
+                    candidates = trainingQueue.filter(item => item.id === forcedId);
+                    // Remove from queue since we force it
+                    cooldownQueue.shift();
                 } else {
-                    alert("Keine aktiven Karten im Set."); switchTab('dashboard'); return;
+                    // Should not happen unless queue empty
+                    alert("Training beendet!"); return switchTab('dashboard');
                 }
             }
 
-            // Priority > Box 0 > Box < 5 > Random
-            let candidates = activeWords.filter(w => w.priority);
-            if (candidates.length === 0) candidates = activeWords.filter(w => w.box === 0);
-            if (candidates.length === 0) candidates = activeWords.filter(w => w.box < 5);
-            if (candidates.length === 0) candidates = activeWords; 
+            // SELECTION LOGIC: Priority > Box 0 > Box < 5 > Random
+            let pool = candidates.filter(x => x.card.priority);
+            if(pool.length === 0) pool = candidates.filter(x => x.card.box === 0);
+            if(pool.length === 0) pool = candidates.filter(x => x.card.box < 5);
+            if(pool.length === 0) pool = candidates;
 
-            const picked = candidates[Math.floor(Math.random() * candidates.length)];
-            currentQuestionIndex = picked.idx;
+            // Pick random
+            const pick = pool[Math.floor(Math.random() * pool.length)];
+            currentCardInfo = pick; // Store for checking
             
-            if (picked.type === 'sequence') {
-                isSequenceActive = true;
-                currentSequenceStep = 0;
-                direction = 0; 
-                displayQuestion(picked, true);
-            } else {
-                direction = Math.random() < 0.5 ? 0 : 1;
-                displayQuestion(picked, false);
-            }
-        }
-
-        function displayQuestion(item, isSeq) {
-            let qText = "";
-            let levelInfo = `Box ${item.box || 0}`;
+            // Direction
+            direction = Math.random() < 0.5 ? 0 : 1; 
             
-            if (isSeq) {
-                const step = item.steps[currentSequenceStep];
-                qText = step.de;
-                document.getElementById('seq-progress').style.display = 'block';
-                document.getElementById('seq-progress').innerText = `Schritt ${currentSequenceStep + 1} von ${item.steps.length}`;
-            } else {
-                qText = direction === 0 ? item.de : item.lang;
-                document.getElementById('seq-progress').style.display = 'none';
-            }
-
-            document.getElementById('question-display').innerText = qText;
-            
-            // BOX INFO OBEN RECHTS UPDATE
-            const boxDisplay = document.getElementById('box-display');
-            boxDisplay.innerText = levelInfo;
-            boxDisplay.innerHTML = levelInfo; // Reset falls Gold war
-            
-            document.getElementById('priority-indicator').style.visibility = item.priority ? 'visible' : 'hidden';
+            // Render
+            document.getElementById('test-unit-name').innerText = "Unit: " + pick.uName;
+            document.getElementById('box-display').innerText = "Box " + pick.card.box;
+            document.getElementById('question-display').innerText = (direction === 0 ? pick.card.de : pick.card.lang);
+            document.getElementById('priority-indicator').style.visibility = pick.card.priority ? 'visible' : 'hidden';
         }
 
         function checkAnswer() {
-            const list = getCurrentList();
-            const item = list[currentQuestionIndex];
-            const rawInput = document.getElementById('test-input').value; // Original Input
-            const input = cleanString(rawInput); // Clean Input
+            const input = cleanString(document.getElementById('test-input').value);
+            const target = direction === 0 ? currentCardInfo.card.lang : currentCardInfo.card.de;
             
-            let correctStr = "";
-            let noteStr = "";
+            const isCorrect = input === cleanString(target);
+            const userRaw = document.getElementById('test-input').value;
             
-            if (item.type === 'sequence') {
-                correctStr = item.steps[currentSequenceStep].lang;
-                noteStr = item.steps[currentSequenceStep].note;
-            } else {
-                correctStr = direction === 0 ? item.lang : item.de;
-                noteStr = item.note;
-            }
-
-            // Toleranz-Vergleich
-            const isCorrect = input === cleanString(correctStr);
-            showResult(isCorrect, correctStr, noteStr, item, rawInput);
+            showResult(isCorrect, target, userRaw);
         }
 
-        function showResult(success, correctAns, note, item, userRawAnswer) {
-            document.getElementById('input-area').classList.add('hidden'); // Versteckt Input
-            document.getElementById('result-area').classList.remove('hidden'); // Zeigt Ergebnis
+        function editCurrentCard() {
+            if(currentCardInfo) {
+                openEditModal(currentCardInfo.uIdx, currentCardInfo.wIdx);
+            }
+        }
+
+        function showResult(success, solution, userAns) {
+            document.getElementById('input-area').classList.add('hidden');
+            document.getElementById('result-area').classList.remove('hidden');
             
             const fb = document.getElementById('feedback-message');
-            const ovr = document.getElementById('override-container');
             const noteDiv = document.getElementById('notes-display');
-            
-            const oldBox = item.box || 0;
+            const oldBox = currentCardInfo.card.box;
             let newBox = oldBox;
 
-            // ANZEIGE DEINER ANTWORT
-            const userDisplay = userRawAnswer ? userRawAnswer : "(Keine Antwort)";
-            let userHtml = `<div style="color:#aaa; font-size:0.9rem; margin-bottom:5px;">Deine Antwort: <span style="color:#fff">${userDisplay}</span></div>`;
+            // Calculate Dynamic Wait Time
+            // Cap wait time at (TotalCards - 1) so we never block completely if deck is small
+            const totalCards = trainingQueue.length;
+            const safeWaitWrong = Math.max(0, Math.min(3, totalCards - 1));
+            const safeWaitCorrect = Math.max(0, Math.min(10, totalCards - 1));
 
-            // INTELLIGENTE WARTEZEIT BERECHNUNG
-            // Wir wollen nicht mehr warten als Karten da sind, sonst blockiert alles.
-            const totalActive = getCurrentList().filter(w => w.active).length;
-            
-            // WARTEZEITEN KONFIGURATION
-            const waitTimeWrong = 3;  
-            const waitTimeCorrect = 10; 
-
-            // Sichere Berechnung (mindestens 0)
-            const safeWaitWrong = Math.max(0, Math.min(waitTimeWrong, totalActive - 1));
-            const safeWaitCorrect = Math.max(0, Math.min(waitTimeCorrect, totalActive - 1));
+            const displayAns = userAns ? userAns : "(Leer)";
+            let userHtml = `<div style="color:#aaa; font-size:0.9rem; margin-bottom:5px;">Deine Antwort: <span style="color:#fff">${displayAns}</span></div>`;
 
             if (success) {
-                fb.innerHTML = `<div class="feedback-box correct"><h3>Richtig! 🎉</h3></div>`;
-                fb.innerHTML += userHtml;
-                fb.innerHTML += `<div style="margin-top:5px; color:#aaa;">Lösung: ${correctAns}</div>`;
-                ovr.innerHTML = '';
+                if (newBox < 5) newBox++;
+                currentCardInfo.card.box = newBox;
+                currentCardInfo.card.lastWrong = false;
+                updateStreak();
                 
-                // Box Logik
-                if (item.type !== 'sequence') {
-                    if (item.box < 5) newBox++;
-                    item.box = newBox;
-                    item.lastWrong = false;
-                    updateStreak();
-                } else {
-                    if (currentSequenceStep === item.steps.length - 1) {
-                         if (item.box < 5) newBox++;
-                         item.box = newBox;
-                         item.lastWrong = false;
-                         updateStreak();
-                    }
-                }
+                fb.innerHTML = `<div class="feedback-box correct"><h3>Richtig! 🎉</h3></div>${userHtml}<div style="margin-top:5px; color:#aaa;">Lösung: ${solution}</div>`;
+                document.getElementById('override-container').innerHTML = '';
                 
-                // AUCH BEI RICHTIG AUF DIE WARTEBANK
-                cooldownQueue.push({ idx: currentQuestionIndex, wait: safeWaitCorrect });
+                // Add to cooldown (prevent immediate flip side)
+                cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect });
 
             } else {
                 newBox = 0;
-                fb.innerHTML = `<div class="feedback-box wrong"><h3>Leider falsch</h3></div>`;
-                fb.innerHTML += userHtml;
-                fb.innerHTML += `<div style="margin-top:5px; font-size:1.1rem;">Lösung:<br><span style="color:var(--success-text)">${correctAns}</span></div>`;
-                ovr.innerHTML = `<button class="override-btn" onclick="overrideResult()">War doch richtig (Tippfehler)</button>`;
+                currentCardInfo.card.box = 0;
+                currentCardInfo.card.lastWrong = true;
                 
-                // Bei Fehler: Box 0
-                item.box = 0;
-                item.lastWrong = true;
-                cooldownQueue.push({ idx: currentQuestionIndex, wait: safeWaitWrong });
+                fb.innerHTML = `<div class="feedback-box wrong"><h3>Leider falsch</h3></div>${userHtml}<div style="margin-top:5px; font-size:1.1rem;">Lösung:<br><span style="color:var(--success-text)">${solution}</span></div>`;
+                document.getElementById('override-container').innerHTML = `<button class="override-btn" onclick="overrideResult()">War doch richtig (Tippfehler)</button>`;
+                
+                cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitWrong });
             }
 
-            // GOLD INFO: WIRD JETZT OBEN RECHTS ANGEZEIGT
-            const boxDisplay = document.getElementById('box-display');
-            boxDisplay.innerHTML = `<span class="gold-trans">Box ${oldBox} ➔ Box ${newBox}</span>`;
+            // Gold Info Top Right
+            document.getElementById('box-display').innerHTML = `<span class="gold-trans">Box ${oldBox} ➔ Box ${newBox}</span>`;
 
-            if(note) {
-                noteDiv.innerText = "💡 " + note;
+            if(currentCardInfo.card.note) {
+                noteDiv.innerText = "💡 " + currentCardInfo.card.note;
                 noteDiv.classList.remove('hidden');
             } else {
                 noteDiv.classList.add('hidden');
@@ -1124,71 +888,51 @@
         }
 
         function overrideResult() {
-            const list = getCurrentList();
-            const item = list[currentQuestionIndex];
+            // Revert logic
+            const totalCards = trainingQueue.length;
+            const safeWaitCorrect = Math.max(0, Math.min(10, totalCards - 1));
             
-            // Remove from cooldown queue since we force it correct
-            const qIdx = cooldownQueue.findIndex(c => c.idx === currentQuestionIndex);
-            if(qIdx > -1) cooldownQueue.splice(qIdx, 1);
+            // Remove 'wrong' wait
+            cooldownQueue = cooldownQueue.filter(c => c.id !== currentCardInfo.id);
             
-            // Manuelle Korrektur erhöht Box + 1
-            if(item.box < 5) item.box++; 
-            item.lastWrong = false;
+            // Add 'correct' wait
+            cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect });
             
-            // Wieder auf die Wartebank
-            const totalActive = list.filter(w => w.active).length;
-            const safeWaitCorrect = Math.max(0, Math.min(10, totalActive - 1));
-            
-            cooldownQueue.push({ idx: currentQuestionIndex, wait: safeWaitCorrect });
+            if(currentCardInfo.card.box < 5) currentCardInfo.card.box++; 
+            currentCardInfo.card.lastWrong = false;
             
             updateStreak();
             save();
             nextQuestion();
         }
 
-        // --- IMPORT / EXPORT ---
+        // --- EXPORT ---
         function clearCurrentProjectData() {
-            if(!confirm("Alle Karten in diesem Projekt unwiderruflich löschen?")) return;
-            const proj = appData.projects[appData.activeProjectId];
-            proj.words = [];
+            if(!confirm("Alles leeren?")) return;
+            appData.projects[appData.activeProjectId].units.forEach(u => u.words = []);
             save(); renderList();
         }
 
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "core_learning_backup_" + new Date().toISOString().slice(0,10) + ".json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
+            const node = document.createElement('a');
+            node.setAttribute("href", dataStr);
+            node.setAttribute("download", "core_learning_v6_backup.json");
+            document.body.appendChild(node); node.click(); node.remove();
         }
 
         function exportCSV() {
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; // UTF-8 BOM
-            csvContent += "Projekt;Typ;Frage;Antwort;Notiz;Box;Priorität\n";
-
-            appData.projects.forEach(p => {
-                p.words.forEach(w => {
-                    const clean = (text) => '"' + (text ? text.replace(/"/g, '""') : "") + '"';
-                    
-                    if(w.type === 'sequence') {
-                        w.steps.forEach(step => {
-                            csvContent += `${clean(p.name)};Sequenz: ${clean(w.title)};${clean(step.de)};${clean(step.lang)};${clean(step.note)};${w.box};${w.priority?"Ja":"Nein"}\n`;
-                        });
-                    } else {
-                        csvContent += `${clean(p.name)};Karte;${clean(w.de)};${clean(w.lang)};${clean(w.note)};${w.box};${w.priority?"Ja":"Nein"}\n`;
-                    }
+            let csv = "data:text/csv;charset=utf-8,\uFEFFUnit;Frage;Antwort;Notiz;Box\n";
+            appData.projects[appData.activeProjectId].units.forEach(u => {
+                u.words.forEach(w => {
+                    const c = t => '"' + (t?t.replace(/"/g,'""'):"") + '"';
+                    csv += `${c(u.name)};${c(w.de)};${c(w.lang)};${c(w.note)};${w.box}\n`;
                 });
             });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "core_learning_export.csv");
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+            const node = document.createElement('a');
+            node.setAttribute("href", encodeURI(csv));
+            node.setAttribute("download", "core_export.csv");
+            document.body.appendChild(node); node.click(); node.remove();
         }
 
         function importCSV(input) {
@@ -1196,32 +940,25 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
-                const text = e.target.result;
-                const lines = text.split('\n');
+                const lines = e.target.result.split('\n');
                 let count = 0;
+                // Default to first unit
+                const targetUnit = appData.projects[appData.activeProjectId].units[0];
+                const sep = lines[0].includes(';') ? ';' : ',';
                 
-                const firstLine = lines[0] || "";
-                const separator = firstLine.includes(';') ? ';' : ',';
-
                 lines.forEach(line => {
-                    if (!line.trim()) return;
-                    const parts = line.split(separator);
-                    if (parts.length >= 2) {
-                        const de = cleanDisplay(parts[0]);
-                        const lang = cleanDisplay(parts[1]);
-                        const note = parts[2] ? cleanDisplay(parts[2]) : "";
-                        
-                        if (de && lang) {
-                            getCurrentList().push({
-                                type: 'word', de: de, lang: lang, note: note,
-                                active: true, priority: false, box: 0
-                            });
-                            count++;
-                        }
+                    if(!line.trim()) return;
+                    const parts = line.split(sep);
+                    if(parts.length >= 2) {
+                        targetUnit.words.push({
+                            type:'word', de:cleanDisplay(parts[0]), lang:cleanDisplay(parts[1]), 
+                            note: parts[2]?cleanDisplay(parts[2]):"", active:true, priority:false, box:0, lastWrong:false
+                        });
+                        count++;
                     }
                 });
-                save(); renderList(); alert(`${count} Karten importiert!`);
-                input.value = ''; 
+                save(); renderList(); alert(count + " importiert in Unit: " + targetUnit.name);
+                input.value='';
             };
             reader.readAsText(file);
         }
