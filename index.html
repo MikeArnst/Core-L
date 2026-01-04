@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Core-Learning v6.0 Units</title>
+    <title>Version 5.0 Final Polish</title>
     <style>
         :root {
-            /* Core Theme v6.0 */
+            /* Core Theme */
             --bg-app: #050505;
             --bg-card: #121212;
             --input-bg: #1e1e1e;
@@ -82,6 +82,19 @@
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
+        /* Unit List Items */
+        .unit-card {
+            background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border);
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .unit-card:hover { background: #252525; }
+        .unit-info { flex: 1; }
+        .unit-name { font-weight: 500; font-size: 1rem; color: var(--text-main); }
+        .unit-count { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+        .unit-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-small-icon { width: 35px; height: 35px; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 6px; }
+
         /* Training Edit Button */
         .train-edit-btn {
             background: transparent; border: 1px solid #333; color: #666;
@@ -90,16 +103,27 @@
         }
         .train-edit-btn:hover { background: #222; color: white; }
 
-        /* Unit List Items */
-        .unit-card {
-            background: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border);
-            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        /* DASHBOARD STATS */
+        .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
+        .stat-card {
+            flex: 1; background: var(--input-bg); padding: 15px; border-radius: 12px;
+            border: 1px solid var(--border); text-align: center; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .unit-info { flex: 1; }
-        .unit-name { font-weight: 500; font-size: 0.95rem; }
-        .unit-count { font-size: 0.75rem; color: var(--text-muted); }
-        .unit-actions { display: flex; gap: 5px; }
-        .btn-small-icon { width: 35px; height: 35px; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .stat-val { font-size: 1.8rem; font-weight: 700; display: block; line-height: 1.2; margin-bottom: 5px; }
+        .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+
+        .dashboard-actions { display: flex; justify-content: center; gap: 30px; margin-top: 25px; margin-bottom: 10px; }
+        .action-item { text-align: center; cursor: pointer; width: 80px; }
+        .list-btn-circle {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: var(--input-bg); color: var(--text-main); font-size: 24px; border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 8px auto; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s;
+        }
+        .action-item:active .list-btn-circle { transform: scale(0.9); }
+        .action-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
 
         /* CARDS */
         .vocab-item {
@@ -234,8 +258,8 @@
 <body>
 
     <div id="app-header" onclick="showProjects()">
-        <h1><span class="fat-spot">CORE</span>-<span class="fat-spot">L</span>earning</h1>
-        <div class="subtitle">v6.0 | Units</div>
+        <h1>Version 5.0 Final Polish</h1>
+        <div class="subtitle">Das ultimative Leitner-Lernsystem</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -250,11 +274,11 @@
         </div>
     </div>
 
-    <div id="view-dashboard" class="container hidden fade-in">
+    <div id="view-project-overview" class="container hidden fade-in">
         <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 15px; padding: 8px 15px; font-size: 12px;">← Projekte</button>
-        <h3 id="dashboard-title" style="margin-bottom:20px;">Projekt</h3>
+        <h3 id="overview-title" style="margin-bottom:20px; text-transform:uppercase; color:var(--text-main);">PROJEKT</h3>
 
-        <button onclick="startTest(null)" style="background: var(--accent-seq); margin-bottom: 25px;">Gesamt-Training starten</button>
+        <button onclick="startTest(null)" style="background: var(--accent-seq); margin-bottom: 25px;">Gesamt-Training starten (Alle Units)</button>
 
         <h3 style="color:#888; font-size:0.8rem; margin-bottom:10px;">UNITS (LEKTIONEN)</h3>
         <div id="unit-list-container"></div>
@@ -263,15 +287,39 @@
             <input type="text" id="new-unit-name" placeholder="Neue Unit (z.B. Tiere)">
             <button class="outline" onclick="createNewUnit()">+ Unit erstellen</button>
         </div>
+    </div>
 
-        <div class="dashboard-actions" style="margin-top:30px;">
+    <div id="view-unit-details" class="container hidden fade-in">
+        <button class="secondary" onclick="openProject(appData.activeProjectId)" style="width: auto; margin-bottom: 15px; padding: 8px 15px; font-size: 12px;">← Zurück zur Übersicht</button>
+        
+        <h3 id="unit-title-display">UNIT NAME</h3>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-val" style="color:var(--fire-color)"><span id="streak-count">0</span> 🔥</span>
+                <span class="stat-label">Streak</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" style="color:var(--success-text)"><span id="mastery-percent">0</span>%</span>
+                <span class="stat-label">Gelernt</span>
+            </div>
+        </div>
+        
+        <h3>Neues Wort hinzufügen</h3>
+        <textarea id="input-de" rows="1" placeholder="🇩🇪 Deutsch"></textarea>
+        <textarea id="input-lang" rows="1" placeholder="🌍 Fremdsprache"></textarea>
+        <textarea id="input-note" rows="2" placeholder="💡 Notiz (Optional)"></textarea>
+        <button onclick="addVocab()">Speichern</button>
+        
+        <div class="dashboard-actions">
             <div class="action-item" onclick="switchTab('listManager')"><div class="list-btn-circle">📜</div><div class="action-label">Datenbank</div></div>
+            <div class="action-item" onclick="startTest(appData.activeUnitId)"><div class="list-btn-circle">🎓</div><div class="action-label">Training</div></div>
         </div>
     </div>
 
     <div id="view-list-manager" class="container hidden fade-in" style="padding-bottom: 30px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <button class="secondary" onclick="switchTab('dashboard')" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Zurück</button>
+            <button class="secondary" onclick="goBackFromDB()" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Zurück</button>
             <span style="color:var(--text-muted); font-size:0.8rem;"><span id="list-count">0</span> Einträge</span>
         </div>
         
@@ -291,17 +339,6 @@
             <label class="file-upload" style="font-size:10px;">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv, text/csv, text/plain" onchange="importCSV(this)"></label>
         </div>
         
-        <div style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px; border:1px solid #333;">
-            <div style="font-size:0.7rem; color:#888; margin-bottom:5px;">NEUES WORT HINZUFÜGEN</div>
-            <select id="add-word-unit-select" style="margin-bottom:5px; padding:8px; font-size:12px;"></select>
-            <div style="display:flex; gap:5px;">
-                <input id="input-de" placeholder="Deutsch" style="margin:0;">
-                <input id="input-lang" placeholder="Fremd" style="margin:0;">
-            </div>
-            <input id="input-note" placeholder="Notiz" style="margin:5px 0 5px 0;">
-            <button onclick="addVocab()" style="margin:0; padding:8px;">Hinzufügen</button>
-        </div>
-
         <button class="select-mode-btn" id="btn-select-mode" onclick="toggleSelectMode()" style="margin-bottom:15px;">Auswahl-Modus starten</button>
 
         <div id="vocab-list-container"></div>
@@ -315,14 +352,85 @@
 
     <div id="view-guide" class="container hidden fade-in">
         <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px;">← Zurück</button>
+        
         <div class="guide-section">
-            <div class="guide-title">🚀 Version 6.0: Units</div>
+            <div class="guide-title">🚀 Neue Struktur: Units</div>
             <div class="guide-text">
                 Deine Vokabeln sind jetzt in <b>Units (Lektionen)</b> organisiert.
-                <br><br>
-                <b>Training:</b> Du kannst entweder das gesamte Projekt trainieren ("Gesamt-Training") oder gezielt einzelne Units üben (Play-Button neben der Unit).
-                <br><br>
-                <b>Verschieben:</b> Wenn du eine Karte bearbeitest, kannst du sie nun in eine andere Unit verschieben.
+                <br>1. Wähle ein Projekt.
+                <br>2. Klicke auf eine Unit, um Wörter hinzuzufügen.
+                <br>3. Trainiere entweder alles ("Gesamt-Training") oder nur die Unit (im Unit-Fenster).
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <div class="guide-title">🧠 Das Brain-System</div>
+            <div class="guide-text">
+                Core-L nutzt das <b>Leitner-Prinzip</b>. Neue Wörter (Box 0) kommen oft dran. Wenn du sie kannst, steigen sie auf. In Box 5 hast du sie gemeistert.
+                <br><b>Regel:</b> Ein Fehler? Zurück auf Box 0.
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <div class="guide-title">🎨 Die Farben</div>
+            <div class="guide-legend">
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-0)"></span> Box 0: Neu / Falsch</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-1)"></span> Box 1: Anfänger</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-2)"></span> Box 2: Geht so</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-3)"></span> Box 3: Fortgeschritten</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-4)"></span> Box 4: Profi</div>
+                <div class="legend-item"><span class="color-dot" style="background:var(--box-5); box-shadow:0 0 5px orange;"></span> Box 5: Master</div>
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <div class="guide-title">📂 Import & Export Guide</div>
+            <div class="guide-text">
+                <p>So bekommst du deine Vokabellisten aus <b>Excel</b> oder <b>Google Sheets</b> in die App:</p>
+                
+                <div style="margin-bottom:10px;">
+                    <b>1. Das Tabellen-Format</b><br>
+                    Erstelle eine Tabelle <u>ohne Überschriften</u>.
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Spalte A:</b> Dein Wort / Frage (z.B. Deutsch)</li>
+                        <li><b>Spalte B:</b> Die Lösung / Sprache (z.B. Englisch)</li>
+                        <li><b>Spalte C:</b> (Optional) Notiz oder Eselsbrücke</li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <b>2. Als CSV speichern</b><br>
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        <li><b>Google Sheets:</b> <i>Datei</i> → <i>Herunterladen</i> → <i>Kommagetrennte Werte (.csv)</i></li>
+                        <li><b>Excel:</b> <i>Datei</i> → <i>Speichern unter</i> → Dateityp: <i>CSV (Trennzeichen-getrennt) (*.csv)</i></li>
+                    </ul>
+                </div>
+
+                <div style="margin-bottom:10px;">
+                    <b>3. Importieren</b><br>
+                    Gehe in die <i>Datenbank</i> (📜), klicke auf <b>"📂 Import"</b> und wähle die Datei aus.
+                    <br><span style="font-size:0.8em; color:#666;">(Die App erkennt automatisch, ob Trennzeichen Kommas oder Semikolons sind.)</span>
+                </div>
+
+                <hr style="border-color:#333; margin:15px 0;">
+
+                <div>
+                    <b>💾 Backup (JSON)</b><br>
+                    Nutze dies, um deine Daten zu sichern oder auf ein anderes Gerät zu übertragen.
+                    <br><br>
+                    <b>📊 Export (Excel)</b><br>
+                    Erstellt eine CSV-Datei, die du direkt in Excel oder Google Sheets öffnen und lesen kannst.
+                </div>
+            </div>
+        </div>
+
+        <div class="guide-section">
+            <div class="guide-title">💬 Sequenzen & Power-Features</div>
+            <div class="guide-text">
+                <ul>
+                    <li style="margin-bottom:8px;"><b>Auswahl-Modus:</b> Markiere Karten. Links erscheint <b>Verbinden</b> (erstellt Sequenz), Rechts erscheint <b>Löschen</b> (entfernt alle Markierten).</li>
+                    <li style="margin-bottom:8px;"><b>Sequenzen:</b> Unterhaltungen werden am Stück abgefragt. Im Bearbeiten-Menü kannst du sie mit <b>"♻️ Zerlegen"</b> wieder in Einzelkarten auflösen.</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -355,7 +463,7 @@
 
     <div id="view-test" class="container hidden fade-in">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
-            <button class="secondary" onclick="switchTab('dashboard')" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Beenden</button>
+            <button class="secondary" onclick="quitTest()" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Beenden</button>
             
             <div class="top-right-info">
                 <span id="test-unit-name" style="color:var(--text-muted); font-size:0.8rem; font-style:italic;">Unit: Allgemein</span>
@@ -396,20 +504,23 @@
         // projects: [ { name: "Türkisch", units: [ { name: "Tiere", words: [] } ] } ]
         let appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] };
         
-        let trainingQueue = []; // Flattened list for training
-        let currentCardInfo = null; // { card: obj, unitIdx: int, wordIdx: int }
+        let trainingQueue = []; 
+        let currentCardInfo = null; 
         let currentSequenceStep = 0; 
         let isSequenceActive = false;
         
         let cooldownQueue = []; 
-        let isSelectMode = false; let selectedIndices = new Set(); // Stores composite IDs "unitIdx-wordIdx"
+        let isSelectMode = false; let selectedIndices = new Set(); 
         let direction = 0; 
+        
+        // Tracks current Unit context. If null, we are in project overview.
+        let activeUnitId = null;
 
         document.addEventListener('DOMContentLoaded', () => { loadData(); });
 
         function loadData() {
             try {
-                const data = localStorage.getItem('core_l_data_v2'); // Keep v2 key to migrate
+                const data = localStorage.getItem('core_l_data_v2'); 
                 if (data) { appData = JSON.parse(data); } 
                 
                 if (!appData.projects) appData.projects = [];
@@ -430,7 +541,6 @@
         function migrateToV6() {
             let migrated = false;
             appData.projects.forEach(p => {
-                // If project has words but no units (Old format)
                 if (p.words && !p.units) {
                     p.units = [];
                     if (p.words.length > 0) {
@@ -438,10 +548,9 @@
                     } else {
                         p.units.push({ name: "Allgemein", words: [] });
                     }
-                    delete p.words; // Remove old flat list
+                    delete p.words; 
                     migrated = true;
                 }
-                // Safety check
                 if (!p.units) p.units = [{ name: "Allgemein", words: [] }];
             });
             if (migrated) save();
@@ -471,9 +580,13 @@
         function switchTab(tab) {
             document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
             if(tab === 'projects') document.getElementById('view-projects').classList.remove('hidden');
-            if(tab === 'dashboard') {
-                document.getElementById('view-dashboard').classList.remove('hidden');
-                renderUnitDashboard();
+            if(tab === 'project-overview') {
+                document.getElementById('view-project-overview').classList.remove('hidden');
+                renderProjectOverview();
+            }
+            if(tab === 'unit-details') {
+                document.getElementById('view-unit-details').classList.remove('hidden');
+                renderUnitDetails();
             }
             if(tab === 'listManager') {
                 document.getElementById('view-list-manager').classList.remove('hidden');
@@ -485,10 +598,10 @@
         }
 
         function showProjects() {
+            activeUnitId = null;
             switchTab('projects');
             const c = document.getElementById('project-list-container'); c.innerHTML = '';
             appData.projects.forEach((p, i) => {
-                // Count total words
                 let total = 0; if(p.units) p.units.forEach(u => total += u.words.length);
                 const div = document.createElement('div'); div.className = 'project-card';
                 div.innerHTML = `<span class="project-name">📂 ${p.name}</span><span class="project-count">${total} Karten</span>`;
@@ -512,26 +625,28 @@
 
         function openProject(i) {
             appData.activeProjectId = i;
-            switchTab('dashboard');
+            activeUnitId = null; // Reset unit selection
+            switchTab('project-overview');
         }
 
-        // --- UNIT DASHBOARD ---
-        function renderUnitDashboard() {
+        // --- PROJECT OVERVIEW (List of Units) ---
+        function renderProjectOverview() {
             const p = appData.projects[appData.activeProjectId];
-            document.getElementById('dashboard-title').innerText = p.name;
+            document.getElementById('overview-title').innerText = p.name;
             
             const c = document.getElementById('unit-list-container'); c.innerHTML = '';
             
             p.units.forEach((u, idx) => {
                 const div = document.createElement('div'); div.className = 'unit-card';
+                // Click on card -> Go INTO unit
+                div.onclick = () => openUnit(idx);
                 div.innerHTML = `
                     <div class="unit-info">
                         <div class="unit-name">${u.name}</div>
                         <div class="unit-count">${u.words.length} Wörter</div>
                     </div>
                     <div class="unit-actions">
-                        <button class="btn-small-icon" style="background:var(--accent-seq); color:white;" onclick="startTest(${idx})">▶</button>
-                        <button class="btn-small-icon" style="background:#333;" onclick="deleteUnit(${idx})">✕</button>
+                        <button class="btn-small-icon" style="background:#333;" onclick="event.stopPropagation(); deleteUnit(${idx})">✕</button>
                     </div>
                 `;
                 c.appendChild(div);
@@ -542,13 +657,36 @@
             const name = document.getElementById('new-unit-name').value.trim();
             if(!name) return;
             appData.projects[appData.activeProjectId].units.push({ name: name, words: [] });
-            save(); document.getElementById('new-unit-name').value=''; renderUnitDashboard();
+            save(); document.getElementById('new-unit-name').value=''; renderProjectOverview();
         }
 
         function deleteUnit(idx) {
             if(confirm("Unit löschen? Alle Karten darin gehen verloren!")) {
                 appData.projects[appData.activeProjectId].units.splice(idx, 1);
-                save(); renderUnitDashboard();
+                save(); renderProjectOverview();
+            }
+        }
+
+        // --- UNIT DETAILS (Inside a Unit) ---
+        function openUnit(idx) {
+            activeUnitId = idx;
+            switchTab('unit-details');
+        }
+
+        function renderUnitDetails() {
+            const p = appData.projects[appData.activeProjectId];
+            const u = p.units[activeUnitId];
+            
+            document.getElementById('unit-title-display').innerText = u.name;
+            
+            // Calculate Stats for THIS unit
+            const list = u.words;
+            document.getElementById('streak-count').innerText = appData.streak || 0;
+            if(!list || list.length === 0) { 
+                document.getElementById('mastery-percent').innerText = "0"; 
+            } else {
+                const mastered = list.filter(w => (w.box || 0) >= 4).length;
+                document.getElementById('mastery-percent').innerText = Math.round((mastered / list.length) * 100);
             }
         }
 
@@ -556,31 +694,44 @@
         function initDBFilters() {
             const p = appData.projects[appData.activeProjectId];
             const filter = document.getElementById('db-unit-filter');
-            const add = document.getElementById('add-word-unit-select');
             
             filter.innerHTML = '<option value="all">Alle Units anzeigen</option>';
-            add.innerHTML = '';
             
             p.units.forEach((u, i) => {
-                filter.innerHTML += `<option value="${i}">${u.name}</option>`;
-                add.innerHTML += `<option value="${i}">${u.name}</option>`;
+                // If we came from a specific unit, pre-select it
+                const selected = (activeUnitId !== null && activeUnitId === i) ? 'selected' : '';
+                filter.innerHTML += `<option value="${i}" ${selected}>${u.name}</option>`;
             });
+        }
+        
+        function goBackFromDB() {
+            // If we have an active unit, go back to that unit's dashboard
+            if (activeUnitId !== null) {
+                switchTab('unit-details');
+            } else {
+                switchTab('project-overview');
+            }
         }
 
         function addVocab() {
-            const unitIdx = document.getElementById('add-word-unit-select').value;
+            // Add to the CURRENTLY active unit
+            if (activeUnitId === null) return alert("Fehler: Keine Unit ausgewählt.");
+            
             const de = cleanDisplay(document.getElementById('input-de').value);
             const lang = cleanDisplay(document.getElementById('input-lang').value);
             const note = cleanDisplay(document.getElementById('input-note').value);
             
             if(!de || !lang) return alert("Bitte ausfüllen");
             
-            appData.projects[appData.activeProjectId].units[unitIdx].words.push({
+            appData.projects[appData.activeProjectId].units[activeUnitId].words.push({
                 type: 'word', de: de, lang: lang, note: note, active: true, priority: false, box: 0, lastWrong: false
             });
             save();
             document.getElementById('input-de').value=''; document.getElementById('input-lang').value=''; document.getElementById('input-note').value='';
-            renderList();
+            
+            // Refresh stats
+            renderUnitDetails();
+            alert("Gespeichert!");
         }
 
         // Collects all cards based on filter for DB view
@@ -592,7 +743,6 @@
             p.units.forEach((u, uIdx) => {
                 if(mode === 'all' || mode == uIdx) {
                     u.words.forEach((w, wIdx) => {
-                        // Attach composite ID for handling
                         list.push({ ...w, unitIdx: uIdx, wordIdx: wIdx, unitName: u.name });
                     });
                 }
@@ -606,12 +756,10 @@
             const search = document.getElementById('search-input').value.toLowerCase();
             const sort = document.getElementById('sort-select').value;
             
-            // Filter Search
             let filtered = list.filter(item => {
                 return (item.de.toLowerCase().includes(search) || item.lang.toLowerCase().includes(search));
             });
 
-            // Sort
             if (sort === 'newest') filtered.reverse();
             else if (sort === 'box-asc') filtered.sort((a,b) => a.box - b.box);
             else if (sort === 'box-desc') filtered.sort((a,b) => b.box - a.box);
@@ -622,9 +770,6 @@
             filtered.forEach(item => {
                 const div = document.createElement('div');
                 div.className = `vocab-item fade-in ${!item.active ? 'paused' : ''}`;
-                
-                // Composite ID for functions
-                const cid = `${item.unitIdx}-${item.wordIdx}`;
                 
                 div.innerHTML = `
                     <div class="status-bar box-${item.box}">
@@ -667,7 +812,6 @@
             const p = appData.projects[appData.activeProjectId];
             const item = p.units[uIdx].words[wIdx];
             
-            // Setup Unit Selector
             const unitSel = document.getElementById('edit-unit-select');
             unitSel.innerHTML = '';
             p.units.forEach((u, i) => {
@@ -693,23 +837,18 @@
             const oldUIdx = editTarget.uIdx;
             const wIdx = editTarget.wIdx;
             
-            // Update Data
             const card = p.units[oldUIdx].words[wIdx];
             card.de = de; card.lang = lang; card.note = note;
 
-            // Move if unit changed
             if (newUIdx !== oldUIdx) {
-                p.units[oldUIdx].words.splice(wIdx, 1); // Remove from old
-                p.units[newUIdx].words.push(card); // Add to new
+                p.units[oldUIdx].words.splice(wIdx, 1); 
+                p.units[newUIdx].words.push(card); 
             }
 
             save();
             closeEditModal();
-            // If in DB view
             if(!document.getElementById('view-list-manager').classList.contains('hidden')) renderList();
-            // If in Test view and we edited the current card, refresh display
             if(!document.getElementById('view-test').classList.contains('hidden') && currentCardInfo) {
-                // Update display only if we didn't move it. If moved, it's messy, so just continue
                 if(newUIdx === oldUIdx) {
                     document.getElementById('question-display').innerText = (direction===0 ? de : lang);
                     document.getElementById('test-unit-name').innerText = "Unit: " + p.units[newUIdx].name;
@@ -724,12 +863,7 @@
             save();
             closeEditModal();
             if(!document.getElementById('view-list-manager').classList.contains('hidden')) renderList();
-            
-            // Handle Training delete
             if(!document.getElementById('view-test').classList.contains('hidden')) {
-                // Remove from Queue if it's there
-                // This is complex because queue has flattened objects.
-                // Easiest: Just skip to next and hope for best or restart logic
                 nextQuestion();
             }
         }
@@ -738,11 +872,8 @@
 
         // --- TRAINING LOGIC ---
         
-        // Starts training. If unitIdx is null, trains all.
         function startTest(unitIdx) {
             const p = appData.projects[appData.activeProjectId];
-            
-            // Build Training Queue (Flattened references)
             trainingQueue = [];
             
             p.units.forEach((u, uI) => {
@@ -750,11 +881,7 @@
                     u.words.forEach((w, wI) => {
                         if (w.active) {
                             trainingQueue.push({ 
-                                card: w, 
-                                uIdx: uI, 
-                                wIdx: wI, 
-                                uName: u.name,
-                                id: `${uI}-${wI}` // Unique ID for cooldown mapping
+                                card: w, uIdx: uI, wIdx: wI, uName: u.name, id: `${uI}-${wI}`
                             });
                         }
                     });
@@ -762,10 +889,18 @@
             });
 
             if (trainingQueue.length === 0) return alert("Keine aktiven Karten in dieser Auswahl.");
-            
-            cooldownQueue = []; // Reset cooldown
+            cooldownQueue = []; 
             switchTab('test');
             nextQuestion();
+        }
+
+        function quitTest() {
+            // Return to where we came from
+            if (activeUnitId !== null) {
+                switchTab('unit-details');
+            } else {
+                switchTab('project-overview');
+            }
         }
 
         function nextQuestion() {
@@ -774,44 +909,50 @@
             document.getElementById('test-input').value = '';
             document.getElementById('test-input').focus();
 
-            // COOLDOWN LOGIC
-            // Decrease wait time
             cooldownQueue.forEach(i => i.wait--);
-            // Remove finished
-            cooldownQueue = cooldownQueue.filter(i => i.wait > 0);
+            // Cleanup queue: remove wait<=0 AND check if card still exists
+            const p = appData.projects[appData.activeProjectId];
             
-            // Get available candidates (not in cooldown)
+            for (let i = cooldownQueue.length - 1; i >= 0; i--) {
+                const qItem = cooldownQueue[i];
+                // Check exist
+                const u = p.units[qItem.uIdx];
+                if (u && u.words[qItem.wIdx]) {
+                    if (qItem.wait <= 0) cooldownQueue.splice(i, 1);
+                } else {
+                    cooldownQueue.splice(i, 1); // Deleted card
+                }
+            }
+
             const blockedIds = cooldownQueue.map(c => c.id);
+            // Re-verify trainingQueue (filter out deleted)
+            trainingQueue = trainingQueue.filter(t => p.units[t.uIdx] && p.units[t.uIdx].words[t.wIdx]);
+            
             let candidates = trainingQueue.filter(item => !blockedIds.includes(item.id));
 
-            // EMERGENCY FALLBACK: If all blocked, pick the one with lowest wait
             if (candidates.length === 0) {
                 if (cooldownQueue.length > 0) {
                     cooldownQueue.sort((a,b) => a.wait - b.wait);
                     const forcedId = cooldownQueue[0].id;
                     candidates = trainingQueue.filter(item => item.id === forcedId);
-                    // Remove from queue since we force it
+                    // If forced candidate doesn't exist anymore, recursion
+                    if(candidates.length === 0) { cooldownQueue.shift(); return nextQuestion(); }
                     cooldownQueue.shift();
                 } else {
-                    // Should not happen unless queue empty
-                    alert("Training beendet!"); return switchTab('dashboard');
+                    alert("Training beendet!"); return quitTest();
                 }
             }
 
-            // SELECTION LOGIC: Priority > Box 0 > Box < 5 > Random
             let pool = candidates.filter(x => x.card.priority);
             if(pool.length === 0) pool = candidates.filter(x => x.card.box === 0);
             if(pool.length === 0) pool = candidates.filter(x => x.card.box < 5);
             if(pool.length === 0) pool = candidates;
 
-            // Pick random
             const pick = pool[Math.floor(Math.random() * pool.length)];
-            currentCardInfo = pick; // Store for checking
+            currentCardInfo = pick; 
             
-            // Direction
             direction = Math.random() < 0.5 ? 0 : 1; 
             
-            // Render
             document.getElementById('test-unit-name').innerText = "Unit: " + pick.uName;
             document.getElementById('box-display').innerText = "Box " + pick.card.box;
             document.getElementById('question-display').innerText = (direction === 0 ? pick.card.de : pick.card.lang);
@@ -843,8 +984,6 @@
             const oldBox = currentCardInfo.card.box;
             let newBox = oldBox;
 
-            // Calculate Dynamic Wait Time
-            // Cap wait time at (TotalCards - 1) so we never block completely if deck is small
             const totalCards = trainingQueue.length;
             const safeWaitWrong = Math.max(0, Math.min(3, totalCards - 1));
             const safeWaitCorrect = Math.max(0, Math.min(10, totalCards - 1));
@@ -861,8 +1000,7 @@
                 fb.innerHTML = `<div class="feedback-box correct"><h3>Richtig! 🎉</h3></div>${userHtml}<div style="margin-top:5px; color:#aaa;">Lösung: ${solution}</div>`;
                 document.getElementById('override-container').innerHTML = '';
                 
-                // Add to cooldown (prevent immediate flip side)
-                cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect });
+                cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect, uIdx:currentCardInfo.uIdx, wIdx:currentCardInfo.wIdx });
 
             } else {
                 newBox = 0;
@@ -872,10 +1010,9 @@
                 fb.innerHTML = `<div class="feedback-box wrong"><h3>Leider falsch</h3></div>${userHtml}<div style="margin-top:5px; font-size:1.1rem;">Lösung:<br><span style="color:var(--success-text)">${solution}</span></div>`;
                 document.getElementById('override-container').innerHTML = `<button class="override-btn" onclick="overrideResult()">War doch richtig (Tippfehler)</button>`;
                 
-                cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitWrong });
+                cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitWrong, uIdx:currentCardInfo.uIdx, wIdx:currentCardInfo.wIdx });
             }
 
-            // Gold Info Top Right
             document.getElementById('box-display').innerHTML = `<span class="gold-trans">Box ${oldBox} ➔ Box ${newBox}</span>`;
 
             if(currentCardInfo.card.note) {
@@ -888,15 +1025,13 @@
         }
 
         function overrideResult() {
-            // Revert logic
             const totalCards = trainingQueue.length;
             const safeWaitCorrect = Math.max(0, Math.min(10, totalCards - 1));
             
-            // Remove 'wrong' wait
+            // Remove wrong wait
             cooldownQueue = cooldownQueue.filter(c => c.id !== currentCardInfo.id);
-            
-            // Add 'correct' wait
-            cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect });
+            // Add correct wait
+            cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect, uIdx:currentCardInfo.uIdx, wIdx:currentCardInfo.wIdx });
             
             if(currentCardInfo.card.box < 5) currentCardInfo.card.box++; 
             currentCardInfo.card.lastWrong = false;
@@ -917,7 +1052,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
             const node = document.createElement('a');
             node.setAttribute("href", dataStr);
-            node.setAttribute("download", "core_learning_v6_backup.json");
+            node.setAttribute("download", "core_learning_backup.json");
             document.body.appendChild(node); node.click(); node.remove();
         }
 
@@ -957,11 +1092,19 @@
                         count++;
                     }
                 });
-                save(); renderList(); alert(count + " importiert in Unit: " + targetUnit.name);
+                save(); 
+                // Refresh list depending on view
+                if(!document.getElementById('view-list-manager').classList.contains('hidden')) renderList();
+                
+                alert(count + " importiert in Unit: " + targetUnit.name);
                 input.value='';
             };
             reader.readAsText(file);
         }
+        
+        // HELPER
+        function toggleSelectMode() { isSelectMode = !isSelectMode; renderList(); }
+        function dissolveSequence() { /* Placeholder as Sequences are flattened in V6 simple mode */ }
     </script>
 </body>
 </html>
