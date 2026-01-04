@@ -45,7 +45,7 @@
         .fade-in { animation: fadeIn 0.25s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* HEADER DESIGN RESTORED */
+        /* HEADER DESIGN FIX */
         #app-header { text-align: center; margin-bottom: 25px; margin-top: 10px; cursor: pointer; user-select: none; }
         
         #app-header h1 { 
@@ -57,7 +57,7 @@
             color: white; 
         }
         
-        /* Die Klasse für den fetten Teil (CORE-L) */
+        /* Fett für CORE-L */
         .fat-spot {
             font-weight: 700; 
             color: #ffffff;
@@ -110,17 +110,36 @@
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
-        /* Unit List Items */
-        .unit-card {
-            background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border);
-            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; transition: background 0.2s;
+        /* Unit/Project List Items */
+        .project-card, .unit-card {
+            background: var(--input-bg); 
+            padding: 15px; 
+            border-radius: 10px; 
+            border: 1px solid var(--border);
+            margin-bottom: 10px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            cursor: pointer; 
+            transition: background 0.2s;
         }
-        .unit-card:hover { background: #252525; }
+        .project-card:hover, .unit-card:hover { background: #252525; }
+        
         .unit-info { flex: 1; }
-        .unit-name { font-weight: 500; font-size: 1rem; color: var(--text-main); }
+        .project-name, .unit-name { font-weight: 500; font-size: 1rem; color: var(--text-main); }
         .unit-count { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+        
         .unit-actions { display: flex; gap: 10px; align-items: center; }
+        
+        /* Adjusted Icon Button for Perfect Centering */
+        .btn-icon { 
+            width: 40px; height: 40px; padding: 0; margin: 0; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 18px; border-radius: 8px; 
+            background: rgba(255,255,255,0.05); color: var(--text-muted);
+            border: 1px solid transparent;
+        }
+        .btn-icon:hover { color: white; background: rgba(255,255,255,0.1); }
         .btn-small-icon { width: 35px; height: 35px; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 6px; }
 
         /* Training Edit Button */
@@ -210,11 +229,6 @@
         }
         .vocab-actions-wrapper { display: flex; justify-content: flex-end; gap: 8px; }
         
-        .btn-icon { width: 30px; height: 30px; padding: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid transparent; }
-        .btn-icon:hover { color: #ffffff; background: rgba(255,255,255,0.1); }
-        .btn-icon.active-star { color: var(--star-color); background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.2); }
-        .btn-icon.is-paused { color: #f97316; background: rgba(249, 115, 22, 0.1); border-color: rgba(249, 115, 22, 0.2); } 
-
         /* INLINE BUTTONS */
         .btn-inline {
             border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
@@ -245,18 +259,6 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-content { background: var(--bg-card); width: 95%; max-width: 400px; padding: 20px; border-radius: 12px; border: 1px solid var(--border); max-height: 80vh; overflow-y: auto; }
 
-        .project-card { 
-            background: var(--input-bg); 
-            padding: 14px 16px; 
-            border-radius: 10px; 
-            margin-bottom: 8px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            cursor: pointer; 
-            border: 1px solid var(--border); 
-        }
-        .project-name { font-weight: 500; font-size: 1rem; color: white; }
         
         .guide-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
         .guide-section:last-child { border: none; }
@@ -526,9 +528,20 @@
         </div>
     </div>
 
+    <div id="import-project-modal" class="modal-overlay hidden">
+        <div class="modal-content fade-in">
+            <h3>Projekt importieren</h3>
+            <p style="color:#aaa; font-size:0.9rem;">Wähle ein anderes Projekt. Es wird als neue Unit in dein aktuelles Projekt kopiert.</p>
+            
+            <div id="import-project-list" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
+            
+            <button class="secondary" onclick="closeImportProjectModal()">Abbrechen</button>
+        </div>
+    </div>
+
     <div id="project-edit-modal" class="modal-overlay hidden">
         <div class="modal-content fade-in">
-            <h3>Projekt bearbeiten</h3>
+            <h3>Projekt verwalten</h3>
             
             <input type="text" id="edit-project-name-input" placeholder="Projektname">
 
@@ -542,17 +555,6 @@
             <button onclick="saveProjectName()">Speichern</button>
             <button class="danger" onclick="deleteProjectFromModal()">🗑️ Löschen</button>
             <button class="secondary" onclick="closeProjectEditModal()">Abbrechen</button>
-        </div>
-    </div>
-
-    <div id="import-project-modal" class="modal-overlay hidden">
-        <div class="modal-content fade-in">
-            <h3>Projekt importieren</h3>
-            <p style="color:#aaa; font-size:0.9rem;">Wähle ein anderes Projekt. Es wird als neue Unit in dein aktuelles Projekt kopiert.</p>
-            
-            <div id="import-project-list" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
-            
-            <button class="secondary" onclick="closeImportProjectModal()">Abbrechen</button>
         </div>
     </div>
 
@@ -610,7 +612,6 @@
         let activeUnitId = null;
         let isDuplicateFilterActive = false; 
 
-        // Tracks which project is being edited
         let editProjectIndex = -1;
 
         document.addEventListener('DOMContentLoaded', () => { loadData(); });
@@ -706,8 +707,7 @@
                 // EDIT BUTTON (GEAR)
                 const editBtn = document.createElement('button'); 
                 editBtn.innerText = "⚙️"; 
-                editBtn.className = "btn-icon";
-                editBtn.style.width="35px"; 
+                editBtn.className = "btn-icon"; // Reused class, adjusted in CSS for margin
                 editBtn.onclick=(e)=>{e.stopPropagation(); openProjectEditModal(i)};
                 
                 div.appendChild(editBtn); 
@@ -755,9 +755,9 @@
                 appData.projects[editProjectIndex] = appData.projects[newIndex];
                 appData.projects[newIndex] = temp;
                 
-                editProjectIndex = newIndex; // Update index to follow
+                editProjectIndex = newIndex; 
                 save();
-                showProjects(); // Refresh background list
+                showProjects(); 
             }
         }
 
@@ -774,14 +774,42 @@
             switchTab('project-overview');
         }
 
+        function updateDashboardStats() {
+            // New Weighted Logic:
+            // Box 0 = 0, Box 1 = 1, ... Box 5 = 5 pts.
+            let list = [];
+            
+            if(activeUnitId !== null) {
+                list = appData.projects[appData.activeProjectId].units[activeUnitId].words;
+            } else {
+                // Should technically not happen as this func calls from inside unit view
+                // But for safety
+                return; 
+            }
+
+            document.getElementById('streak-count').innerText = appData.streak || 0;
+            
+            if(!list || list.length === 0) { 
+                document.getElementById('mastery-percent').innerText = "0"; 
+            } else {
+                let totalPoints = 0;
+                let maxPoints = list.length * 5;
+                
+                list.forEach(w => {
+                    totalPoints += (w.box || 0);
+                });
+                
+                // Avoid division by zero
+                let percent = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+                document.getElementById('mastery-percent').innerText = percent;
+            }
+        }
+
         // --- PROJECT OVERVIEW (List of Units) ---
         function renderProjectOverview() {
             const p = appData.projects[appData.activeProjectId];
-            
-            // Set Project Title
             document.getElementById('overview-project-name').innerText = p.name;
             
-            // UPDATE TOTAL COUNT STAT
             let total = 0; if(p.units) p.units.forEach(u => total += u.words.length);
             document.getElementById('project-total-count').innerText = total;
 
@@ -789,7 +817,6 @@
             
             p.units.forEach((u, idx) => {
                 const div = document.createElement('div'); div.className = 'unit-card';
-                // Click on card -> Go INTO unit
                 div.onclick = () => openUnit(idx);
                 div.innerHTML = `
                     <div class="unit-info">
@@ -823,7 +850,6 @@
             const list = document.getElementById('import-project-list');
             list.innerHTML = '';
             
-            // Show all projects EXCEPT current
             appData.projects.forEach((p, idx) => {
                 if (idx !== appData.activeProjectId) {
                     const btn = document.createElement('button');
@@ -836,7 +862,6 @@
             });
             
             if(list.innerHTML === '') list.innerHTML = "<p style='color:#666'>Keine anderen Projekte vorhanden.</p>";
-            
             document.getElementById('import-project-modal').classList.remove('hidden');
         }
 
@@ -848,13 +873,9 @@
             const sourceP = appData.projects[sourceProjectIdx];
             const targetP = appData.projects[appData.activeProjectId];
             
-            // Create new unit with source project name
             const newUnit = { name: sourceP.name, words: [] };
-            
-            // Flatten all words from source
             sourceP.units.forEach(u => {
                 u.words.forEach(w => {
-                    // Deep copy word to avoid reference issues
                     newUnit.words.push(JSON.parse(JSON.stringify(w)));
                 });
             });
@@ -866,7 +887,7 @@
             alert(`Projekt "${sourceP.name}" wurde als Unit importiert!`);
         }
 
-        // --- UNIT DETAILS (Inside a Unit) ---
+        // --- UNIT DETAILS ---
         function openUnit(idx) {
             activeUnitId = idx;
             switchTab('unit-details');
@@ -877,16 +898,7 @@
             const u = p.units[activeUnitId];
             
             document.getElementById('unit-title-display').innerText = u.name;
-            
-            // Calculate Stats for THIS unit
-            const list = u.words;
-            document.getElementById('streak-count').innerText = appData.streak || 0;
-            if(!list || list.length === 0) { 
-                document.getElementById('mastery-percent').innerText = "0"; 
-            } else {
-                const mastered = list.filter(w => (w.box || 0) >= 4).length;
-                document.getElementById('mastery-percent').innerText = Math.round((mastered / list.length) * 100);
-            }
+            updateDashboardStats(); // Called here to update percentages correctly
         }
 
         // --- DATABASE & LISTS ---
@@ -899,24 +911,18 @@
             addSelector.innerHTML = '';
             
             p.units.forEach((u, i) => {
-                // Pre-select if specific unit active
                 const selected = (activeUnitId !== null && activeUnitId === i) ? 'selected' : '';
                 filter.innerHTML += `<option value="${i}" ${selected}>${u.name}</option>`;
-                // Fill Add Dropdown
                 addSelector.innerHTML += `<option value="${i}">${u.name}</option>`;
             });
 
-            // Show/Hide Global Add Area based on context
             const globalAdd = document.getElementById('global-add-area');
             if (activeUnitId === null) {
-                // We are in Global Project DB
                 globalAdd.style.display = 'block';
             } else {
-                // We are in specific Unit DB (Unit already has add screen)
                 globalAdd.style.display = 'none';
             }
             
-            // Reset duplicate filter on entry
             isDuplicateFilterActive = false;
             updateDuplicateButton();
         }
@@ -930,7 +936,6 @@
         }
 
         function addVocab() {
-            // Context: Inside specific Unit
             if (activeUnitId === null) return alert("Fehler: Keine Unit ausgewählt.");
             
             const de = cleanDisplay(document.getElementById('input-de').value);
@@ -950,7 +955,6 @@
         }
 
         function addVocabGlobal() {
-            // Context: Global Project DB
             const unitIdx = document.getElementById('add-word-unit-select').value;
             const de = cleanDisplay(document.getElementById('global-input-de').value);
             const lang = cleanDisplay(document.getElementById('global-input-lang').value);
@@ -982,7 +986,6 @@
             return list;
         }
 
-        // TOGGLE DUPLICATE FILTER
         function toggleDuplicateFilter() {
             isDuplicateFilterActive = !isDuplicateFilterActive;
             updateDuplicateButton();
@@ -996,7 +999,7 @@
                 btn.style.color = "white";
                 btn.innerText = "Alle anzeigen";
             } else {
-                btn.style.backgroundColor = ""; // Reset to secondary style
+                btn.style.backgroundColor = ""; 
                 btn.style.color = "var(--text-muted)";
                 btn.innerText = "⚠️ Duplikate finden";
             }
@@ -1008,12 +1011,10 @@
             const search = document.getElementById('search-input').value.toLowerCase();
             const sort = document.getElementById('sort-select').value;
             
-            // 1. Filter Search
             let filtered = list.filter(item => {
                 return (item.de.toLowerCase().includes(search) || item.lang.toLowerCase().includes(search));
             });
 
-            // 2. Filter Duplicates (if active)
             if (isDuplicateFilterActive) {
                 const counts = {};
                 filtered.forEach(item => {
@@ -1023,7 +1024,6 @@
                 filtered = filtered.filter(item => counts[cleanString(item.de)] > 1);
             }
 
-            // 3. Sort
             if (sort === 'newest') filtered.reverse();
             else if (sort === 'box-asc') filtered.sort((a,b) => a.box - b.box);
             else if (sort === 'box-desc') filtered.sort((a,b) => b.box - a.box);
@@ -1140,14 +1140,12 @@
             const p = appData.projects[appData.activeProjectId];
             trainingQueue = [];
             
-            // INTELLIGENT TRAINING: Prevent duplicates in session
             const seenQuestions = new Set();
 
             p.units.forEach((u, uI) => {
                 if (unitIdx === null || unitIdx === uI) {
                     u.words.forEach((w, wI) => {
                         if (w.active) {
-                            // De-duplication logic for training
                             const key = cleanString(w.de);
                             if (!seenQuestions.has(key)) {
                                 trainingQueue.push({ 
