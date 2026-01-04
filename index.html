@@ -45,16 +45,24 @@
         .fade-in { animation: fadeIn 0.25s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* HEADER DESIGN */
+        /* HEADER DESIGN RESTORED */
         #app-header { text-align: center; margin-bottom: 25px; margin-top: 10px; cursor: pointer; user-select: none; }
+        
         #app-header h1 { 
             font-size: 1.8rem; 
             letter-spacing: 1px; 
             margin: 0; 
-            font-weight: 700; 
+            font-weight: 300; /* Dünn für 'earning' */
             text-shadow: 0 0 15px rgba(255,255,255,0.15); 
             color: white; 
         }
+        
+        /* Die Klasse für den fetten Teil (CORE-L) */
+        .fat-spot {
+            font-weight: 700; 
+            color: #ffffff;
+        }
+
         .subtitle { 
             font-size: 0.8rem; 
             color: var(--text-muted); 
@@ -237,8 +245,18 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-content { background: var(--bg-card); width: 95%; max-width: 400px; padding: 20px; border-radius: 12px; border: 1px solid var(--border); max-height: 80vh; overflow-y: auto; }
 
-        .project-card { background: var(--input-bg); padding: 14px 16px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid var(--border); }
-        .project-name { font-weight: 500; }
+        .project-card { 
+            background: var(--input-bg); 
+            padding: 14px 16px; 
+            border-radius: 10px; 
+            margin-bottom: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            cursor: pointer; 
+            border: 1px solid var(--border); 
+        }
+        .project-name { font-weight: 500; font-size: 1rem; color: white; }
         
         .guide-section { margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
         .guide-section:last-child { border: none; }
@@ -278,7 +296,7 @@
 <body>
 
     <div id="app-header" onclick="showProjects()">
-        <h1>CORE-Learning</h1>
+        <h1><span class="fat-spot">CORE-L</span>earning</h1>
         <div class="subtitle">Version 5.0 Final Polish</div>
         <div class="author-note">von Mike Arnst</div>
     </div>
@@ -508,6 +526,25 @@
         </div>
     </div>
 
+    <div id="project-edit-modal" class="modal-overlay hidden">
+        <div class="modal-content fade-in">
+            <h3>Projekt bearbeiten</h3>
+            
+            <input type="text" id="edit-project-name-input" placeholder="Projektname">
+
+            <div style="display:flex; gap:10px; margin: 15px 0;">
+                <button onclick="moveProject(-1)">▲ Hoch</button>
+                <button onclick="moveProject(1)">▼ Runter</button>
+            </div>
+            
+            <hr style="border-color:#333; margin:15px 0;">
+
+            <button onclick="saveProjectName()">Speichern</button>
+            <button class="danger" onclick="deleteProjectFromModal()">🗑️ Löschen</button>
+            <button class="secondary" onclick="closeProjectEditModal()">Abbrechen</button>
+        </div>
+    </div>
+
     <div id="import-project-modal" class="modal-overlay hidden">
         <div class="modal-content fade-in">
             <h3>Projekt importieren</h3>
@@ -571,7 +608,10 @@
         let direction = 0; 
         
         let activeUnitId = null;
-        let isDuplicateFilterActive = false; // Toggle state for DB
+        let isDuplicateFilterActive = false; 
+
+        // Tracks which project is being edited
+        let editProjectIndex = -1;
 
         document.addEventListener('DOMContentLoaded', () => { loadData(); });
 
@@ -659,15 +699,66 @@
             switchTab('projects');
             const c = document.getElementById('project-list-container'); c.innerHTML = '';
             appData.projects.forEach((p, i) => {
-                let total = 0; if(p.units) p.units.forEach(u => total += u.words.length);
                 const div = document.createElement('div'); div.className = 'project-card';
-                div.innerHTML = `<span class="project-name">📂 ${p.name}</span><span class="project-count">${total} Karten</span>`;
+                div.innerHTML = `<span class="project-name">📂 ${p.name}</span>`;
                 div.onclick = () => openProject(i);
                 
-                const del = document.createElement('button'); del.innerText = "✕"; del.className = "btn-icon";
-                del.style.width="30px"; del.onclick=(e)=>{e.stopPropagation(); deleteProject(i)};
-                div.appendChild(del); c.appendChild(div);
+                // EDIT BUTTON (GEAR)
+                const editBtn = document.createElement('button'); 
+                editBtn.innerText = "⚙️"; 
+                editBtn.className = "btn-icon";
+                editBtn.style.width="35px"; 
+                editBtn.onclick=(e)=>{e.stopPropagation(); openProjectEditModal(i)};
+                
+                div.appendChild(editBtn); 
+                c.appendChild(div);
             });
+        }
+
+        // --- PROJECT EDITING ---
+        function openProjectEditModal(index) {
+            editProjectIndex = index;
+            document.getElementById('edit-project-name-input').value = appData.projects[index].name;
+            document.getElementById('project-edit-modal').classList.remove('hidden');
+        }
+
+        function closeProjectEditModal() {
+            document.getElementById('project-edit-modal').classList.add('hidden');
+        }
+
+        function saveProjectName() {
+            const newName = document.getElementById('edit-project-name-input').value.trim();
+            if(newName) {
+                appData.projects[editProjectIndex].name = newName;
+                save();
+                closeProjectEditModal();
+                showProjects();
+            } else {
+                alert("Name darf nicht leer sein.");
+            }
+        }
+
+        function deleteProjectFromModal() {
+            if(confirm(`Projekt "${appData.projects[editProjectIndex].name}" wirklich löschen?`)) {
+                appData.projects.splice(editProjectIndex, 1);
+                save();
+                closeProjectEditModal();
+                showProjects();
+            }
+        }
+
+        function moveProject(direction) {
+            const newIndex = editProjectIndex + direction;
+            if(newIndex >= 0 && newIndex < appData.projects.length) {
+                // Swap
+                const temp = appData.projects[editProjectIndex];
+                appData.projects[editProjectIndex] = appData.projects[newIndex];
+                appData.projects[newIndex] = temp;
+                
+                editProjectIndex = newIndex; // Update index to follow
+                save();
+                showProjects(); // Refresh background list
+            }
         }
 
         function createNewProject() {
@@ -675,9 +766,6 @@
             if(!name) return;
             appData.projects.push({ name: name, units: [{name:"Allgemein", words:[]}] });
             save(); document.getElementById('new-project-name').value=''; showProjects();
-        }
-        function deleteProject(i) {
-            if(confirm("Projekt löschen?")) { appData.projects.splice(i,1); save(); showProjects(); }
         }
 
         function openProject(i) {
@@ -689,8 +777,11 @@
         // --- PROJECT OVERVIEW (List of Units) ---
         function renderProjectOverview() {
             const p = appData.projects[appData.activeProjectId];
+            
+            // Set Project Title
             document.getElementById('overview-project-name').innerText = p.name;
             
+            // UPDATE TOTAL COUNT STAT
             let total = 0; if(p.units) p.units.forEach(u => total += u.words.length);
             document.getElementById('project-total-count').innerText = total;
 
@@ -698,6 +789,7 @@
             
             p.units.forEach((u, idx) => {
                 const div = document.createElement('div'); div.className = 'unit-card';
+                // Click on card -> Go INTO unit
                 div.onclick = () => openUnit(idx);
                 div.innerHTML = `
                     <div class="unit-info">
@@ -774,7 +866,7 @@
             alert(`Projekt "${sourceP.name}" wurde als Unit importiert!`);
         }
 
-        // --- UNIT DETAILS ---
+        // --- UNIT DETAILS (Inside a Unit) ---
         function openUnit(idx) {
             activeUnitId = idx;
             switchTab('unit-details');
@@ -786,6 +878,7 @@
             
             document.getElementById('unit-title-display').innerText = u.name;
             
+            // Calculate Stats for THIS unit
             const list = u.words;
             document.getElementById('streak-count').innerText = appData.streak || 0;
             if(!list || list.length === 0) { 
@@ -806,15 +899,20 @@
             addSelector.innerHTML = '';
             
             p.units.forEach((u, i) => {
+                // Pre-select if specific unit active
                 const selected = (activeUnitId !== null && activeUnitId === i) ? 'selected' : '';
                 filter.innerHTML += `<option value="${i}" ${selected}>${u.name}</option>`;
+                // Fill Add Dropdown
                 addSelector.innerHTML += `<option value="${i}">${u.name}</option>`;
             });
 
+            // Show/Hide Global Add Area based on context
             const globalAdd = document.getElementById('global-add-area');
             if (activeUnitId === null) {
+                // We are in Global Project DB
                 globalAdd.style.display = 'block';
             } else {
+                // We are in specific Unit DB (Unit already has add screen)
                 globalAdd.style.display = 'none';
             }
             
@@ -832,6 +930,7 @@
         }
 
         function addVocab() {
+            // Context: Inside specific Unit
             if (activeUnitId === null) return alert("Fehler: Keine Unit ausgewählt.");
             
             const de = cleanDisplay(document.getElementById('input-de').value);
@@ -851,6 +950,7 @@
         }
 
         function addVocabGlobal() {
+            // Context: Global Project DB
             const unitIdx = document.getElementById('add-word-unit-select').value;
             const de = cleanDisplay(document.getElementById('global-input-de').value);
             const lang = cleanDisplay(document.getElementById('global-input-lang').value);
@@ -1195,7 +1295,9 @@
             const totalCards = trainingQueue.length;
             const safeWaitCorrect = Math.max(0, Math.min(10, totalCards - 1));
             
+            // Remove wrong wait
             cooldownQueue = cooldownQueue.filter(c => c.id !== currentCardInfo.id);
+            // Add correct wait
             cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect, uIdx:currentCardInfo.uIdx, wIdx:currentCardInfo.wIdx });
             
             if(currentCardInfo.card.box < 5) currentCardInfo.card.box++; 
