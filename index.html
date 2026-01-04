@@ -45,13 +45,20 @@
         .fade-in { animation: fadeIn 0.25s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* HEADER */
+        /* HEADER DESIGN */
         #app-header { text-align: center; margin-bottom: 25px; margin-top: 10px; cursor: pointer; user-select: none; }
+        
         #app-header h1 { 
-            font-size: 1.8rem; letter-spacing: 1px; margin: 0; 
-            font-weight: 300; text-shadow: 0 0 15px rgba(255,255,255,0.15); color: white; 
+            font-size: 1.8rem; 
+            letter-spacing: 1px; 
+            margin: 0; 
+            font-weight: 300; 
+            text-shadow: 0 0 15px rgba(255,255,255,0.15); 
+            color: white; 
         }
+        
         .fat-spot { font-weight: 700; color: #ffffff; }
+
         .subtitle { 
             font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; 
             letter-spacing: 1.5px; margin-top: 5px; font-weight: 400; 
@@ -90,7 +97,7 @@
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
-        /* LIST ITEMS (PROJECTS & UNITS) */
+        /* LIST ITEMS */
         .project-card, .unit-card {
             background: var(--input-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border);
             margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
@@ -101,7 +108,6 @@
         .unit-info { flex: 1; }
         .project-name, .unit-name { font-weight: 500; font-size: 1rem; color: var(--text-main); }
         .unit-count { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
-        
         .unit-actions { display: flex; gap: 10px; align-items: center; }
         
         .btn-icon { 
@@ -112,14 +118,9 @@
             border: 1px solid transparent;
         }
         .btn-icon:hover { color: white; background: rgba(255,255,255,0.1); }
-        
-        .btn-small-icon { 
-            width: 35px; height: 35px; padding: 0; margin: 0; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 16px; border-radius: 6px; 
-        }
+        .btn-small-icon { width: 35px; height: 35px; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 6px; }
 
-        /* TRAINING */
+        /* TRAINING BUTTONS */
         .train-edit-btn {
             background: transparent; border: 1px solid #333; color: #666;
             width: 30px; height: 30px; padding: 0; border-radius: 50%;
@@ -138,8 +139,9 @@
         .stat-val { font-size: 1.8rem; font-weight: 700; display: block; line-height: 1.2; margin-bottom: 5px; }
         .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
 
-        .dashboard-actions { display: flex; justify-content: center; gap: 30px; margin-top: 25px; margin-bottom: 10px; }
-        .action-item { text-align: center; cursor: pointer; width: 80px; }
+        /* ACTION FOOTER */
+        .dashboard-actions { display: flex; justify-content: center; gap: 30px; margin-top: 30px; margin-bottom: 10px; }
+        .action-item { text-align: center; cursor: pointer; width: 100px; }
         .list-btn-circle {
             width: 60px; height: 60px; border-radius: 50%;
             background: var(--input-bg); color: var(--text-main); font-size: 24px; border: 1px solid var(--border);
@@ -147,7 +149,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s;
         }
         .action-item:active .list-btn-circle { transform: scale(0.9); }
-        .action-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
+        .action-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; margin-top: 5px; }
 
         /* CARDS */
         .vocab-item {
@@ -295,16 +297,21 @@
     <div id="view-project-overview" class="container hidden fade-in">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
             <button class="secondary" onclick="showProjects()" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Projekte</button>
-            
             <div style="text-align:right;">
                 <div id="overview-project-name" style="font-weight:bold; color:var(--text-main); font-size:1.1rem;">Projekt</div>
-                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
-                    <span id="project-total-count">0</span> Karten total
-                </div>
             </div>
         </div>
 
-        <button onclick="startTest(null)" style="background: var(--accent-seq); margin-bottom: 25px;">Gesamt-Training starten (Alle Units)</button>
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-val" style="color:var(--fire-color)"><span id="global-streak-count">0</span> 🔥</span>
+                <span class="stat-label">Streak</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val" style="color:var(--success-text)"><span id="global-mastery-percent">0</span>%</span>
+                <span class="stat-label">Projekt-Fortschritt</span>
+            </div>
+        </div>
 
         <h3 style="color:#888; font-size:0.8rem; margin-bottom:10px;">UNITS (LEKTIONEN)</h3>
         <div id="unit-list-container"></div>
@@ -315,8 +322,15 @@
             <button class="secondary" style="margin-top:10px;" onclick="openProjectImportModal()">📥 Projekt als Unit importieren</button>
         </div>
 
-        <div class="dashboard-actions" style="margin-top:30px;">
-            <div class="action-item" onclick="switchTab('listManager')"><div class="list-btn-circle">📜</div><div class="action-label">Projekt-Datenbank</div></div>
+        <div class="dashboard-actions">
+            <div class="action-item" onclick="switchTab('listManager')">
+                <div class="list-btn-circle">📜</div>
+                <div class="action-label">Projekt-Datenbank</div>
+            </div>
+            <div class="action-item" onclick="startTest(null)">
+                <div class="list-btn-circle" style="border-color:var(--accent-seq);">🚀</div>
+                <div class="action-label" style="color:var(--accent-seq);">Projekt Training</div>
+            </div>
         </div>
     </div>
 
@@ -326,13 +340,9 @@
         <h3 id="unit-title-display">UNIT NAME</h3>
 
         <div class="stats-row">
-            <div class="stat-card">
-                <span class="stat-val" style="color:var(--fire-color)"><span id="streak-count">0</span> 🔥</span>
-                <span class="stat-label">Streak</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-val" style="color:var(--success-text)"><span id="mastery-percent">0</span>%</span>
-                <span class="stat-label">Gelernt</span>
+            <div class="stat-card" style="width: 100%;">
+                <span class="stat-val" style="color:var(--success-text)"><span id="unit-mastery-percent">0</span>%</span>
+                <span class="stat-label">Unit-Fortschritt</span>
             </div>
         </div>
         
@@ -343,8 +353,8 @@
         <button onclick="addVocab()">Speichern</button>
         
         <div class="dashboard-actions">
-            <div class="action-item" onclick="switchTab('listManager')"><div class="list-btn-circle">📜</div><div class="action-label">Datenbank</div></div>
-            <div class="action-item" onclick="startActiveUnitTraining()"><div class="list-btn-circle">🎓</div><div class="action-label">Training</div></div>
+            <div class="action-item" onclick="switchTab('listManager')"><div class="list-btn-circle">📜</div><div class="action-label">Unit-Datenbank</div></div>
+            <div class="action-item" onclick="startActiveUnitTraining()"><div class="list-btn-circle">🎓</div><div class="action-label">Unit Training</div></div>
         </div>
     </div>
 
@@ -396,109 +406,31 @@
 
     <div id="view-guide" class="container hidden fade-in">
         <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px;">← Zurück</button>
-        
         <div class="guide-section">
             <div class="guide-title">🚀 Neue Struktur: Units</div>
             <div class="guide-text">
                 Deine Vokabeln sind jetzt in <b>Units (Lektionen)</b> organisiert.
                 <br>1. Wähle ein Projekt.
                 <br>2. Klicke auf eine Unit, um Wörter hinzuzufügen.
-                <br>3. Trainiere entweder alles ("Gesamt-Training") oder nur die Unit (im Unit-Fenster).
+                <br>3. Trainiere entweder alles ("Projekt Training") oder nur die Unit.
             </div>
         </div>
-
-        <div class="guide-section">
-            <div class="guide-title">🧠 Das Brain-System</div>
-            <div class="guide-text">
-                Core-L nutzt das <b>Leitner-Prinzip</b>. Neue Wörter (Box 0) kommen oft dran. Wenn du sie kannst, steigen sie auf. In Box 5 hast du sie gemeistert.
-                <br><b>Regel:</b> Ein Fehler? Zurück auf Box 0.
-            </div>
         </div>
-
-        <div class="guide-section">
-            <div class="guide-title">🎨 Die Farben</div>
-            <div class="guide-legend">
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-0)"></span> Box 0: Neu / Falsch</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-1)"></span> Box 1: Anfänger</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-2)"></span> Box 2: Geht so</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-3)"></span> Box 3: Fortgeschritten</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-4)"></span> Box 4: Profi</div>
-                <div class="legend-item"><span class="color-dot" style="background:var(--box-5); box-shadow:0 0 5px orange;"></span> Box 5: Master</div>
-            </div>
-        </div>
-
-        <div class="guide-section">
-            <div class="guide-title">📂 Import & Export Guide</div>
-            <div class="guide-text">
-                <p>So bekommst du deine Vokabellisten aus <b>Excel</b> oder <b>Google Sheets</b> in die App:</p>
-                
-                <div style="margin-bottom:10px;">
-                    <b>1. Das Tabellen-Format</b><br>
-                    Erstelle eine Tabelle <u>ohne Überschriften</u>.
-                    <ul style="margin-top:5px; padding-left:20px;">
-                        <li><b>Spalte A:</b> Dein Wort / Frage (z.B. Deutsch)</li>
-                        <li><b>Spalte B:</b> Die Lösung / Sprache (z.B. Englisch)</li>
-                        <li><b>Spalte C:</b> (Optional) Notiz oder Eselsbrücke</li>
-                    </ul>
-                </div>
-
-                <div style="margin-bottom:10px;">
-                    <b>2. Als CSV speichern</b><br>
-                    <ul style="margin-top:5px; padding-left:20px;">
-                        <li><b>Google Sheets:</b> <i>Datei</i> → <i>Herunterladen</i> → <i>Kommagetrennte Werte (.csv)</i></li>
-                        <li><b>Excel:</b> <i>Datei</i> → <i>Speichern unter</i> → Dateityp: <i>CSV (Trennzeichen-getrennt) (*.csv)</i></li>
-                    </ul>
-                </div>
-
-                <div style="margin-bottom:10px;">
-                    <b>3. Importieren</b><br>
-                    Gehe in die <i>Datenbank</i> (📜), klicke auf <b>"📂 Import"</b> und wähle die Datei aus.
-                    <br><span style="font-size:0.8em; color:#666;">(Die App erkennt automatisch, ob Trennzeichen Kommas oder Semikolons sind.)</span>
-                </div>
-
-                <hr style="border-color:#333; margin:15px 0;">
-
-                <div>
-                    <b>💾 Backup (JSON)</b><br>
-                    Nutze dies, um deine Daten zu sichern oder auf ein anderes Gerät zu übertragen.
-                    <br><br>
-                    <b>📊 Export (Excel)</b><br>
-                    Erstellt eine CSV-Datei, die du direkt in Excel oder Google Sheets öffnen und lesen kannst.
-                </div>
-            </div>
-        </div>
-
-        <div class="guide-section">
-            <div class="guide-title">💬 Sequenzen & Power-Features</div>
-            <div class="guide-text">
-                <ul>
-                    <li style="margin-bottom:8px;"><b>Auswahl-Modus:</b> Markiere Karten. Links erscheint <b>Verbinden</b> (erstellt Sequenz), Rechts erscheint <b>Löschen</b> (entfernt alle Markierten).</li>
-                    <li style="margin-bottom:8px;"><b>Sequenzen:</b> Unterhaltungen werden am Stück abgefragt. Im Bearbeiten-Menü kannst du sie mit <b>"♻️ Zerlegen"</b> wieder in Einzelkarten auflösen.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
 
     <div id="edit-modal" class="modal-overlay hidden">
         <div class="modal-content fade-in">
             <h3>Bearbeiten</h3>
-            
             <div style="margin-bottom:15px;">
                 <label style="font-size:0.75rem; color:#888;">Unit:</label>
                 <select id="edit-unit-select" style="margin-bottom:0;"></select>
             </div>
-
             <div id="seq-title-edit-container" class="hidden" style="margin-bottom:15px;">
                 <label style="font-size:0.7rem; color:var(--accent-seq);">Sequenz Titel</label>
                 <input type="text" id="edit-seq-title">
             </div>
-            
             <div id="edit-content-area"></div> 
-            
             <button id="btn-split-seq" class="split-btn hidden" onclick="dissolveSequence()">♻️ In Einzelkarten zerlegen</button>
-            
             <hr style="border-color:#333; margin:15px 0;">
-            
             <button onclick="saveEdit()">Speichern</button>
             <button class="secondary" onclick="closeEditModal()">Abbrechen</button>
             <button class="danger" style="margin-top:10px;" onclick="deleteCurrentCardFromEdit()">🗑️ Karte löschen</button>
@@ -509,9 +441,7 @@
         <div class="modal-content fade-in">
             <h3>Projekt importieren</h3>
             <p style="color:#aaa; font-size:0.9rem;">Wähle ein anderes Projekt. Es wird als neue Unit in dein aktuelles Projekt kopiert.</p>
-            
             <div id="import-project-list" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
-            
             <button class="secondary" onclick="closeImportProjectModal()">Abbrechen</button>
         </div>
     </div>
@@ -549,7 +479,6 @@
     <div id="view-test" class="container hidden fade-in">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
             <button class="secondary" onclick="quitTest()" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Beenden</button>
-            
             <div class="top-right-info">
                 <span id="test-unit-name" style="color:var(--text-muted); font-size:0.8rem; font-style:italic;">Unit: Allgemein</span>
                 <span id="box-display" class="box-info-tag">Box 0</span>
@@ -560,7 +489,6 @@
             <div style="display:flex; justify-content:center; align-items:center; gap: 10px; margin-bottom: 5px;">
                 <div id="priority-indicator" style="font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
             </div>
-            
             <div style="display:flex; justify-content:center; align-items:center;">
                 <div id="question-display">...</div>
             </div>
@@ -601,7 +529,7 @@
         let isDuplicateFilterActive = false; 
 
         let editProjectIndex = -1;
-        let editUnitIndex = -1; // For Unit Edit Modal
+        let editUnitIndex = -1; 
 
         document.addEventListener('DOMContentLoaded', () => { loadData(); });
 
@@ -624,7 +552,6 @@
             }
         }
 
-        // MIGRATION: Convert old flat projects to Unit structure
         function migrateToV6() {
             let migrated = false;
             appData.projects.forEach(p => {
@@ -693,7 +620,6 @@
                 div.innerHTML = `<span class="project-name">📂 ${p.name}</span>`;
                 div.onclick = () => openProject(i);
                 
-                // EDIT BUTTON (GEAR)
                 const editBtn = document.createElement('button'); 
                 editBtn.innerText = "⚙️"; 
                 editBtn.className = "btn-icon"; 
@@ -704,7 +630,6 @@
             });
         }
 
-        // --- PROJECT EDITING ---
         function openProjectEditModal(index) {
             editProjectIndex = index;
             document.getElementById('edit-project-name-input').value = appData.projects[index].name;
@@ -761,7 +686,136 @@
             switchTab('project-overview');
         }
 
-        // --- UNIT EDITING (NEW) ---
+        // --- STATS CALCULATION (SPLIT) ---
+        
+        function updateProjectStats() {
+            const p = appData.projects[appData.activeProjectId];
+            document.getElementById('global-streak-count').innerText = appData.streak || 0;
+            
+            // Calculate total words and total score across ALL units
+            let totalWords = 0;
+            let totalPoints = 0;
+            
+            p.units.forEach(u => {
+                totalWords += u.words.length;
+                u.words.forEach(w => {
+                    totalPoints += (w.box || 0);
+                });
+            });
+            
+            const maxPoints = totalWords * 5;
+            const percent = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+            
+            document.getElementById('global-mastery-percent').innerText = percent;
+        }
+
+        function updateUnitStats() {
+            const p = appData.projects[appData.activeProjectId];
+            const u = p.units[activeUnitId];
+            
+            const list = u.words;
+            
+            if(!list || list.length === 0) { 
+                document.getElementById('unit-mastery-percent').innerText = "0"; 
+            } else {
+                let totalPoints = 0;
+                let maxPoints = list.length * 5;
+                list.forEach(w => { totalPoints += (w.box || 0); });
+                let percent = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+                document.getElementById('unit-mastery-percent').innerText = percent;
+            }
+        }
+
+        // --- PROJECT OVERVIEW ---
+        function renderProjectOverview() {
+            const p = appData.projects[appData.activeProjectId];
+            document.getElementById('overview-project-name').innerText = p.name;
+            
+            updateProjectStats();
+
+            const c = document.getElementById('unit-list-container'); c.innerHTML = '';
+            
+            p.units.forEach((u, idx) => {
+                const div = document.createElement('div'); div.className = 'unit-card';
+                div.onclick = () => openUnit(idx);
+                div.innerHTML = `
+                    <div class="unit-info">
+                        <div class="unit-name">${u.name}</div>
+                        <div class="unit-count">${u.words.length} Wörter</div>
+                    </div>
+                    <div class="unit-actions">
+                        <button class="btn-small-icon" style="background:#333;" onclick="event.stopPropagation(); openUnitEditModal(${idx})">⚙️</button>
+                    </div>
+                `;
+                c.appendChild(div);
+            });
+        }
+
+        function createNewUnit() {
+            const name = document.getElementById('new-unit-name').value.trim();
+            if(!name) return;
+            appData.projects[appData.activeProjectId].units.push({ name: name, words: [] });
+            save(); document.getElementById('new-unit-name').value=''; renderProjectOverview();
+        }
+
+        function openProjectImportModal() {
+            const list = document.getElementById('import-project-list');
+            list.innerHTML = '';
+            appData.projects.forEach((p, idx) => {
+                if (idx !== appData.activeProjectId) {
+                    const btn = document.createElement('button');
+                    btn.className = "secondary";
+                    btn.style.marginBottom = "8px";
+                    btn.innerText = `📂 ${p.name}`;
+                    btn.onclick = () => performProjectImport(idx);
+                    list.appendChild(btn);
+                }
+            });
+            if(list.innerHTML === '') list.innerHTML = "<p style='color:#666'>Keine anderen Projekte vorhanden.</p>";
+            document.getElementById('import-project-modal').classList.remove('hidden');
+        }
+
+        function closeImportProjectModal() {
+            document.getElementById('import-project-modal').classList.add('hidden');
+        }
+
+        function performProjectImport(sourceProjectIdx) {
+            const sourceP = appData.projects[sourceProjectIdx];
+            const targetP = appData.projects[appData.activeProjectId];
+            const newUnit = { name: sourceP.name, words: [] };
+            sourceP.units.forEach(u => {
+                u.words.forEach(w => {
+                    newUnit.words.push(JSON.parse(JSON.stringify(w)));
+                });
+            });
+            targetP.units.push(newUnit);
+            save();
+            closeImportProjectModal();
+            renderProjectOverview();
+            alert(`Projekt "${sourceP.name}" wurde als Unit importiert!`);
+        }
+
+        // --- UNIT DETAILS ---
+        function openUnit(idx) {
+            activeUnitId = idx;
+            switchTab('unit-details');
+        }
+
+        function startActiveUnitTraining() {
+            if(activeUnitId !== null) {
+                startTest(activeUnitId);
+            } else {
+                alert("Fehler: Keine Unit aktiv.");
+            }
+        }
+
+        function renderUnitDetails() {
+            const p = appData.projects[appData.activeProjectId];
+            const u = p.units[activeUnitId];
+            document.getElementById('unit-title-display').innerText = u.name;
+            updateUnitStats(); 
+        }
+
         function openUnitEditModal(uIdx) {
             editUnitIndex = uIdx;
             const p = appData.projects[appData.activeProjectId];
@@ -802,114 +856,6 @@
                 editUnitIndex = newIndex;
                 save();
                 renderProjectOverview();
-            }
-        }
-
-        // --- PROJECT OVERVIEW (List of Units) ---
-        function renderProjectOverview() {
-            const p = appData.projects[appData.activeProjectId];
-            document.getElementById('overview-project-name').innerText = p.name;
-            
-            let total = 0; if(p.units) p.units.forEach(u => total += u.words.length);
-            document.getElementById('project-total-count').innerText = total;
-
-            const c = document.getElementById('unit-list-container'); c.innerHTML = '';
-            
-            p.units.forEach((u, idx) => {
-                const div = document.createElement('div'); div.className = 'unit-card';
-                div.onclick = () => openUnit(idx);
-                div.innerHTML = `
-                    <div class="unit-info">
-                        <div class="unit-name">${u.name}</div>
-                        <div class="unit-count">${u.words.length} Wörter</div>
-                    </div>
-                    <div class="unit-actions">
-                        <button class="btn-small-icon" style="background:#333;" onclick="event.stopPropagation(); openUnitEditModal(${idx})">⚙️</button>
-                    </div>
-                `;
-                c.appendChild(div);
-            });
-        }
-
-        function createNewUnit() {
-            const name = document.getElementById('new-unit-name').value.trim();
-            if(!name) return;
-            appData.projects[appData.activeProjectId].units.push({ name: name, words: [] });
-            save(); document.getElementById('new-unit-name').value=''; renderProjectOverview();
-        }
-
-        // --- IMPORT PROJECT AS UNIT ---
-        function openProjectImportModal() {
-            const list = document.getElementById('import-project-list');
-            list.innerHTML = '';
-            
-            appData.projects.forEach((p, idx) => {
-                if (idx !== appData.activeProjectId) {
-                    const btn = document.createElement('button');
-                    btn.className = "secondary";
-                    btn.style.marginBottom = "8px";
-                    btn.innerText = `📂 ${p.name}`;
-                    btn.onclick = () => performProjectImport(idx);
-                    list.appendChild(btn);
-                }
-            });
-            
-            if(list.innerHTML === '') list.innerHTML = "<p style='color:#666'>Keine anderen Projekte vorhanden.</p>";
-            document.getElementById('import-project-modal').classList.remove('hidden');
-        }
-
-        function closeImportProjectModal() {
-            document.getElementById('import-project-modal').classList.add('hidden');
-        }
-
-        function performProjectImport(sourceProjectIdx) {
-            const sourceP = appData.projects[sourceProjectIdx];
-            const targetP = appData.projects[appData.activeProjectId];
-            
-            const newUnit = { name: sourceP.name, words: [] };
-            sourceP.units.forEach(u => {
-                u.words.forEach(w => {
-                    newUnit.words.push(JSON.parse(JSON.stringify(w)));
-                });
-            });
-            
-            targetP.units.push(newUnit);
-            save();
-            closeImportProjectModal();
-            renderProjectOverview();
-            alert(`Projekt "${sourceP.name}" wurde als Unit importiert!`);
-        }
-
-        // --- UNIT DETAILS ---
-        function openUnit(idx) {
-            activeUnitId = idx;
-            switchTab('unit-details');
-        }
-
-        function startActiveUnitTraining() {
-            if(activeUnitId !== null) {
-                startTest(activeUnitId);
-            } else {
-                alert("Fehler: Keine Unit aktiv.");
-            }
-        }
-
-        function renderUnitDetails() {
-            const p = appData.projects[appData.activeProjectId];
-            const u = p.units[activeUnitId];
-            
-            document.getElementById('unit-title-display').innerText = u.name;
-            
-            const list = u.words;
-            document.getElementById('streak-count').innerText = appData.streak || 0;
-            if(!list || list.length === 0) { 
-                document.getElementById('mastery-percent').innerText = "0"; 
-            } else {
-                let totalPoints = 0;
-                let maxPoints = list.length * 5;
-                list.forEach(w => { totalPoints += (w.box || 0); });
-                let percent = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
-                document.getElementById('mastery-percent').innerText = percent;
             }
         }
 
@@ -1305,7 +1251,9 @@
             const totalCards = trainingQueue.length;
             const safeWaitCorrect = Math.max(0, Math.min(10, totalCards - 1));
             
+            // Remove wrong wait
             cooldownQueue = cooldownQueue.filter(c => c.id !== currentCardInfo.id);
+            // Add correct wait
             cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect, uIdx:currentCardInfo.uIdx, wIdx:currentCardInfo.wIdx });
             
             if(currentCardInfo.card.box < 5) currentCardInfo.card.box++; 
@@ -1352,6 +1300,7 @@
             reader.onload = function(e) {
                 const lines = e.target.result.split('\n');
                 let count = 0;
+                // Default to first unit
                 const targetUnit = appData.projects[appData.activeProjectId].units[0];
                 const sep = lines[0].includes(';') ? ';' : ',';
                 
