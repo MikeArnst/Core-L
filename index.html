@@ -528,17 +528,6 @@
         </div>
     </div>
 
-    <div id="import-project-modal" class="modal-overlay hidden">
-        <div class="modal-content fade-in">
-            <h3>Projekt importieren</h3>
-            <p style="color:#aaa; font-size:0.9rem;">Wähle ein anderes Projekt. Es wird als neue Unit in dein aktuelles Projekt kopiert.</p>
-            
-            <div id="import-project-list" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
-            
-            <button class="secondary" onclick="closeImportProjectModal()">Abbrechen</button>
-        </div>
-    </div>
-
     <div id="project-edit-modal" class="modal-overlay hidden">
         <div class="modal-content fade-in">
             <h3>Projekt verwalten</h3>
@@ -555,6 +544,17 @@
             <button onclick="saveProjectName()">Speichern</button>
             <button class="danger" onclick="deleteProjectFromModal()">🗑️ Löschen</button>
             <button class="secondary" onclick="closeProjectEditModal()">Abbrechen</button>
+        </div>
+    </div>
+
+    <div id="import-project-modal" class="modal-overlay hidden">
+        <div class="modal-content fade-in">
+            <h3>Projekt importieren</h3>
+            <p style="color:#aaa; font-size:0.9rem;">Wähle ein anderes Projekt. Es wird als neue Unit in dein aktuelles Projekt kopiert.</p>
+            
+            <div id="import-project-list" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
+            
+            <button class="secondary" onclick="closeImportProjectModal()">Abbrechen</button>
         </div>
     </div>
 
@@ -707,7 +707,7 @@
                 // EDIT BUTTON (GEAR)
                 const editBtn = document.createElement('button'); 
                 editBtn.innerText = "⚙️"; 
-                editBtn.className = "btn-icon"; // Reused class, adjusted in CSS for margin
+                editBtn.className = "btn-icon"; 
                 editBtn.onclick=(e)=>{e.stopPropagation(); openProjectEditModal(i)};
                 
                 div.appendChild(editBtn); 
@@ -1011,10 +1011,12 @@
             const search = document.getElementById('search-input').value.toLowerCase();
             const sort = document.getElementById('sort-select').value;
             
+            // 1. Filter Search
             let filtered = list.filter(item => {
                 return (item.de.toLowerCase().includes(search) || item.lang.toLowerCase().includes(search));
             });
 
+            // 2. Filter Duplicates (if active)
             if (isDuplicateFilterActive) {
                 const counts = {};
                 filtered.forEach(item => {
@@ -1024,6 +1026,7 @@
                 filtered = filtered.filter(item => counts[cleanString(item.de)] > 1);
             }
 
+            // 3. Sort
             if (sort === 'newest') filtered.reverse();
             else if (sort === 'box-asc') filtered.sort((a,b) => a.box - b.box);
             else if (sort === 'box-desc') filtered.sort((a,b) => b.box - a.box);
@@ -1140,6 +1143,7 @@
             const p = appData.projects[appData.activeProjectId];
             trainingQueue = [];
             
+            // INTELLIGENT TRAINING: Prevent duplicates in session
             const seenQuestions = new Set();
 
             p.units.forEach((u, uI) => {
