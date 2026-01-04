@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CORE-Learning</title>
+    <title>Version 5.0 Final Polish</title>
     <style>
         :root {
             /* Core Theme */
@@ -46,9 +46,8 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
         #app-header { text-align: center; margin-bottom: 25px; margin-top: 10px; cursor: pointer; user-select: none; }
-        #app-header h1 { font-size: 1.8rem; letter-spacing: 2px; margin: 0; font-weight: 700; text-shadow: 0 0 15px rgba(255,255,255,0.1); color: white; }
-        .fat-spot { font-weight: 700; text-transform: uppercase; color: #ffffff; }
-        .subtitle { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; font-weight: 400; }
+        #app-header h1 { font-size: 1.8rem; letter-spacing: 1px; margin: 0; font-weight: 600; text-shadow: 0 0 15px rgba(255,255,255,0.1); color: white; }
+        .subtitle { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1px; margin-top: 5px; font-weight: 400; }
 
         .container {
             width: 100%; max-width: 500px; background: var(--bg-card);
@@ -258,8 +257,8 @@
 <body>
 
     <div id="app-header" onclick="showProjects()">
-        <h1>CORE-Learning</h1>
-        <div class="subtitle">Das ultimative Leitner-Lernsystem</div>
+        <h1>Version 5.0 Final Polish</h1>
+        <div class="subtitle">von Mike Arnst</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -277,6 +276,13 @@
     <div id="view-project-overview" class="container hidden fade-in">
         <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 15px; padding: 8px 15px; font-size: 12px;">← Projekte</button>
         <h3 id="overview-title" style="margin-bottom:20px; text-transform:uppercase; color:var(--text-main);">PROJEKT</h3>
+
+        <div class="stats-row">
+            <div class="stat-card">
+                <span class="stat-val" style="color:var(--primary)">📖 <span id="project-total-count">0</span></span>
+                <span class="stat-label">Gesamte Karten</span>
+            </div>
+        </div>
 
         <button onclick="startTest(null)" style="background: var(--accent-seq); margin-bottom: 25px;">Gesamt-Training starten (Alle Units)</button>
 
@@ -647,6 +653,10 @@
             const p = appData.projects[appData.activeProjectId];
             document.getElementById('overview-title').innerText = p.name;
             
+            // UPDATE TOTAL COUNT STAT
+            let total = 0; if(p.units) p.units.forEach(u => total += u.words.length);
+            document.getElementById('project-total-count').innerText = total;
+
             const c = document.getElementById('unit-list-container'); c.innerHTML = '';
             
             p.units.forEach((u, idx) => {
