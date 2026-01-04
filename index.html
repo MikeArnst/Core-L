@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Version 5.0 Final Polish</title>
+    <title>CORE-Learning</title>
     <style>
         :root {
             /* Core Theme */
@@ -45,9 +45,30 @@
         .fade-in { animation: fadeIn 0.25s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* HEADER DESIGN */
         #app-header { text-align: center; margin-bottom: 25px; margin-top: 10px; cursor: pointer; user-select: none; }
-        #app-header h1 { font-size: 1.8rem; letter-spacing: 1px; margin: 0; font-weight: 600; text-shadow: 0 0 15px rgba(255,255,255,0.1); color: white; }
-        .subtitle { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 1px; margin-top: 5px; font-weight: 400; }
+        #app-header h1 { 
+            font-size: 1.8rem; 
+            letter-spacing: 1px; 
+            margin: 0; 
+            font-weight: 700; 
+            text-shadow: 0 0 15px rgba(255,255,255,0.15); 
+            color: white; 
+        }
+        .subtitle { 
+            font-size: 0.8rem; 
+            color: var(--text-muted); 
+            text-transform: uppercase; 
+            letter-spacing: 1.5px; 
+            margin-top: 5px; 
+            font-weight: 400; 
+        }
+        .author-note {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 2px;
+            font-style: italic;
+        }
 
         .container {
             width: 100%; max-width: 500px; background: var(--bg-card);
@@ -93,14 +114,6 @@
         .unit-count { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
         .unit-actions { display: flex; gap: 10px; align-items: center; }
         .btn-small-icon { width: 35px; height: 35px; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 6px; }
-
-        /* Training Edit Button */
-        .train-edit-btn {
-            background: transparent; border: 1px solid #333; color: #666;
-            width: 30px; height: 30px; padding: 0; border-radius: 50%;
-            font-size: 14px; margin-left: 10px; display: inline-flex; align-items: center; justify-content: center;
-        }
-        .train-edit-btn:hover { background: #222; color: white; }
 
         /* DASHBOARD STATS */
         .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
@@ -257,8 +270,9 @@
 <body>
 
     <div id="app-header" onclick="showProjects()">
-        <h1>Version 5.0 Final Polish</h1>
-        <div class="subtitle">von Mike Arnst</div>
+        <h1>CORE-Learning</h1>
+        <div class="subtitle">Version 5.0 Final Polish</div>
+        <div class="author-note">von Mike Arnst</div>
     </div>
 
     <div id="view-projects" class="container fade-in">
@@ -274,13 +288,14 @@
     </div>
 
     <div id="view-project-overview" class="container hidden fade-in">
-        <button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 15px; padding: 8px 15px; font-size: 12px;">← Projekte</button>
-        <h3 id="overview-title" style="margin-bottom:20px; text-transform:uppercase; color:var(--text-main);">PROJEKT</h3>
-
-        <div class="stats-row">
-            <div class="stat-card">
-                <span class="stat-val" style="color:var(--primary)">📖 <span id="project-total-count">0</span></span>
-                <span class="stat-label">Gesamte Karten</span>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+            <button class="secondary" onclick="showProjects()" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Projekte</button>
+            
+            <div style="text-align:right;">
+                <div id="overview-project-name" style="font-weight:bold; color:var(--text-main); font-size:1.1rem;">Projekt</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-top:4px;">
+                    <span id="project-total-count">0</span> Karten total
+                </div>
             </div>
         </div>
 
@@ -651,7 +666,9 @@
         // --- PROJECT OVERVIEW (List of Units) ---
         function renderProjectOverview() {
             const p = appData.projects[appData.activeProjectId];
-            document.getElementById('overview-title').innerText = p.name;
+            
+            // Set Project Title
+            document.getElementById('overview-project-name').innerText = p.name;
             
             // UPDATE TOTAL COUNT STAT
             let total = 0; if(p.units) p.units.forEach(u => total += u.words.length);
