@@ -45,38 +45,18 @@
         .fade-in { animation: fadeIn 0.25s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* HEADER DESIGN FIX */
+        /* HEADER */
         #app-header { text-align: center; margin-bottom: 25px; margin-top: 10px; cursor: pointer; user-select: none; }
-        
         #app-header h1 { 
-            font-size: 1.8rem; 
-            letter-spacing: 1px; 
-            margin: 0; 
-            font-weight: 300; /* Dünn für 'earning' */
-            text-shadow: 0 0 15px rgba(255,255,255,0.15); 
-            color: white; 
+            font-size: 1.8rem; letter-spacing: 1px; margin: 0; 
+            font-weight: 300; text-shadow: 0 0 15px rgba(255,255,255,0.15); color: white; 
         }
-        
-        /* Fett für CORE-L */
-        .fat-spot {
-            font-weight: 700; 
-            color: #ffffff;
-        }
-
+        .fat-spot { font-weight: 700; color: #ffffff; }
         .subtitle { 
-            font-size: 0.8rem; 
-            color: var(--text-muted); 
-            text-transform: uppercase; 
-            letter-spacing: 1.5px; 
-            margin-top: 5px; 
-            font-weight: 400; 
+            font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; 
+            letter-spacing: 1.5px; margin-top: 5px; font-weight: 400; 
         }
-        .author-note {
-            font-size: 0.7rem;
-            color: #666;
-            margin-top: 2px;
-            font-style: italic;
-        }
+        .author-note { font-size: 0.7rem; color: #666; margin-top: 2px; font-style: italic; }
 
         .container {
             width: 100%; max-width: 500px; background: var(--bg-card);
@@ -110,18 +90,11 @@
         button.select-mode-active { background-color: #1e3a8a; border: 1px solid var(--accent-seq); color: white; }
         button.split-btn { background-color: rgba(59, 130, 246, 0.2); border: 1px solid var(--accent-seq); color: var(--accent-seq); margin-top:15px; }
 
-        /* Unit/Project List Items */
+        /* LIST ITEMS (PROJECTS & UNITS) */
         .project-card, .unit-card {
-            background: var(--input-bg); 
-            padding: 15px; 
-            border-radius: 10px; 
-            border: 1px solid var(--border);
-            margin-bottom: 10px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            cursor: pointer; 
-            transition: background 0.2s;
+            background: var(--input-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border);
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; transition: background 0.2s;
         }
         .project-card:hover, .unit-card:hover { background: #252525; }
         
@@ -131,7 +104,6 @@
         
         .unit-actions { display: flex; gap: 10px; align-items: center; }
         
-        /* Adjusted Icon Button for Perfect Centering */
         .btn-icon { 
             width: 40px; height: 40px; padding: 0; margin: 0; 
             display: flex; align-items: center; justify-content: center; 
@@ -140,9 +112,14 @@
             border: 1px solid transparent;
         }
         .btn-icon:hover { color: white; background: rgba(255,255,255,0.1); }
-        .btn-small-icon { width: 35px; height: 35px; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 6px; }
+        
+        .btn-small-icon { 
+            width: 35px; height: 35px; padding: 0; margin: 0; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 16px; border-radius: 6px; 
+        }
 
-        /* Training Edit Button */
+        /* TRAINING */
         .train-edit-btn {
             background: transparent; border: 1px solid #333; color: #666;
             width: 30px; height: 30px; padding: 0; border-radius: 50%;
@@ -367,7 +344,7 @@
         
         <div class="dashboard-actions">
             <div class="action-item" onclick="switchTab('listManager')"><div class="list-btn-circle">📜</div><div class="action-label">Datenbank</div></div>
-            <div class="action-item" onclick="startTest(appData.activeUnitId)"><div class="list-btn-circle">🎓</div><div class="action-label">Training</div></div>
+            <div class="action-item" onclick="startActiveUnitTraining()"><div class="list-btn-circle">🎓</div><div class="action-label">Training</div></div>
         </div>
     </div>
 
@@ -528,25 +505,6 @@
         </div>
     </div>
 
-    <div id="project-edit-modal" class="modal-overlay hidden">
-        <div class="modal-content fade-in">
-            <h3>Projekt verwalten</h3>
-            
-            <input type="text" id="edit-project-name-input" placeholder="Projektname">
-
-            <div style="display:flex; gap:10px; margin: 15px 0;">
-                <button onclick="moveProject(-1)">▲ Hoch</button>
-                <button onclick="moveProject(1)">▼ Runter</button>
-            </div>
-            
-            <hr style="border-color:#333; margin:15px 0;">
-
-            <button onclick="saveProjectName()">Speichern</button>
-            <button class="danger" onclick="deleteProjectFromModal()">🗑️ Löschen</button>
-            <button class="secondary" onclick="closeProjectEditModal()">Abbrechen</button>
-        </div>
-    </div>
-
     <div id="import-project-modal" class="modal-overlay hidden">
         <div class="modal-content fade-in">
             <h3>Projekt importieren</h3>
@@ -555,6 +513,36 @@
             <div id="import-project-list" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
             
             <button class="secondary" onclick="closeImportProjectModal()">Abbrechen</button>
+        </div>
+    </div>
+
+    <div id="project-edit-modal" class="modal-overlay hidden">
+        <div class="modal-content fade-in">
+            <h3>Projekt verwalten</h3>
+            <input type="text" id="edit-project-name-input" placeholder="Projektname">
+            <div style="display:flex; gap:10px; margin: 15px 0;">
+                <button onclick="moveProject(-1)">▲ Hoch</button>
+                <button onclick="moveProject(1)">▼ Runter</button>
+            </div>
+            <hr style="border-color:#333; margin:15px 0;">
+            <button onclick="saveProjectName()">Speichern</button>
+            <button class="danger" onclick="deleteProjectFromModal()">🗑️ Löschen</button>
+            <button class="secondary" onclick="closeProjectEditModal()">Abbrechen</button>
+        </div>
+    </div>
+
+    <div id="unit-edit-modal" class="modal-overlay hidden">
+        <div class="modal-content fade-in">
+            <h3>Unit verwalten</h3>
+            <input type="text" id="edit-unit-name-modal-input" placeholder="Unit Name">
+            <div style="display:flex; gap:10px; margin: 15px 0;">
+                <button onclick="moveUnit(-1)">▲ Hoch</button>
+                <button onclick="moveUnit(1)">▼ Runter</button>
+            </div>
+            <hr style="border-color:#333; margin:15px 0;">
+            <button onclick="saveUnitNameFromModal()">Speichern</button>
+            <button class="danger" onclick="deleteUnitFromModal()">🗑️ Löschen</button>
+            <button class="secondary" onclick="closeUnitEditModal()">Abbrechen</button>
         </div>
     </div>
 
@@ -613,6 +601,7 @@
         let isDuplicateFilterActive = false; 
 
         let editProjectIndex = -1;
+        let editUnitIndex = -1; // For Unit Edit Modal
 
         document.addEventListener('DOMContentLoaded', () => { loadData(); });
 
@@ -750,11 +739,9 @@
         function moveProject(direction) {
             const newIndex = editProjectIndex + direction;
             if(newIndex >= 0 && newIndex < appData.projects.length) {
-                // Swap
                 const temp = appData.projects[editProjectIndex];
                 appData.projects[editProjectIndex] = appData.projects[newIndex];
                 appData.projects[newIndex] = temp;
-                
                 editProjectIndex = newIndex; 
                 save();
                 showProjects(); 
@@ -774,34 +761,47 @@
             switchTab('project-overview');
         }
 
-        function updateDashboardStats() {
-            // New Weighted Logic:
-            // Box 0 = 0, Box 1 = 1, ... Box 5 = 5 pts.
-            let list = [];
-            
-            if(activeUnitId !== null) {
-                list = appData.projects[appData.activeProjectId].units[activeUnitId].words;
-            } else {
-                // Should technically not happen as this func calls from inside unit view
-                // But for safety
-                return; 
-            }
+        // --- UNIT EDITING (NEW) ---
+        function openUnitEditModal(uIdx) {
+            editUnitIndex = uIdx;
+            const p = appData.projects[appData.activeProjectId];
+            document.getElementById('edit-unit-name-modal-input').value = p.units[uIdx].name;
+            document.getElementById('unit-edit-modal').classList.remove('hidden');
+        }
 
-            document.getElementById('streak-count').innerText = appData.streak || 0;
-            
-            if(!list || list.length === 0) { 
-                document.getElementById('mastery-percent').innerText = "0"; 
-            } else {
-                let totalPoints = 0;
-                let maxPoints = list.length * 5;
-                
-                list.forEach(w => {
-                    totalPoints += (w.box || 0);
-                });
-                
-                // Avoid division by zero
-                let percent = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
-                document.getElementById('mastery-percent').innerText = percent;
+        function closeUnitEditModal() {
+            document.getElementById('unit-edit-modal').classList.add('hidden');
+        }
+
+        function saveUnitNameFromModal() {
+            const newName = document.getElementById('edit-unit-name-modal-input').value.trim();
+            if(newName) {
+                appData.projects[appData.activeProjectId].units[editUnitIndex].name = newName;
+                save();
+                closeUnitEditModal();
+                renderProjectOverview();
+            }
+        }
+
+        function deleteUnitFromModal() {
+            if(confirm("Unit wirklich löschen? Alle Karten gehen verloren!")) {
+                appData.projects[appData.activeProjectId].units.splice(editUnitIndex, 1);
+                save();
+                closeUnitEditModal();
+                renderProjectOverview();
+            }
+        }
+
+        function moveUnit(direction) {
+            const p = appData.projects[appData.activeProjectId];
+            const newIndex = editUnitIndex + direction;
+            if(newIndex >= 0 && newIndex < p.units.length) {
+                const temp = p.units[editUnitIndex];
+                p.units[editUnitIndex] = p.units[newIndex];
+                p.units[newIndex] = temp;
+                editUnitIndex = newIndex;
+                save();
+                renderProjectOverview();
             }
         }
 
@@ -824,7 +824,7 @@
                         <div class="unit-count">${u.words.length} Wörter</div>
                     </div>
                     <div class="unit-actions">
-                        <button class="btn-small-icon" style="background:#333;" onclick="event.stopPropagation(); deleteUnit(${idx})">✕</button>
+                        <button class="btn-small-icon" style="background:#333;" onclick="event.stopPropagation(); openUnitEditModal(${idx})">⚙️</button>
                     </div>
                 `;
                 c.appendChild(div);
@@ -836,13 +836,6 @@
             if(!name) return;
             appData.projects[appData.activeProjectId].units.push({ name: name, words: [] });
             save(); document.getElementById('new-unit-name').value=''; renderProjectOverview();
-        }
-
-        function deleteUnit(idx) {
-            if(confirm("Unit löschen? Alle Karten darin gehen verloren!")) {
-                appData.projects[appData.activeProjectId].units.splice(idx, 1);
-                save(); renderProjectOverview();
-            }
         }
 
         // --- IMPORT PROJECT AS UNIT ---
@@ -893,12 +886,31 @@
             switchTab('unit-details');
         }
 
+        function startActiveUnitTraining() {
+            if(activeUnitId !== null) {
+                startTest(activeUnitId);
+            } else {
+                alert("Fehler: Keine Unit aktiv.");
+            }
+        }
+
         function renderUnitDetails() {
             const p = appData.projects[appData.activeProjectId];
             const u = p.units[activeUnitId];
             
             document.getElementById('unit-title-display').innerText = u.name;
-            updateDashboardStats(); // Called here to update percentages correctly
+            
+            const list = u.words;
+            document.getElementById('streak-count').innerText = appData.streak || 0;
+            if(!list || list.length === 0) { 
+                document.getElementById('mastery-percent').innerText = "0"; 
+            } else {
+                let totalPoints = 0;
+                let maxPoints = list.length * 5;
+                list.forEach(w => { totalPoints += (w.box || 0); });
+                let percent = maxPoints > 0 ? Math.round((totalPoints / maxPoints) * 100) : 0;
+                document.getElementById('mastery-percent').innerText = percent;
+            }
         }
 
         // --- DATABASE & LISTS ---
@@ -1011,12 +1023,10 @@
             const search = document.getElementById('search-input').value.toLowerCase();
             const sort = document.getElementById('sort-select').value;
             
-            // 1. Filter Search
             let filtered = list.filter(item => {
                 return (item.de.toLowerCase().includes(search) || item.lang.toLowerCase().includes(search));
             });
 
-            // 2. Filter Duplicates (if active)
             if (isDuplicateFilterActive) {
                 const counts = {};
                 filtered.forEach(item => {
@@ -1026,7 +1036,6 @@
                 filtered = filtered.filter(item => counts[cleanString(item.de)] > 1);
             }
 
-            // 3. Sort
             if (sort === 'newest') filtered.reverse();
             else if (sort === 'box-asc') filtered.sort((a,b) => a.box - b.box);
             else if (sort === 'box-desc') filtered.sort((a,b) => b.box - a.box);
@@ -1143,7 +1152,6 @@
             const p = appData.projects[appData.activeProjectId];
             trainingQueue = [];
             
-            // INTELLIGENT TRAINING: Prevent duplicates in session
             const seenQuestions = new Set();
 
             p.units.forEach((u, uI) => {
@@ -1297,9 +1305,7 @@
             const totalCards = trainingQueue.length;
             const safeWaitCorrect = Math.max(0, Math.min(10, totalCards - 1));
             
-            // Remove wrong wait
             cooldownQueue = cooldownQueue.filter(c => c.id !== currentCardInfo.id);
-            // Add correct wait
             cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect, uIdx:currentCardInfo.uIdx, wIdx:currentCardInfo.wIdx });
             
             if(currentCardInfo.card.box < 5) currentCardInfo.card.box++; 
@@ -1346,7 +1352,6 @@
             reader.onload = function(e) {
                 const lines = e.target.result.split('\n');
                 let count = 0;
-                // Default to first unit
                 const targetUnit = appData.projects[appData.activeProjectId].units[0];
                 const sep = lines[0].includes(';') ? ';' : ',';
                 
