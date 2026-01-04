@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Version 5.0 Final Polish</title>
+    <title>CORE-Learning</title>
     <style>
         :root {
             /* Core Theme */
@@ -46,9 +46,9 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
         #app-header { text-align: center; margin-bottom: 25px; margin-top: 10px; cursor: pointer; user-select: none; }
-        #app-header h1 { font-size: 1.5rem; letter-spacing: 2px; margin: 0; font-weight: 400; text-shadow: 0 0 15px rgba(255,255,255,0.05); }
+        #app-header h1 { font-size: 1.8rem; letter-spacing: 2px; margin: 0; font-weight: 700; text-shadow: 0 0 15px rgba(255,255,255,0.1); color: white; }
         .fat-spot { font-weight: 700; text-transform: uppercase; color: #ffffff; }
-        .subtitle { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px; font-weight: 500; }
+        .subtitle { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; font-weight: 400; }
 
         .container {
             width: 100%; max-width: 500px; background: var(--bg-card);
@@ -258,7 +258,7 @@
 <body>
 
     <div id="app-header" onclick="showProjects()">
-        <h1>Version 5.0 Final Polish</h1>
+        <h1>CORE-Learning</h1>
         <div class="subtitle">Das ultimative Leitner-Lernsystem</div>
     </div>
 
@@ -286,6 +286,10 @@
         <div style="margin-top:15px; border-top:1px solid #333; padding-top:15px;">
             <input type="text" id="new-unit-name" placeholder="Neue Unit (z.B. Tiere)">
             <button class="outline" onclick="createNewUnit()">+ Unit erstellen</button>
+        </div>
+
+        <div class="dashboard-actions" style="margin-top:30px;">
+            <div class="action-item" onclick="switchTab('listManager')"><div class="list-btn-circle">📜</div><div class="action-label">Projekt-Datenbank</div></div>
         </div>
     </div>
 
@@ -339,6 +343,17 @@
             <label class="file-upload" style="font-size:10px;">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv, text/csv, text/plain" onchange="importCSV(this)"></label>
         </div>
         
+        <div id="global-add-area" style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px; border:1px solid #333; display:none;">
+            <div style="font-size:0.7rem; color:#888; margin-bottom:5px;">NEUES WORT HINZUFÜGEN</div>
+            <select id="add-word-unit-select" style="margin-bottom:5px; padding:8px; font-size:12px; width:100%; box-sizing:border-box;"></select>
+            <div style="display:flex; gap:5px;">
+                <input id="global-input-de" placeholder="Deutsch" style="margin:0;">
+                <input id="global-input-lang" placeholder="Fremd" style="margin:0;">
+            </div>
+            <input id="global-input-note" placeholder="Notiz" style="margin:5px 0 5px 0;">
+            <button onclick="addVocabGlobal()" style="margin:0; padding:8px;">Hinzufügen</button>
+        </div>
+
         <button class="select-mode-btn" id="btn-select-mode" onclick="toggleSelectMode()" style="margin-bottom:15px;">Auswahl-Modus starten</button>
 
         <div id="vocab-list-container"></div>
@@ -501,7 +516,6 @@
 
     <script>
         // --- DATA STRUCTURE V6 (Units) ---
-        // projects: [ { name: "Türkisch", units: [ { name: "Tiere", words: [] } ] } ]
         let appData = { activeProjectId: 0, lastPracticeDate: "", streak: 0, projects: [] };
         
         let trainingQueue = []; 
@@ -513,7 +527,6 @@
         let isSelectMode = false; let selectedIndices = new Set(); 
         let direction = 0; 
         
-        // Tracks current Unit context. If null, we are in project overview.
         let activeUnitId = null;
 
         document.addEventListener('DOMContentLoaded', () => { loadData(); });
@@ -694,18 +707,31 @@
         function initDBFilters() {
             const p = appData.projects[appData.activeProjectId];
             const filter = document.getElementById('db-unit-filter');
+            const addSelector = document.getElementById('add-word-unit-select');
             
             filter.innerHTML = '<option value="all">Alle Units anzeigen</option>';
+            addSelector.innerHTML = '';
             
             p.units.forEach((u, i) => {
-                // If we came from a specific unit, pre-select it
+                // Pre-select if specific unit active
                 const selected = (activeUnitId !== null && activeUnitId === i) ? 'selected' : '';
                 filter.innerHTML += `<option value="${i}" ${selected}>${u.name}</option>`;
+                // Fill Add Dropdown
+                addSelector.innerHTML += `<option value="${i}">${u.name}</option>`;
             });
+
+            // Show/Hide Global Add Area based on context
+            const globalAdd = document.getElementById('global-add-area');
+            if (activeUnitId === null) {
+                // We are in Global Project DB
+                globalAdd.style.display = 'block';
+            } else {
+                // We are in specific Unit DB (Unit already has add screen)
+                globalAdd.style.display = 'none';
+            }
         }
         
         function goBackFromDB() {
-            // If we have an active unit, go back to that unit's dashboard
             if (activeUnitId !== null) {
                 switchTab('unit-details');
             } else {
@@ -714,7 +740,7 @@
         }
 
         function addVocab() {
-            // Add to the CURRENTLY active unit
+            // Context: Inside specific Unit
             if (activeUnitId === null) return alert("Fehler: Keine Unit ausgewählt.");
             
             const de = cleanDisplay(document.getElementById('input-de').value);
@@ -729,12 +755,28 @@
             save();
             document.getElementById('input-de').value=''; document.getElementById('input-lang').value=''; document.getElementById('input-note').value='';
             
-            // Refresh stats
             renderUnitDetails();
             alert("Gespeichert!");
         }
 
-        // Collects all cards based on filter for DB view
+        function addVocabGlobal() {
+            // Context: Global Project DB
+            const unitIdx = document.getElementById('add-word-unit-select').value;
+            const de = cleanDisplay(document.getElementById('global-input-de').value);
+            const lang = cleanDisplay(document.getElementById('global-input-lang').value);
+            const note = cleanDisplay(document.getElementById('global-input-note').value);
+
+            if(!de || !lang) return alert("Bitte ausfüllen");
+
+            appData.projects[appData.activeProjectId].units[unitIdx].words.push({
+                type: 'word', de: de, lang: lang, note: note, active: true, priority: false, box: 0, lastWrong: false
+            });
+            save();
+            document.getElementById('global-input-de').value=''; document.getElementById('global-input-lang').value=''; document.getElementById('global-input-note').value='';
+            
+            renderList();
+        }
+
         function getDisplayList() {
             const p = appData.projects[appData.activeProjectId];
             const mode = document.getElementById('db-unit-filter').value;
@@ -805,7 +847,7 @@
         }
 
         // --- EDITING ---
-        let editTarget = null; // { uIdx, wIdx }
+        let editTarget = null; 
 
         function openEditModal(uIdx, wIdx) {
             editTarget = { uIdx, wIdx };
@@ -895,7 +937,6 @@
         }
 
         function quitTest() {
-            // Return to where we came from
             if (activeUnitId !== null) {
                 switchTab('unit-details');
             } else {
@@ -910,22 +951,19 @@
             document.getElementById('test-input').focus();
 
             cooldownQueue.forEach(i => i.wait--);
-            // Cleanup queue: remove wait<=0 AND check if card still exists
             const p = appData.projects[appData.activeProjectId];
             
             for (let i = cooldownQueue.length - 1; i >= 0; i--) {
                 const qItem = cooldownQueue[i];
-                // Check exist
                 const u = p.units[qItem.uIdx];
                 if (u && u.words[qItem.wIdx]) {
                     if (qItem.wait <= 0) cooldownQueue.splice(i, 1);
                 } else {
-                    cooldownQueue.splice(i, 1); // Deleted card
+                    cooldownQueue.splice(i, 1); 
                 }
             }
 
             const blockedIds = cooldownQueue.map(c => c.id);
-            // Re-verify trainingQueue (filter out deleted)
             trainingQueue = trainingQueue.filter(t => p.units[t.uIdx] && p.units[t.uIdx].words[t.wIdx]);
             
             let candidates = trainingQueue.filter(item => !blockedIds.includes(item.id));
@@ -935,7 +973,6 @@
                     cooldownQueue.sort((a,b) => a.wait - b.wait);
                     const forcedId = cooldownQueue[0].id;
                     candidates = trainingQueue.filter(item => item.id === forcedId);
-                    // If forced candidate doesn't exist anymore, recursion
                     if(candidates.length === 0) { cooldownQueue.shift(); return nextQuestion(); }
                     cooldownQueue.shift();
                 } else {
@@ -1093,9 +1130,7 @@
                     }
                 });
                 save(); 
-                // Refresh list depending on view
                 if(!document.getElementById('view-list-manager').classList.contains('hidden')) renderList();
-                
                 alert(count + " importiert in Unit: " + targetUnit.name);
                 input.value='';
             };
@@ -1104,7 +1139,7 @@
         
         // HELPER
         function toggleSelectMode() { isSelectMode = !isSelectMode; renderList(); }
-        function dissolveSequence() { /* Placeholder as Sequences are flattened in V6 simple mode */ }
+        function dissolveSequence() { /* Placeholder */ }
     </script>
 </body>
 </html>
