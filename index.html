@@ -115,6 +115,14 @@
         .unit-actions { display: flex; gap: 10px; align-items: center; }
         .btn-small-icon { width: 35px; height: 35px; padding: 0; margin: 0; display: flex; align-items: center; justify-content: center; font-size: 16px; border-radius: 6px; }
 
+        /* Training Edit Button */
+        .train-edit-btn {
+            background: transparent; border: 1px solid #333; color: #666;
+            width: 30px; height: 30px; padding: 0; border-radius: 50%;
+            font-size: 14px; margin-left: 10px; display: inline-flex; align-items: center; justify-content: center;
+        }
+        .train-edit-btn:hover { background: #222; color: white; }
+
         /* DASHBOARD STATS */
         .stats-row { display: flex; gap: 15px; margin-bottom: 25px; }
         .stat-card {
@@ -307,6 +315,7 @@
         <div style="margin-top:15px; border-top:1px solid #333; padding-top:15px;">
             <input type="text" id="new-unit-name" placeholder="Neue Unit (z.B. Tiere)">
             <button class="outline" onclick="createNewUnit()">+ Unit erstellen</button>
+            <button class="secondary" style="margin-top:10px;" onclick="openProjectImportModal()">📥 Projekt als Unit importieren</button>
         </div>
 
         <div class="dashboard-actions" style="margin-top:30px;">
@@ -364,6 +373,8 @@
             <label class="file-upload" style="font-size:10px;">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv, text/csv, text/plain" onchange="importCSV(this)"></label>
         </div>
         
+        <button class="secondary" id="btn-show-duplicates" onclick="toggleDuplicateFilter()" style="margin-bottom:10px;">⚠️ Duplikate finden</button>
+
         <div id="global-add-area" style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px; border:1px solid #333; display:none;">
             <div style="font-size:0.7rem; color:#888; margin-bottom:5px;">NEUES WORT HINZUFÜGEN</div>
             <select id="add-word-unit-select" style="margin-bottom:5px; padding:8px; font-size:12px; width:100%; box-sizing:border-box;"></select>
@@ -497,6 +508,17 @@
         </div>
     </div>
 
+    <div id="import-project-modal" class="modal-overlay hidden">
+        <div class="modal-content fade-in">
+            <h3>Projekt importieren</h3>
+            <p style="color:#aaa; font-size:0.9rem;">Wähle ein anderes Projekt. Es wird als neue Unit in dein aktuelles Projekt kopiert.</p>
+            
+            <div id="import-project-list" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
+            
+            <button class="secondary" onclick="closeImportProjectModal()">Abbrechen</button>
+        </div>
+    </div>
+
     <div id="view-test" class="container hidden fade-in">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
             <button class="secondary" onclick="quitTest()" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Beenden</button>
@@ -549,6 +571,7 @@
         let direction = 0; 
         
         let activeUnitId = null;
+        let isDuplicateFilterActive = false; // Toggle state for DB
 
         document.addEventListener('DOMContentLoaded', () => { loadData(); });
 
@@ -659,18 +682,15 @@
 
         function openProject(i) {
             appData.activeProjectId = i;
-            activeUnitId = null; // Reset unit selection
+            activeUnitId = null; 
             switchTab('project-overview');
         }
 
         // --- PROJECT OVERVIEW (List of Units) ---
         function renderProjectOverview() {
             const p = appData.projects[appData.activeProjectId];
-            
-            // Set Project Title
             document.getElementById('overview-project-name').innerText = p.name;
             
-            // UPDATE TOTAL COUNT STAT
             let total = 0; if(p.units) p.units.forEach(u => total += u.words.length);
             document.getElementById('project-total-count').innerText = total;
 
@@ -678,7 +698,6 @@
             
             p.units.forEach((u, idx) => {
                 const div = document.createElement('div'); div.className = 'unit-card';
-                // Click on card -> Go INTO unit
                 div.onclick = () => openUnit(idx);
                 div.innerHTML = `
                     <div class="unit-info">
@@ -707,7 +726,55 @@
             }
         }
 
-        // --- UNIT DETAILS (Inside a Unit) ---
+        // --- IMPORT PROJECT AS UNIT ---
+        function openProjectImportModal() {
+            const list = document.getElementById('import-project-list');
+            list.innerHTML = '';
+            
+            // Show all projects EXCEPT current
+            appData.projects.forEach((p, idx) => {
+                if (idx !== appData.activeProjectId) {
+                    const btn = document.createElement('button');
+                    btn.className = "secondary";
+                    btn.style.marginBottom = "8px";
+                    btn.innerText = `📂 ${p.name}`;
+                    btn.onclick = () => performProjectImport(idx);
+                    list.appendChild(btn);
+                }
+            });
+            
+            if(list.innerHTML === '') list.innerHTML = "<p style='color:#666'>Keine anderen Projekte vorhanden.</p>";
+            
+            document.getElementById('import-project-modal').classList.remove('hidden');
+        }
+
+        function closeImportProjectModal() {
+            document.getElementById('import-project-modal').classList.add('hidden');
+        }
+
+        function performProjectImport(sourceProjectIdx) {
+            const sourceP = appData.projects[sourceProjectIdx];
+            const targetP = appData.projects[appData.activeProjectId];
+            
+            // Create new unit with source project name
+            const newUnit = { name: sourceP.name, words: [] };
+            
+            // Flatten all words from source
+            sourceP.units.forEach(u => {
+                u.words.forEach(w => {
+                    // Deep copy word to avoid reference issues
+                    newUnit.words.push(JSON.parse(JSON.stringify(w)));
+                });
+            });
+            
+            targetP.units.push(newUnit);
+            save();
+            closeImportProjectModal();
+            renderProjectOverview();
+            alert(`Projekt "${sourceP.name}" wurde als Unit importiert!`);
+        }
+
+        // --- UNIT DETAILS ---
         function openUnit(idx) {
             activeUnitId = idx;
             switchTab('unit-details');
@@ -719,7 +786,6 @@
             
             document.getElementById('unit-title-display').innerText = u.name;
             
-            // Calculate Stats for THIS unit
             const list = u.words;
             document.getElementById('streak-count').innerText = appData.streak || 0;
             if(!list || list.length === 0) { 
@@ -740,22 +806,21 @@
             addSelector.innerHTML = '';
             
             p.units.forEach((u, i) => {
-                // Pre-select if specific unit active
                 const selected = (activeUnitId !== null && activeUnitId === i) ? 'selected' : '';
                 filter.innerHTML += `<option value="${i}" ${selected}>${u.name}</option>`;
-                // Fill Add Dropdown
                 addSelector.innerHTML += `<option value="${i}">${u.name}</option>`;
             });
 
-            // Show/Hide Global Add Area based on context
             const globalAdd = document.getElementById('global-add-area');
             if (activeUnitId === null) {
-                // We are in Global Project DB
                 globalAdd.style.display = 'block';
             } else {
-                // We are in specific Unit DB (Unit already has add screen)
                 globalAdd.style.display = 'none';
             }
+            
+            // Reset duplicate filter on entry
+            isDuplicateFilterActive = false;
+            updateDuplicateButton();
         }
         
         function goBackFromDB() {
@@ -767,7 +832,6 @@
         }
 
         function addVocab() {
-            // Context: Inside specific Unit
             if (activeUnitId === null) return alert("Fehler: Keine Unit ausgewählt.");
             
             const de = cleanDisplay(document.getElementById('input-de').value);
@@ -787,7 +851,6 @@
         }
 
         function addVocabGlobal() {
-            // Context: Global Project DB
             const unitIdx = document.getElementById('add-word-unit-select').value;
             const de = cleanDisplay(document.getElementById('global-input-de').value);
             const lang = cleanDisplay(document.getElementById('global-input-lang').value);
@@ -819,16 +882,48 @@
             return list;
         }
 
+        // TOGGLE DUPLICATE FILTER
+        function toggleDuplicateFilter() {
+            isDuplicateFilterActive = !isDuplicateFilterActive;
+            updateDuplicateButton();
+            renderList();
+        }
+
+        function updateDuplicateButton() {
+            const btn = document.getElementById('btn-show-duplicates');
+            if (isDuplicateFilterActive) {
+                btn.style.backgroundColor = "var(--accent-seq)";
+                btn.style.color = "white";
+                btn.innerText = "Alle anzeigen";
+            } else {
+                btn.style.backgroundColor = ""; // Reset to secondary style
+                btn.style.color = "var(--text-muted)";
+                btn.innerText = "⚠️ Duplikate finden";
+            }
+        }
+
         function renderList() {
-            const list = getDisplayList();
+            let list = getDisplayList();
             const container = document.getElementById('vocab-list-container');
             const search = document.getElementById('search-input').value.toLowerCase();
             const sort = document.getElementById('sort-select').value;
             
+            // 1. Filter Search
             let filtered = list.filter(item => {
                 return (item.de.toLowerCase().includes(search) || item.lang.toLowerCase().includes(search));
             });
 
+            // 2. Filter Duplicates (if active)
+            if (isDuplicateFilterActive) {
+                const counts = {};
+                filtered.forEach(item => {
+                    const key = cleanString(item.de);
+                    counts[key] = (counts[key] || 0) + 1;
+                });
+                filtered = filtered.filter(item => counts[cleanString(item.de)] > 1);
+            }
+
+            // 3. Sort
             if (sort === 'newest') filtered.reverse();
             else if (sort === 'box-asc') filtered.sort((a,b) => a.box - b.box);
             else if (sort === 'box-desc') filtered.sort((a,b) => b.box - a.box);
@@ -945,13 +1040,21 @@
             const p = appData.projects[appData.activeProjectId];
             trainingQueue = [];
             
+            // INTELLIGENT TRAINING: Prevent duplicates in session
+            const seenQuestions = new Set();
+
             p.units.forEach((u, uI) => {
                 if (unitIdx === null || unitIdx === uI) {
                     u.words.forEach((w, wI) => {
                         if (w.active) {
-                            trainingQueue.push({ 
-                                card: w, uIdx: uI, wIdx: wI, uName: u.name, id: `${uI}-${wI}`
-                            });
+                            // De-duplication logic for training
+                            const key = cleanString(w.de);
+                            if (!seenQuestions.has(key)) {
+                                trainingQueue.push({ 
+                                    card: w, uIdx: uI, wIdx: wI, uName: u.name, id: `${uI}-${wI}`
+                                });
+                                seenQuestions.add(key);
+                            }
                         }
                     });
                 }
@@ -1092,9 +1195,7 @@
             const totalCards = trainingQueue.length;
             const safeWaitCorrect = Math.max(0, Math.min(10, totalCards - 1));
             
-            // Remove wrong wait
             cooldownQueue = cooldownQueue.filter(c => c.id !== currentCardInfo.id);
-            // Add correct wait
             cooldownQueue.push({ id: currentCardInfo.id, wait: safeWaitCorrect, uIdx:currentCardInfo.uIdx, wIdx:currentCardInfo.wIdx });
             
             if(currentCardInfo.card.box < 5) currentCardInfo.card.box++; 
