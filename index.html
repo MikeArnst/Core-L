@@ -1,15 +1,217 @@
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#121212">
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js')
-        .then(registration => {
-          console.log('ServiceWorker registriert erfolgreich:', registration.scope);
-        })
-        .catch(error => {
-          console.log('ServiceWorker Registrierung fehlgeschlagen:', error);
-        });
-    });
-  }
-</script>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CORE-Learning</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app-header" onclick="showProjects()">
+<h1><span class="fat-spot">CORE-L</span>earning</h1>
+<div class="subtitle">Version 5.0 Final Polish</div>
+<div class="author-note">von Mike Arnst</div>
+</div>
+<div id="view-projects" class="container fade-in">
+<h3>Deine Projekte</h3>
+<div id="project-list-container"></div>
+<div style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+<input type="text" id="new-project-name" placeholder="Neues Projekt...">
+<button class="outline" onclick="createNewProject()">+ Projekt erstellen</button>
+</div>
+<div style="text-align:center; margin-top:20px;">
+<button class="secondary" style="width:auto; font-size:0.8rem; padding:8px 15px;" onclick="switchTab('guide')">ℹ️ Anleitung</button>
+</div>
+</div>
+<div id="view-project-overview" class="container hidden fade-in">
+<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+<button class="secondary" onclick="showProjects()" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Projekte</button>
+<div style="text-align:right;">
+<div id="overview-project-name" style="font-weight:bold; color:var(--text-main); font-size:1.1rem;">Projekt</div>
+</div>
+</div>
+<div class="stats-row">
+<div class="stat-card">
+<span class="stat-val" style="color:var(--fire-color)"><span id="global-streak-count">0</span> 🔥</span>
+<span class="stat-label">Streak</span>
+</div>
+<div class="stat-card">
+<span class="stat-val" style="color:var(--success-text)"><span id="global-mastery-percent">0</span>%</span>
+<span class="stat-label">Projekt-Fortschritt</span>
+</div>
+</div>
+<h3 style="color:#888; font-size:0.8rem; margin-bottom:10px;">UNITS (LEKTIONEN)</h3>
+<div id="unit-list-container"></div>
+<div style="margin-top:15px; border-top:1px solid #333; padding-top:15px;">
+<input type="text" id="new-unit-name" placeholder="Neue Unit (z.B. Tiere)">
+<button class="outline" onclick="createNewUnit()">+ Unit erstellen</button>
+<button class="secondary" style="margin-top:10px;" onclick="openProjectImportModal()">📥 Projekt als Unit importieren</button>
+</div>
+<div class="dashboard-actions">
+<div class="action-item" onclick="switchTab('listManager')">
+<div class="list-btn-circle">📜</div>
+<div class="action-label">Projekt-Datenbank</div>
+</div>
+<div class="action-item" onclick="startTest(null)">
+<div class="list-btn-circle" style="border-color:var(--accent-seq);">🚀</div>
+<div class="action-label" style="color:var(--accent-seq);">Projekt Training</div>
+</div>
+</div>
+</div>
+<div id="view-unit-details" class="container hidden fade-in">
+<button class="secondary" onclick="openProject(appData.activeProjectId)" style="width: auto; margin-bottom: 15px; padding: 8px 15px; font-size: 12px;">← Zurück zur Übersicht</button>
+<h3 id="unit-title-display">UNIT NAME</h3>
+<div class="stats-row">
+<div class="stat-card" style="width: 100%;">
+<span class="stat-val" style="color:var(--success-text)"><span id="unit-mastery-percent">0</span>%</span>
+<span class="stat-label">Unit-Fortschritt</span>
+</div>
+</div>
+<h3>Neues Wort hinzufügen</h3>
+<textarea id="input-de" rows="1" placeholder="🇩🇪 Deutsch"></textarea>
+<textarea id="input-lang" rows="1" placeholder="🌍 Fremdsprache"></textarea>
+<textarea id="input-note" rows="2" placeholder="💡 Notiz (Optional)"></textarea>
+<button onclick="addVocab()">Speichern</button>
+<div class="dashboard-actions">
+<div class="action-item" onclick="switchTab('listManager')"><div class="list-btn-circle">📜</div><div class="action-label">Unit-Datenbank</div></div>
+<div class="action-item" onclick="startActiveUnitTraining()"><div class="list-btn-circle">🎓</div><div class="action-label">Unit Training</div></div>
+</div>
+</div>
+<div id="view-list-manager" class="container hidden fade-in" style="padding-bottom: 30px;">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+<button class="secondary" onclick="goBackFromDB()" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Zurück</button>
+<span style="color:var(--text-muted); font-size:0.8rem;"><span id="list-count">0</span> Einträge</span>
+</div>
+<select id="db-unit-filter" onchange="renderList()" style="width:100%; margin-bottom:10px; background:#2a2a2a; border-color:#444;">
+<option value="all">Alle Units anzeigen</option>
+</select>
+<input type="text" id="search-input" placeholder="🔍 Suchen..." onkeyup="renderList()">
+<div class="top-management-bar">
+<select id="sort-select" onchange="renderList()">
+<option value="newest">🕒 Neueste</option>
+<option value="box-asc">🔥 Box 0-5</option>
+<option value="box-desc">🏆 Box 5-0</option>
+</select>
+<label class="file-upload" style="font-size:10px;">📂 Import<input type="file" id="csv-input" style="display: none;" accept=".csv, text/csv, text/plain" onchange="importCSV(this)"></label>
+</div>
+<button class="secondary" id="btn-show-duplicates" onclick="toggleDuplicateFilter()" style="margin-bottom:10px;">⚠️ Duplikate finden</button>
+<div id="global-add-area" style="background:#1a1a1a; padding:10px; border-radius:8px; margin-bottom:15px; border:1px solid #333; display:none;">
+<div style="font-size:0.7rem; color:#888; margin-bottom:5px;">NEUES WORT HINZUFÜGEN</div>
+<select id="add-word-unit-select" style="margin-bottom:5px; padding:8px; font-size:12px; width:100%; box-sizing:border-box;"></select>
+<div style="display:flex; gap:5px;">
+<input id="global-input-de" placeholder="Deutsch" style="margin:0;">
+<input id="global-input-lang" placeholder="Fremd" style="margin:0;">
+</div>
+<input id="global-input-note" placeholder="Notiz" style="margin:5px 0 5px 0;">
+<button onclick="addVocabGlobal()" style="margin:0; padding:8px;">Hinzufügen</button>
+</div>
+<button class="select-mode-btn" id="btn-select-mode" onclick="toggleSelectMode()" style="margin-bottom:15px;">Auswahl-Modus starten</button>
+<div id="vocab-list-container"></div>
+<div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
+<button class="outline" onclick="exportData()">⬇️ Backup (JSON)</button>
+<button class="outline" onclick="exportCSV()">📊 Export (Excel)</button>
+<button class="danger" style="margin-top:10px" onclick="clearCurrentProjectData()">Leeren</button>
+</div>
+</div>
+<div id="view-guide" class="container hidden fade-in">
+<button class="secondary" onclick="showProjects()" style="width: auto; margin-bottom: 20px;">← Zurück</button>
+<div class="guide-section">
+<div class="guide-title">🚀 Neue Struktur: Units</div>
+<div class="guide-text">
+Deine Vokabeln sind jetzt in <b>Units (Lektionen)</b> organisiert.
+<br>1. Wähle ein Projekt.
+<br>2. Klicke auf eine Unit, um Wörter hinzuzufügen.
+<br>3. Trainiere entweder alles ("Projekt Training") oder nur die Unit.
+</div>
+</div>
+</div>
+<div id="edit-modal" class="modal-overlay hidden">
+<div class="modal-content fade-in">
+<h3>Bearbeiten</h3>
+<div style="margin-bottom:15px;">
+<label style="font-size:0.75rem; color:#888;">Unit:</label>
+<select id="edit-unit-select" style="margin-bottom:0;"></select>
+</div>
+<div id="seq-title-edit-container" class="hidden" style="margin-bottom:15px;">
+<label style="font-size:0.7rem; color:var(--accent-seq);">Sequenz Titel</label>
+<input type="text" id="edit-seq-title">
+</div>
+<div id="edit-content-area"></div>
+<button id="btn-split-seq" class="split-btn hidden" onclick="dissolveSequence()">♻️ In Einzelkarten zerlegen</button>
+<hr style="border-color:#333; margin:15px 0;">
+<button onclick="saveEdit()">Speichern</button>
+<button class="secondary" onclick="closeEditModal()">Abbrechen</button>
+<button class="danger" style="margin-top:10px;" onclick="deleteCurrentCardFromEdit()">🗑️ Karte löschen</button>
+</div>
+</div>
+<div id="import-project-modal" class="modal-overlay hidden">
+<div class="modal-content fade-in">
+<h3>Projekt importieren</h3>
+<p style="color:#aaa; font-size:0.9rem;">Wähle ein anderes Projekt. Es wird als neue Unit in dein aktuelles Projekt kopiert.</p>
+<div id="import-project-list" style="max-height:300px; overflow-y:auto; margin:15px 0;"></div>
+<button class="secondary" onclick="closeImportProjectModal()">Abbrechen</button>
+</div>
+</div>
+<div id="project-edit-modal" class="modal-overlay hidden">
+<div class="modal-content fade-in">
+<h3>Projekt verwalten</h3>
+<input type="text" id="edit-project-name-input" placeholder="Projektname">
+<div style="display:flex; gap:10px; margin: 15px 0;">
+<button onclick="moveProject(-1)">▲ Hoch</button>
+<button onclick="moveProject(1)">▼ Runter</button>
+</div>
+<hr style="border-color:#333; margin:15px 0;">
+<button onclick="saveProjectName()">Speichern</button>
+<button class="danger" onclick="deleteProjectFromModal()">🗑️ Löschen</button>
+<button class="secondary" onclick="closeProjectEditModal()">Abbrechen</button>
+</div>
+</div>
+<div id="unit-edit-modal" class="modal-overlay hidden">
+<div class="modal-content fade-in">
+<h3>Unit verwalten</h3>
+<input type="text" id="edit-unit-name-modal-input" placeholder="Unit Name">
+<div style="display:flex; gap:10px; margin: 15px 0;">
+<button onclick="moveUnit(-1)">▲ Hoch</button>
+<button onclick="moveUnit(1)">▼ Runter</button>
+</div>
+<hr style="border-color:#333; margin:15px 0;">
+<button onclick="saveUnitNameFromModal()">Speichern</button>
+<button class="danger" onclick="deleteUnitFromModal()">🗑️ Löschen</button>
+<button class="secondary" onclick="closeUnitEditModal()">Abbrechen</button>
+</div>
+</div>
+<div id="view-test" class="container hidden fade-in">
+<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+<button class="secondary" onclick="quitTest()" style="width: auto; margin:0; padding: 8px 15px; font-size: 12px;">← Beenden</button>
+<div class="top-right-info">
+<span id="test-unit-name" style="color:var(--text-muted); font-size:0.8rem; font-style:italic;">Unit: Allgemein</span>
+<span id="box-display" class="box-info-tag">Box 0</span>
+</div>
+</div>
+<div class="persistent-header">
+<div style="display:flex; justify-content:center; align-items:center; gap: 10px; margin-bottom: 5px;">
+<div id="priority-indicator" style="font-size:0.7rem; color:var(--star-color); visibility:hidden; text-transform:uppercase; letter-spacing:1px;">⭐ Wichtig</div>
+</div>
+<div style="display:flex; justify-content:center; align-items:center;">
+<div id="question-display">...</div>
+</div>
+<div id="seq-progress" style="text-align:center; font-size:0.75rem; color:var(--accent-seq); margin-bottom:5px; display:none;">Teil 1/3</div>
+</div>
+<div id="input-area">
+<div style="text-align:left; color:var(--text-muted); font-size: 0.85rem; margin-bottom:5px;">Übersetze:</div>
+<input type="text" id="test-input" placeholder="Antwort..." autocomplete="off">
+<button onclick="checkAnswer()">Prüfen</button>
+<button class="secondary" onclick="editCurrentCard()">Karte bearbeiten</button>
+</div>
+<div id="result-area" class="hidden">
+<div id="feedback-message"></div>
+<div id="override-container"></div>
+<div id="notes-display" class="hint-box hidden"></div>
+<br>
+<button onclick="nextQuestion()">Weiter</button>
+<button class="secondary" onclick="editCurrentCard()" style="margin-top:8px;">Karte bearbeiten</button>
+</div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

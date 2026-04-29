@@ -1,7 +1,9 @@
-const CACHE_NAME = 'core-l-cache-v1';
+const CACHE_NAME = 'core-l-cache-v2';
 const urlsToCache = [
   '/Core-L/',
   '/Core-L/index.html',
+  '/Core-L/style.css',      // Neu hinzugefügt
+  '/Core-L/app.js',         // Neu hinzugefügt
   '/Core-L/manifest.json',
   '/Core-L/icon-512.png'
 ];
